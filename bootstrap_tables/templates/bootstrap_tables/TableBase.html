@@ -1,0 +1,215 @@
+{% extends 'bootstrap_tables/TableMeta.html' %}
+{% load static %}
+
+{% block  table_head_css_extend%}
+    <link rel="stylesheet" href="//rawgit.com/vitalets/x-editable/master/dist/bootstrap3-editable/css/bootstrap-editable.css">
+    {% block TableBase_head_css_extend  %}{% endblock TableBase_head_css_extend %}
+{% endblock table_head_css_extend %}
+
+{% block toolbar %}
+<div id="{% block table_toolbar_id %}toolbar{% endblock table_toolbar_id %}">
+    <div class="form-inline role=form">
+        <div class="form-group">
+            <button id="add" class="btn btn-primary" data-toggle="modal" data-target="#{{ table.form_id }}">
+                <i class="glyphicon glyphicon-plus"></i> {% block toolbar_add %}Add{% endblock toolbar_add %}
+            </button>
+        </div>
+        <div class="form-group">
+            <button id="remove" class="btn btn-danger" disabled>
+                <i class="glyphicon glyphicon-remove"></i> {% block toolbar_remove %}Delete{% endblock toolbar_remove %}
+            </button>
+        </div>
+        <div class="form-group">
+            <select class="form-control">
+                <option value="">Export Basic</option>
+                <option value="all">Export All</option>
+                <option value="selected">Export Selected</option>
+            </select>
+        </div>
+    </div>
+</div>
+{% endblock toolbar %}
+
+{% block table_thead_before %}<th data-checkbox="true"></th>{% endblock table_thead_before %}
+
+{% block table_tbody_before %}<td data-checkbox="true"></td>{% endblock table_tbody_before %}
+
+{% block table_foot_script %}
+<script>
+  require(["{% static 'requirejs/config.js' %}"], function (config) {
+    var $ = require('jquery');
+
+
+    var $table = $('#{{ table.table_id }}'),
+    $add=$('#add'),
+    $remove = $('#remove'),
+    selections = [],
+    pk_tablebase='{{ table.pk }}';
+{#    url_addRow='{{ table.url_addRow }}';#}
+{#    url_removeRow='{{ table.url_removeRow }}';#}
+{#    url_detail='{{ table.url_detail }}';#}
+
+
+    function initTable() {
+        $table.bootstrapTable({
+{#            height: getHeight(),#}
+
+        });
+
+        setTimeout(function () {
+            $table.bootstrapTable('resetView');
+        }, 200);
+
+        $table.on('check.bs.table uncheck.bs.table ' +
+                'check-all.bs.table uncheck-all.bs.table', function () {
+            $remove.prop('disabled', !$table.bootstrapTable('getSelections').length);
+            // save your data, here just save the current page
+            selections = getIdSelections();
+            // push or splice the selections if you want to save all data selections
+        });
+
+        $table.on('expand-row.bs.table', function (e, index, row, $detail) {
+                var data_dic={'pk':pk_tablebase,'ids':row[pk_tablebase]};
+
+                $detail.html('<div class="row">' +
+                                '<div class="col-md-2 col-md-offset-5">' +
+                                    '<i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>' +
+                                '</div>' +
+                             '</div>');
+                $detail.load(url_detail,data_dic)
+        });
+
+        $remove.click(function () {
+            var ids = getIdSelections();
+            $table.bootstrapTable('remove', {
+                field: pk_tablebase,
+                values: ids
+            });
+
+            $.get(url_removeRow,{'pk':pk_tablebase,'ids':ids});
+
+            $remove.prop('disabled', true);
+        });
+
+        EditHandler();
+
+        $('#toolbar').find('select').change(function () {
+            $table.bootstrapTable('destroy').bootstrapTable({
+                exportDataType: $(this).val()
+            });
+        });
+    }
+
+    function EditHandler() {
+        var edit_id='';
+        var edit_val='';
+        $table.on('editable-save.bs.table',function (editable, field, row, oldValue, $el) {
+            edit_id=$el.context.parentElement.id;
+            edit_val=$el.context.text;
+            $.post('{{ request.path }}editable/',{'edit_id':edit_id,'edit_val':row[field],'field':field},function () {
+
+            })
+        });
+
+        $table.on('editable-hidden.bs.table',function (field, row, $el, reason) {
+            edit_val=reason.context.text;
+            if (edit_id){
+
+            }
+
+            edit_id='';
+            edit_val='';
+        });
+    }
+
+    function getIdSelections() {
+        return $.map($table.bootstrapTable('getSelections'), function (row) {
+            return row[pk_tablebase]
+        });
+    }
+
+    {% block table_foot_script_extend %}{% endblock table_foot_script_extend %}
+    $(function () {
+        var scripts = [
+                '{% static 'bootstrap-table/dist/bootstrap-table.min.js' %}',
+                '{% static 'bootstrap-table/dist/extensions/export/bootstrap-table-export.min.js'%}',
+                'http://rawgit.com/hhurz/tableExport.jquery.plugin/master/tableExport.js',
+                '{% static 'bootstrap-table/dist/extensions/editable/bootstrap-table-editable.min.js' %}',
+                'http://rawgit.com/vitalets/x-editable/master/dist/bootstrap3-editable/js/bootstrap-editable.js',
+{#                '{% static 'bootstrap-table/dist/extensions/filter-control/bootstrap-table-filter-control.min.js' %}',#}
+                '{% static 'bootstrap-table/dist/extensions/flat-json/bootstrap-table-flat-json.min.js' %}',
+                '{% static 'bootstrap-table/dist/extensions/multiple-sort/bootstrap-table-multiple-sort.min.js' %}',
+                '{% static 'bootstrap-table/dist/extensions/export/bootstrap-table-export.min.js' %}',
+                'http://rawgit.com/hhurz/tableExport.jquery.plugin/master/tableExport.js'
+            ],
+            
+            eachSeries = function (arr, iterator, callback) {
+                callback = callback || function () {};
+                if (!arr.length) {
+                    return callback();
+                }
+                var completed = 0;
+                var iterate = function () {
+                    iterator(arr[completed], function (err) {
+                        if (err) {
+                            callback(err);
+                            callback = function () {};
+                        }
+                        else {
+                            completed += 1;
+                            if (completed >= arr.length) {
+                                callback(null);
+                            }
+                            else {
+                                iterate();
+                            }
+                        }
+                    });
+                };
+                iterate();
+            };
+        eachSeries(scripts, getScript, initTable);
+    });
+    function getScript(url, callback) {
+        var head = document.getElementsByTagName('head')[0];
+        var script = document.createElement('script');
+        script.src = url;
+        var done = false;
+        // Attach handlers for all browsers
+        script.onload = script.onreadystatechange = function() {
+            if (!done && (!this.readyState ||
+                    this.readyState == 'loaded' || this.readyState == 'complete')) {
+                done = true;
+                if (callback)
+                    callback();
+                // Handle memory leak in IE
+                script.onload = script.onreadystatechange = null;
+            }
+        };
+        head.appendChild(script);
+        // We handle everything using the script element injection
+        return undefined;
+    }
+  });
+</script>
+
+<style>
+
+    .detail{
+        display: table-cell;
+    }
+
+    .price{
+
+    }
+</style>
+{##}
+{#<script>#}
+{#$(document).ready(function () {#}
+{#    $.ajaxSetup({#}
+{#        data: {csrfmiddlewaretoken: '{{ csrf_token }}' }#}
+{#    })#}
+{# });#}
+{#</script>#}
+
+{% endblock table_foot_script %}

@@ -1,0 +1,74 @@
+{% extends 'bbu/base.html' %}
+{% load static %}
+
+{% block title %}LodgIQ - DiDash{% endblock title %}
+
+{% block body_attr %}background = "{% static 'bbu/login-bg.jpg' %}"{% endblock body_attr %}
+
+{% block head_css %}
+    <link href="{% static 'gentelella/vendors/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet">
+    <link href="{% static 'landing/css/landing_box.css' %}" rel="stylesheet">
+{% endblock head_css %}
+
+{% block content %}
+
+<div class="container">
+   <div class="row">
+    <div class="col-md-6 col-md-offset-3">
+      <div class="panel panel-login">
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-lg-12">
+              <form id="login-form" method="post" role="form" style="display: block;">
+                {% csrf_token %}
+                <h2 class="text-center"><img src="{% static 'bbu/lodgiq-logo.png' %}" /></h2>
+                  <div class="form-group">
+                    <input type="text" name="username" id="username" tabindex="1" class="form-control" placeholder="Username" value="">
+                  </div>
+                  <div class="form-group">
+                    <input type="password" name="password" id="password" tabindex="2" class="form-control" placeholder="Password">
+                  </div>
+                  <div class="col-xs-6 form-group pull-left checkbox">
+                    <input id="checkbox1" type="checkbox" name="remember">
+                    <label for="checkbox1">Remember Me</label>
+                  </div>
+                  <div class="col-xs-6 form-group pull-right">
+                        <input type="submit" name="login-submit" id="login-submit" tabindex="4" class="form-control btn btn-login" value="Log In">
+                  </div>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-xs-6 tabs">
+              <a href="/login/" class="active" id="login-form-link"><div class="login">LOGIN</div></a>
+            </div>
+            <div class="col-xs-6 tabs">
+              <a href="/signup/" id="register-form-link"><div class="register">REGISTER</div></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<footer>
+    <div class="container">
+        <div class="col-md-10 col-md-offset-1 text-center">
+            <h6 style="font-size:14px;font-weight:100;color: white;"></h6>
+        </div>
+    </div>
+</footer>
+
+
+{% endblock content %}
+
+{% block foot_js %}
+    <script type="text/javascript">
+        require(["{% static 'requirejs/config.js' %}"], function (config) {
+            require(['{% static 'landing/js/login.js' %}'],function(){
+            })
+        });
+    </script>
+{% endblock foot_js %}

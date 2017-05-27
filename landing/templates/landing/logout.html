@@ -1,0 +1,22 @@
+{% extends 'bbu/base.html' %}
+{% load static %}
+
+{% block title %}LodgIQ - DiDash{% endblock title %}
+
+{% block content %}
+
+    <button class="btn btn-button" id="try">tryit</button>
+
+
+
+{% endblock content %}
+
+{% block foot_js %}
+    <script type="text/javascript">
+        require(["{% static 'requirejs/config.js' %}"], function (config) {
+            require(["{% static 'osr/main.js' %}"],function(){
+              console.log($("#try").html())
+            })
+        });
+    </script>
+{% endblock foot_js %}

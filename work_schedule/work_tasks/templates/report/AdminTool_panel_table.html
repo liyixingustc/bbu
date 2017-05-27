@@ -1,0 +1,80 @@
+{% extends 'didash/panel.html' %}
+{% block panel_title %}Admin Tool{% endblock panel_title %}
+
+{% block panel_content %}
+    <div>
+      <form method="post" id="AdminTool-form" class="form-horizontal form-label-left">
+      {% csrf_token %}
+        <div class="form-group">
+          <label class="control-label col-md-3 col-sm-3 col-xs-12" for="ReportType">Report Type <span class="required">*</span>
+          </label>
+          <div class="col-md-6 col-sm-6 col-xs-12">
+            <select id="ReportType" name="ReportType" class="select2_single form-control col-md-7 col-xs-12" style="width:80% " required>
+              <option value="forecast_check">forecast_check</option>
+              <option value="actuals_check">actuals_check</option>
+              <option value="stay_check">stay_check</option>
+              <option value="daily_revenue">daily_revenue</option>
+              <option value="reservation_trace">reservation_trace</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="control-label col-md-3 col-sm-3 col-xs-12" for="PropertyId">Property Id <span class="required">*</span>
+          </label>
+          <div class="col-md-6 col-sm-6 col-xs-12" disabled="disabled">
+            <select id="PropertyId" name="PropertyId" class="select2_single form-control col-md-7 col-xs-12" style="width:80% " required>
+              {% for property_id in property_list %}
+              <option value="{{ property_id }}">{{ property_id }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div class="form-group  forecast_check actuals_check stay_check">
+          <label class="control-label col-md-3 col-sm-3 col-xs-12" for="AsOfDate">As of Date <span class="required">*</span>
+          </label>
+          <div class="col-md-6 col-sm-6 col-xs-12">
+            <input type="text" id="AsOfDate" name="AsOfDate" class="form-control col-md-7 col-xs-12 datepicker" placeholder="YYYY-MM-DD" data-inputmask="'mask': '99/99/9999'" style="width:80% " required>
+          </div>
+        </div>
+        <div class="form-group  forecast_check actuals_check stay_check">
+          <label class="control-label col-md-3 col-sm-3 col-xs-12" for="Partner">Partner
+          </label>
+          <div class="col-md-6 col-sm-6 col-xs-12">
+            <select id="Partner" name="Partner" class="select2_single form-control col-md-7 col-xs-12" style="width:80% ">
+              <option></option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group daily_revenue" hidden>
+          <label class="control-label col-md-3 col-sm-3 col-xs-12" for="StayDate">Stay Date <span class="required">*</span>
+          </label>
+          <div class="col-md-6 col-sm-6 col-xs-12">
+            <input type="text" id="StayDate" name="StayDate" class="form-control col-md-7 col-xs-12 datepicker" placeholder="YYYY-MM-DD" data-inputmask="'mask': '99/99/9999'" style="width:80% " required>
+          </div>
+        </div>
+        <div class="form-group daily_revenue" hidden>
+          <label class="control-label col-md-3 col-sm-3 col-xs-12" for="MarketCode">Market Code
+          </label>
+          <div class="col-md-6 col-sm-6 col-xs-12">
+            <input type="text" id="MarketCode" name="MarketCode" class="form-control col-md-7 col-xs-12" placeholder="Multi market codes delimited by semicolon, eg: TNOP;CAIR" style="width:80% ">
+          </div>
+        </div>
+        <div class="form-group reservation_trace" hidden>
+          <label class="control-label col-md-3 col-sm-3 col-xs-12" for="EntityId">Entity Id <span class="required">*</span>
+          </label>
+          <div class="col-md-6 col-sm-6 col-xs-12">
+            <input type="text" id="EntityId" name="EntityId" class="form-control col-md-7 col-xs-12" placeholder="Please give a number" style="width:80% " required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="control-label col-md-3 col-sm-3 col-xs-12"></label>
+          <div class="col-md-6 col-sm-6 col-xs-12">
+            <button type="submit" class="btn btn-primary " id="AdminToolTableRefresh">Refresh</button>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="clearfix"></div>
+    <br/>
+    <div id="tables_data"></div>
+{% endblock panel_content %}

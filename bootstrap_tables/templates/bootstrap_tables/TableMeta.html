@@ -1,0 +1,62 @@
+{% load static %}
+
+{% block table_head_css %}
+    <link rel="stylesheet" href="{% static 'bootstrap-table/dist/bootstrap-table.min.css' %}">
+    {% block table_head_css_extend %}{% endblock table_head_css_extend %}
+{% endblock table_head_css %}
+
+{% block table_head_js %}
+    {% block table_params %}{% endblock table_params %}
+    {% block table_head_js_extend %}{% endblock table_head_js_extend %}
+{% endblock table_head_js %}
+
+{% block table_container %}
+<div class="table-container">
+    {% block toolbar %}
+    {% endblock toolbar %}
+
+    {% block table %}
+        <table {{ table.attrs.table| safe }}>
+            {% block table.thead %}
+                <thead>
+                    <tr>
+                        {% block table_thead_before %}{% endblock table_thead_before %}
+                        {% for row in table.auto.th %}
+                            {% for column, th_attrs in row%}
+                                <th data-valign="middle"
+                                    data-align="center"
+                                    {{ th_attrs|safe }}>{{ column }}</th>
+                            {% endfor %}
+                        {% empty %}
+                            <th>{{ table.empty_text }}</th>
+                        {% endfor %}
+                        {% block table_thead_after %}{% endblock table_thead_after %}
+                    </tr>
+                </thead>
+            {% endblock table.thead %}
+            {% block table.tbody %}
+                <tbody>
+                    {% for row in table.auto.td %}
+                    <tr>
+                        {% block table_tbody_before %}{% endblock table_tbody_before %}
+                        {% for data,td_attrs in row %}
+                                <td {{ td_attrs|safe }}{{ table.attrs.td|safe}}>{{ data }}</td>
+                        {% empty %}
+                            <td>{{ table.empty_text }}</td>
+                        {% endfor %}
+                        {% block table_tbody_after %}{% endblock table_tbody_after %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            {% endblock table.tbody %}
+            {% block table.tfoot %}
+                <tfoot>
+                </tfoot>
+            {% endblock table.tfoot %}
+        </table>
+    {% endblock %}
+</div>
+{% endblock table_container %}
+
+{% block table_foot_script %}
+{% endblock table_foot_script %}

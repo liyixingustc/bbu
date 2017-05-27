@@ -1,0 +1,17 @@
+{% extends 'didash/dashboard_base.html' %}
+{% load static %}
+
+{% block content_dashboard %}
+
+{% include 'report/AdminTool_panel_table.html'%}
+
+{% endblock content_dashboard %}
+
+{% block foot_js_dashboard %}
+    <script type="text/javascript">
+      require(["{% static 'requirejs/config.js' %}"], function (config) {
+        require(["{% static 'report/js/AdminTool.js' %}"],function(){
+        })
+      });
+    </script>
+{% endblock foot_js_dashboard %}
