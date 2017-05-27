@@ -19,7 +19,7 @@ class WorkerScheduled(models.Model):
     date = models.DateField()
     duration = models.DurationField()
     time = models.CharField(max_length=100)
-    task = models.ManyToManyField(Tasks)
+    task = models.ManyToManyField(Tasks, through='WorkerScheduledTask')
 
 
 class WorkerActual(models.Model):
@@ -28,11 +28,23 @@ class WorkerActual(models.Model):
     date = models.DateField()
     duration = models.DurationField()
     time = models.CharField(max_length=100)
-    task = models.ManyToManyField(Tasks)
+    task = models.ManyToManyField(Tasks, through='WorkerActualTask')
 
 
-# class WorkerRecords(models.Model):
-#     name = models.OneToOneField(workers, db_column='name')
+class WorkerScheduledTask(models.Model):
+
+    workerscheduled_id = models.ForeignKey(WorkerScheduled, db_column='workerscheduled_id')
+    task_id = models.ForeignKey(Tasks, db_column='task_id')
+    created_on = models.DateTimeField(auto_now_add=True)
+
+
+class WorkerActualTask(models.Model):
+
+    workeractual_id = models.ForeignKey(WorkerActual, db_column='workeractual_id')
+    task_id = models.ForeignKey(Tasks, db_column='task_id')
+    created_on = models.DateTimeField(auto_now_add=True)
+
+
 
 
 
