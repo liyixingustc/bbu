@@ -43,9 +43,9 @@ INSTALLED_APPS += [
     'bbu',
     'accounts',
     'landing',
-    'work_schedule.work_config',
-    'work_schedule.work_tasks',
-    'work_schedule.work_workers',
+    'WorkSchedule.WorkConfig',
+    'WorkSchedule.WorkTasks',
+    'WorkSchedule.WorkWorkers',
 ]
 
 MIDDLEWARE = [

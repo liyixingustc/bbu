@@ -21,3 +21,10 @@ urlpatterns = [
     url(r'^', include('landing.urls')),
 
 ]
+
+
+urlpatterns += [
+    url(r'^WorkSchedule/WorkConfig/', include('WorkSchedule.WorkConfig.urls')),
+    url(r'^WorkSchedule/WorkTasks/', include('WorkSchedule.WorkTasks.urls')),
+    url(r'^WorkSchedule/WorkWorkers/', include('WorkSchedule.WorkWorkers.urls')),
+]

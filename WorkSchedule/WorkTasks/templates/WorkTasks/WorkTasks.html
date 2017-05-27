@@ -1,0 +1,17 @@
+{% extends 'bbu/dashboard_base.html' %}
+{% load static %}
+
+{% block content_dashboard %}
+
+{% include 'WorkTasks/WorkTasks_Panel1.html' %}
+
+{% endblock content_dashboard %}
+
+{% block foot_js_dashboard %}
+    <script type="text/javascript">
+      require(["{% static 'requirejs/config.js' %}"], function (config) {
+        require(["{% static 'WorkTasks/js/WorkTasks.js' %}"],function(){
+        })
+      });
+    </script>
+{% endblock foot_js_dashboard %}
