@@ -7,7 +7,7 @@ from ...WorkTasks.models.models import *
 
 class WorkerAvailable(models.Model):
 
-    name = models.ForeignKey(workers, db_column='name', to_field='name')
+    name = models.ForeignKey(Workers, db_column='name', to_field='name')
     date = models.DateField()
     duration = models.DurationField()
     time = models.CharField(max_length=100)
@@ -15,7 +15,7 @@ class WorkerAvailable(models.Model):
 
 class WorkerScheduled(models.Model):
 
-    name = models.ForeignKey(workers, db_column='name', to_field='name')
+    name = models.ForeignKey(Workers, db_column='name', to_field='name')
     date = models.DateField()
     duration = models.DurationField()
     time = models.CharField(max_length=100)
@@ -24,7 +24,7 @@ class WorkerScheduled(models.Model):
 
 class WorkerActual(models.Model):
 
-    name = models.ForeignKey(workers, db_column='name', to_field='name')
+    name = models.ForeignKey(Workers, db_column='name', to_field='name')
     date = models.DateField()
     duration = models.DurationField()
     time = models.CharField(max_length=100)
