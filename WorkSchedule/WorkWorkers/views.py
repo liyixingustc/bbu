@@ -28,6 +28,8 @@ class Page:
             if 'Table' in widget:
                 if func == 'Create':
                     return cls.Panel.Table.create(request, *args, **kwargs)
+                if func == 'Edit':
+                    return cls.Panel.Table.edit(request, *args, **kwargs)
         elif panel:
             pass
         elif page:
@@ -84,6 +86,7 @@ class Page:
                                 data = WorkWorkersPanel1Table1Manager.set_data(period_start, period_end)
                                 table = WorkWorkersPanel1Table1(data)
                                 return render(request, tables_template_name, {'table': table})
+
                         elif widget == 'Table2':
                             if func == 'Create':
                                 parameters = {}
@@ -96,5 +99,27 @@ class Page:
                                 data = WorkWorkersPanel1Table2Manager.set_data(parameters)
                                 table = WorkWorkersPanel1Table2(data)
                                 return render(request, tables_template_name, {'table': table})
+
+                return JsonResponse({})
+
+            @staticmethod
+            def edit(request, *args, **kwargs):
+
+                page = kwargs['page']
+                panel = kwargs['panel']
+                widget = kwargs['widget']
+                func = kwargs['func']
+
+                if page == 'WorkWorkers':
+                    if panel == 'Panel1':
+                        if widget == 'Table1':
+                            if func == 'Edit':
+                                parameters = {}
+                                parameters['name'] = request.POST.get('name')
+                                parameters['duration'] = request.POST.get('duration')
+                                parameters['date'] = request.POST.get('date')
+
+                                WorkWorkersPanel1Table1Manager.edit(parameters)
+                                return JsonResponse({})
 
                 return JsonResponse({})

@@ -33,7 +33,8 @@ class WorkWorkersPanel1Table1(Table):
                  'td': '',
                  }
 
-        url = {'detail':'Panel1/Table2/Create/'}
+        url = {'detail': 'Panel1/Table2/Create/',
+               'edit': 'Panel1/Table1/Edit/'}
 
 
 class WorkWorkersPanel1Table2(Table):

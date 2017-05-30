@@ -43,6 +43,17 @@ define(function (require) {
                          '</div>');
             $detail.load(WorkWorkers_Panel1_Table1_url_detail,data)
         });
+
+        //editable events
+        $table_id.on('editable-save.bs.table',function (editable, field, row, oldValue, $el) {
+
+            $.post(WorkWorkers_Panel1_Table1_url_edit,{'name':row['name'],'duration':row[field],'date':field},function () {
+
+            })
+        });
+        $table_id.on('editable-hidden.bs.table',function (field, row, $el, reason) {
+
+        });
     }
 
     return run

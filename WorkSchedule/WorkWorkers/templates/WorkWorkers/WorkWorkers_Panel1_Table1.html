@@ -96,7 +96,9 @@
 <script type="text/javascript">
   var WorkWorkers_Panel1_Table1_container_id = "{{ table.container_id }}",
       WorkWorkers_Panel1_Table1_id = "{{ table.table_id }}",
-      WorkWorkers_Panel1_Table1_url_detail = "{{ table.url.detail }}";
+      WorkWorkers_Panel1_Table1_url_detail = "{{ table.url.detail }}",
+      WorkWorkers_Panel1_Table1_url_edit = "{{ table.url.edit }}";
+
   require(["{% static 'requirejs/config.js' %}"], function (config) {
     require(["{% static 'WorkWorkers/js/WorkWorkers_Panel1_Table1.js' %}"],function(run){
         run()

@@ -44,6 +44,18 @@ class WorkWorkersPanel1Table1Manager:
         return data
 
     @classmethod
+    def edit(cls, parameters):
+
+        date = dt.strptime(parameters['date'].split('<br>')[0],'%Y-%m-%d').date()
+        duration = timedelta(hours=float(parameters['duration']))
+
+        name = Workers.objects.get(name= parameters['name'])
+        WorkerAvailable.objects.update_or_create(name=name,date=date,
+                                                 defaults={'duration':duration})
+
+        return
+
+    @classmethod
     def df_week_view(cls, data, name='name', date='date', duration='duration'):
 
         data[date] = (data[date].apply(lambda x: '{date}<br/>{week}'.format(date=str(x),week=x.strftime('%a'))))
