@@ -55,7 +55,7 @@ class Page:
                 widget = kwargs['widget']
                 func = kwargs['func']
 
-                if page == 'WorkConfig':
+                if page == 'WorkWorkers':
                     if panel == 'Panel1':
                         if widget == 'Form1':
                             if func == 'Submit':
@@ -77,13 +77,24 @@ class Page:
                     if panel == 'Panel1':
                         if widget == 'Table1':
                             if func == 'Create':
-                                period_start = request.POST.get('PeriodStart')
-                                period_end = request.POST.get('PeriodEnd')
+                                period_start = request.GET.get('PeriodStart')
+                                period_end = request.GET.get('PeriodEnd')
 
                                 tables_template_name = 'WorkWorkers/WorkWorkers_Panel1_Table1.html'
-                                data = WorkerTableManager.set_data(period_start, period_end)
-                                table = WorkerTable(data)
+                                data = WorkWorkersPanel1Table1Manager.set_data(period_start, period_end)
+                                table = WorkWorkersPanel1Table1(data)
+                                return render(request, tables_template_name, {'table': table})
+                        elif widget == 'Table2':
+                            if func == 'Create':
+                                parameters = {}
+                                parameters['period_start'] = request.POST.get('start')
+                                parameters['period_end'] = request.POST.get('end')
+                                parameters['name'] = request.POST.get('row[name]')
+                                parameters['date'] = request.POST.get('row[date]')
 
+                                tables_template_name = 'WorkWorkers/WorkWorkers_Panel1_Table2.html'
+                                data = WorkWorkersPanel1Table2Manager.set_data(parameters)
+                                table = WorkWorkersPanel1Table2(data)
                                 return render(request, tables_template_name, {'table': table})
 
-                return JsonResponse({'a': 1})
+                return JsonResponse({})

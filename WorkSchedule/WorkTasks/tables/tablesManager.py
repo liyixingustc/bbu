@@ -4,84 +4,112 @@ from datetime import datetime as dt,timedelta
 import pytz
 from django.shortcuts import HttpResponse
 
-class AdminToolTableManager:
+from ..models.models import *
+from ...WorkConfig.models import *
+from ...WorkWorkers.models.models import *
+
+
+class WorkTasksPanel1Table1Manager:
 
     now = dt.now(tz=pytz.timezone('America/New_York'))
 
     @classmethod
-    def SetData(cls,type,partner=None,property_id=None,as_of_date=dt(2017,4,17),StayDate=None,MarketCode=None,EntityId=None):
-        from .DataVerification import DataVerification
-        from processing.Requests import DataVerificationRequest
-        from managers.ConfigurationManager import ConfigurationManager
-        ConfigurationManager.initialize(
-            "{0}/configuration/integration".format(os.path.dirname
-                                                   (os.path.dirname
-                                                    (os.path.dirname
-                                                     (os.path.dirname
-                                                      (os.path.dirname
-                                                       (os.path.abspath(__file__))))))))
+    def set_data(cls, period_start, period_end):
 
-        request = DataVerificationRequest()
+        period_start = dt.strptime(period_start, '%Y-%m-%d')
+        period_end = dt.strptime(period_end, '%Y-%m-%d')
+        period = pd.date_range(period_start, period_end)
 
-        if StayDate:
-            StayDate = dt.strptime(StayDate,'%Y-%m-%d')
-        else:
-            StayDate = cls.now
+        tasks = Tasks.objects.filter(period_start__exact=period_start,
+                                     period_end__exact=period_end).values('line',
+                                                                          'working_order',
+                                                                          'schedule_hour',
+                                                                          'estimate_hour',
+                                                                          'description',
+                                                                          'working_type',
+                                                                          'priority',
+                                                                          'days_old',
+                                                                          'actual_hour')
 
-        output_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),'output/output.csv')
-        request.file_path = output_path
-        request.verification_type = type
-        request.partner_code = partner
-        request.property_id = property_id
-        request.as_of_date = as_of_date
-        request.stay_date = StayDate
-        request.market_code = MarketCode
-        request.entity_id = EntityId
-        processor = DataVerification()
-        result = processor.process(request)
+        tasks = pd.DataFrame.from_records(tasks, columns=['line',
+                                                          'working_order',
+                                                          'schedule_hour',
+                                                          'estimate_hour',
+                                                          'description',
+                                                          'working_type',
+                                                          'priority',
+                                                          'days_old',
+                                                          'actual_hour'])
 
-        stream = open(output_path, 'w')
-        try:
-            stream.write(result.data)
-        finally:
-            stream.close()
+        tasks['schedule_hour'] = tasks['schedule_hour'].apply(lambda x: x.total_seconds()/3600)
+        tasks['estimate_hour'] = tasks['estimate_hour'].apply(lambda x: x.total_seconds()/3600)
+        tasks['actual_hour'] = tasks['actual_hour'].apply(lambda x: x.total_seconds()/3600)
+        tasks['days_old'] = tasks['days_old'].apply(lambda x: x.total_seconds()/(3600*24))
 
-        if type != 'reservation_trace':
-            data = pd.read_csv(output_path)
-            data.sort_values('Stay Date',inplace=True)
-        else:
-            return
+        data = tasks
 
         return data
 
-class IngestorCheckManager:
+
+class WorkTasksPanel1Table2aManager:
 
     now = dt.now(tz=pytz.timezone('America/New_York'))
-    start = str(now.date()- timedelta(days=1))
-    end = str(now.date()+ timedelta(days=1))
 
     @classmethod
-    def UpdateData(cls):
+    def set_data(cls, parameters):
 
-        from scripts.data_repair.Queues_add_fields.Queues_add_fields import Queues_add_fields
-        try:
-            Queues_add_fields(bound_type='inbound', StartDate=cls.start, EndDate=cls.end).execute()
-            return {'status':1}
-        except Exception as e:
-            return {'status':0}
+        period_start = dt.strptime(parameters['period_start'], '%Y-%m-%d')
+        period_end = dt.strptime(parameters['period_end'], '%Y-%m-%d')
+
+        workerscheduled = WorkerScheduledTask.objects.filter(task_id__period_start__exact=period_start,
+                                                             task_id__period_end__exact=period_end,
+                                                             task_id__working_order__exact=parameters['working_order'])\
+                                                                .values('workerscheduled_id__name',
+                                                                        'workerscheduled_id__date',
+                                                                        'workerscheduled_id__duration'
+                                                                        )
+
+        workerscheduled = pd.DataFrame.from_records(workerscheduled, columns=['workerscheduled_id__name',
+                                                                              'workerscheduled_id__date',
+                                                                              'workerscheduled_id__duration'
+                                                                              ])
+
+        workerscheduled.rename_axis({'workerscheduled_id__name': 'name',
+                                     'workerscheduled_id__date': 'date',
+                                     'workerscheduled_id__duration': 'scheduled'}, axis=1, inplace=True)
+
+        workerscheduled['date'] = workerscheduled['date'].apply(lambda x: str(x))
+        workerscheduled['scheduled'] = workerscheduled['scheduled'].apply(lambda x: x.total_seconds()/3600)
+
+        data = workerscheduled
+
+        return data
+
+
+class WorkTasksPanel1Table2bManager:
+
+    now = dt.now(tz=pytz.timezone('America/New_York'))
 
     @classmethod
-    def SetData(cls,StartDate = None,EndDate = None):
-        from scripts.data_analysis.Queues_analysis.Queues_analysis import queues_analysis
-        if StartDate:
-            start = StartDate
-        else:
-            start = cls.start
+    def set_data(cls, parameters):
 
-        if EndDate:
-            end = EndDate
-        else:
-            end = cls.end
+        period_start = dt.strptime(parameters['period_start'], '%Y-%m-%d')
+        period_end = dt.strptime(parameters['period_end'], '%Y-%m-%d')
 
-        results = queues_analysis(StartDate=start,EndDate=end).ResultsGroupByFull()
-        return results
+        workers_available = WorkerAvailable.objects.filter(date__range=[period_start, period_end]).values('name__name',
+                                                                                                          'date',
+                                                                                                          'duration')
+        print(workers_available)
+        workers_available = pd.DataFrame.from_records(workers_available, columns=['name__name',
+                                                                                  'date',
+                                                                                  'duration'
+                                                                                  ])
+
+        workers_available.rename_axis({'name__name': 'name',
+                                       'duration': 'available'}, axis=1, inplace=True)
+        workers_available['date'] = workers_available['date'].apply(lambda x: str(x))
+        workers_available['available'] = workers_available['available'].apply(lambda x: x.total_seconds()/3600)
+
+        data = workers_available
+
+        return data

@@ -9,13 +9,15 @@ import pandas as pd
 class TableMetaClass(type):
 
     def __new__(cls, name, bases, attrs):
-        attrs['_meta'] = opts = TableOptions(attrs.get('Meta', None))
-
+        attrs['_meta'] = opts = TableOptions(name,attrs.get('Meta', None))
         return super(TableMetaClass, cls).__new__(cls, name, bases, attrs)
 
 class TableOptions(object):
-    def __init__(self, options=None):
+    def __init__(self, cls_name, options=None):
         super(TableOptions, self).__init__()
+        self.container_id = getattr(options, 'container_id', cls_name+'Container')
+        self.table_id = getattr(options, 'table_id', cls_name)
+        self.url = getattr(options, 'url', '')
         self.attrs = getattr(options, 'attrs', {})
         self.row_attrs = getattr(options, 'row_attrs', {})
         self.pinned_row_attrs = getattr(options, 'pinned_row_attrs', {})
@@ -51,14 +53,14 @@ class TableOptions(object):
         self.formattable = getattr(options, 'formattable', [])
 
 
-class Table(object):
+class Table(metaclass=TableMetaClass):
 
-    __metaclass__ = TableMetaClass
-
-    def __init__(self,data):
-
+    def __init__(self, data, container_id=None, table_id=None):
         super(Table, self).__init__()
         self.data = data
+        self.container_id = self._meta.container_id
+        self.table_id = self._meta.table_id
+        self.url = self._meta.url
         self.attrs = self._meta.attrs
         self.sequence = self._meta.sequence
         self.orderable = self._meta.orderable
@@ -172,7 +174,7 @@ class Table(object):
         td_attrs = pd.DataFrame(columns=self.columns, index=self.index).fillna('')
         for j in range(td_attrs.shape[1]):
             for i in range(td_attrs.shape[0]):
-                td_attrs.iat[i, j] += ' id="' + '-'.join(
+                td_attrs.iat[i, j] += ' id="' + '|'.join(
                     [self.db,self.app, self.model,self.pk, str(td_attrs.index[i]), str(td_attrs.columns[j])])+'"'
         # print(time.clock()-t0)
         return td_attrs.values

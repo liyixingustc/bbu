@@ -8,27 +8,6 @@
 {% block table_container %}
 <div class="table-container" id = "{{table.container_id}}" hidden>
     {% block toolbar %}
-        <div id="{% block table_toolbar_id %}toolbar{% endblock table_toolbar_id %}">
-            <div class="form-inline role=form">
-                <div class="form-group">
-                    <button id="add" class="btn btn-primary" data-toggle="modal" data-target="#{{ table.form_id }}">
-                        <i class="glyphicon glyphicon-plus"></i> {% block toolbar_add %}Add{% endblock toolbar_add %}
-                    </button>
-                </div>
-                <div class="form-group">
-                    <button id="remove" class="btn btn-danger" disabled>
-                        <i class="glyphicon glyphicon-remove"></i> {% block toolbar_remove %}Delete{% endblock toolbar_remove %}
-                    </button>
-                </div>
-                <div class="form-group">
-                    <select class="form-control">
-                        <option value="">Export Basic</option>
-                        <option value="all">Export All</option>
-                        <option value="selected">Export Selected</option>
-                    </select>
-                </div>
-            </div>
-        </div>
     {% endblock toolbar %}
 
     {% block table %}
@@ -85,11 +64,10 @@
 </style>
 
 <script type="text/javascript">
-  var table_container_id = "{{ table.container_id }}",
-      table_id = "{{ table.table_id }}";
-      url_detail = "{{ table.url.detail }}";
+  var table2b_container_id = "{{ table.container_id }}",
+      table2b_id = "{{ table.table_id }}";
   require(["{% static 'requirejs/config.js' %}"], function (config) {
-    require(["{% static 'WorkTasks/js/WorkTasks_Panel1_Table1.js' %}"],function(run){
+    require(["{% static 'WorkTasks/js/WorkTasks_Panel1_Table2b.js' %}"],function(run){
         run()
     })
   });

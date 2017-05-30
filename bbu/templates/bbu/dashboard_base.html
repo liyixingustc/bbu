@@ -79,8 +79,8 @@
                 <ul class="nav child_menu">
                   <li><a href="{% url 'WorkConfig' page='WorkConfig'%}" id="WorkConfig">Configuration</a></li>
                   <li><a href="{% url 'WorkWorkers_Page' page='WorkWorkers' func='index'%}" id="WorkWorkers">Workers</a></li>
-                  <li><a href="{% url 'WorkTasks' page='WorkTasks'%}" id="WorkTasks">Tasks</a></li>
-                  <li><a href="{% url 'WorkTasks' page='WorkAudit'%}" id="WorkAudit">Audit</a></li>
+                  <li><a href="{% url 'WorkTasks_Page' page='WorkTasks' func='index'%}" id="WorkTasks">Tasks</a></li>
+                  <li><a href="{% url 'WorkTasks_Page' page='WorkAudit' func='index'%}" id="WorkAudit">Audit</a></li>
                 </ul>
               </li>
               {% endif %}

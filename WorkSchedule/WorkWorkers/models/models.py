@@ -9,16 +9,16 @@ class WorkerAvailable(models.Model):
 
     name = models.ForeignKey(Workers, db_column='name', to_field='name')
     date = models.DateField()
-    duration = models.DurationField()
-    time = models.CharField(max_length=100)
+    duration = models.DurationField(default=timedelta(hours=0))
+    time = models.CharField(max_length=100, null=True)
 
 
 class WorkerScheduled(models.Model):
 
     name = models.ForeignKey(Workers, db_column='name', to_field='name')
     date = models.DateField()
-    duration = models.DurationField()
-    time = models.CharField(max_length=100)
+    duration = models.DurationField(default=timedelta(hours=0))
+    time = models.CharField(max_length=100, null=True)
     task = models.ManyToManyField(Tasks, through='WorkerScheduledTask')
 
 
@@ -26,8 +26,8 @@ class WorkerActual(models.Model):
 
     name = models.ForeignKey(Workers, db_column='name', to_field='name')
     date = models.DateField()
-    duration = models.DurationField()
-    time = models.CharField(max_length=100)
+    duration = models.DurationField(default=timedelta(hours=0))
+    time = models.CharField(max_length=100, null=True)
     task = models.ManyToManyField(Tasks, through='WorkerActualTask')
 
 

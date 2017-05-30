@@ -11,66 +11,23 @@ define(function (require) {
 
     $(function () {
 
-        var $forecast_check = $(".forecast_check"),
-            $daily_revenue = $(".daily_revenue"),
-            $reservation_trace = $(".reservation_trace");
+        $("#WorkTasksConfig-form").submit(function (e) {
 
-        EnableForecastCheck();
-        $("#ReportType").change(function () {
-            var ReportType = $(this).val();
-            if ($.inArray(ReportType,['forecast_check','actuals_check','stay_check']) !== -1 ){
-                EnableForecastCheck()
-            }
-            if ($.inArray(ReportType,['daily_revenue']) !== -1 ){
-                EnableDailyRevenue()
-            }
-            if ($.inArray(ReportType,['reservation_trace']) !== -1 ){
-                EnableReservationTrace()
-            }
-        });
+            var data = $(this).serialize(),
+                $tables_data =  $("#tables_data");
+            $("#WorkTasksConfigSubmit").html("Refreshing...");
+            $.post('Panel1/Form1/Submit/',data,function () {
+                $tables_data.html('<div class="row">' +
+                    '<div class="col-md-2 col-md-offset-5">' +
+                        '<i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>' +
+                    '</div>' +
+                 '</div>');
+                $tables_data.load('Panel1/Table1/Create/',data,function () {
 
-        function EnableForecastCheck() {
-            $daily_revenue.find(":input").prop( "disabled", true );
-            $daily_revenue.hide();
-            $reservation_trace.find(":input").prop( "disabled", true );
-            $reservation_trace.hide();
-            $forecast_check.find(":input").prop( "disabled", false );
-            $forecast_check.show();
-        }
-
-        function EnableDailyRevenue() {
-            $forecast_check.find(":input").prop( "disabled", true );
-            $forecast_check.hide();
-            $reservation_trace.find(":input").prop( "disabled", true );
-            $reservation_trace.hide();
-            $daily_revenue.find(":input").prop( "disabled", false );
-            $daily_revenue.show();
-        }
-
-        function EnableReservationTrace() {
-            $forecast_check.find(":input").prop( "disabled", true );
-            $forecast_check.hide();
-            $daily_revenue.find(":input").prop( "disabled", true );
-            $daily_revenue.hide();
-            $reservation_trace.find(":input").prop( "disabled", false );
-            $reservation_trace.show();
-        }
-
-        $("#AdminTool-form").submit(function (e) {
-
-            var data = $(this).serialize();
-            $("#AdminToolTableRefresh").html("Refreshing...");
-            if ($('#ReportType').val()==='reservation_trace'){
-                $.get('/report/AdminTool/table/create_table/',data,function () {
-                    window.location.href = 'reservation_trace/download/';
-                    $("#AdminToolTableRefresh").html("Refresh");
-                })
-            }
-            else {
-                $("#tables_data").load('/report/AdminTool/table/create_table/',data,function () {
-                    $("#AdminToolTableRefresh").html("Refresh");
                 });
-            }
+                $("#WorkTasksConfigSubmit").html("Refresh");
+            });
+
             return false
         });
     });

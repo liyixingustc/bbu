@@ -11,7 +11,16 @@ require.config({
         'bootstrap-table' : ['/static/bootstrap-table/dist/bootstrap-table.min'],
         'bootstrap-datepicker':['/static/bootstrap-datepicker/dist/js/bootstrap-datepicker.min'],
         'gentelella' : ['/static/gentelella/build/js/custom.min'],
-        'select2' : ['https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min','/static/select2/dist/js/select2.min']
+        'select2' : ['https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min','/static/select2/dist/js/select2.min'],
+        // bootstrap table extensions
+        'bootstrap-table-export' : ['/static/bootstrap-table/dist/extensions/export/bootstrap-table-export.min'],
+        'tableExport' : ['http://rawgit.com/hhurz/tableExport.jquery.plugin/master/tableExport'],
+        'bootstrap-table-editable' : ['/static/bootstrap-table/dist/extensions/editable/bootstrap-table-editable.min'],
+        'x-editable' : ['http://rawgit.com/vitalets/x-editable/master/dist/bootstrap3-editable/js/bootstrap-editable'],
+        'filter-control' : ['/static/bootstrap-table/dist/extensions/filter-control/bootstrap-table-filter-control.min'],
+        'flat-json' : ['/static/bootstrap-table/dist/extensions/flat-json/bootstrap-table-flat-json.min'],
+        'multiple-sort' : ['/static/bootstrap-table/dist/extensions/multiple-sort/bootstrap-table-multiple-sort.min']
+
     },
     shim:{
 
@@ -33,6 +42,28 @@ require.config({
         },
         'select2':{
             deps:['jquery','bootstrap']
+        },
+        // bootstrap table extensions
+        'bootstrap-table-export':{
+            deps:['jquery','bootstrap','bootstrap-table']
+        },
+        'tableExport':{
+            deps:['jquery','bootstrap']
+        },
+        'bootstrap-table-editable':{
+            deps:['jquery','bootstrap','bootstrap-table','x-editable']
+        },
+        'x-editable':{
+            deps:['jquery','bootstrap']
+        },
+        'filter-control':{
+            deps:['jquery','bootstrap','bootstrap-table']
+        },
+        'flat-json':{
+            deps:['jquery','bootstrap','bootstrap-table']
+        },
+        'multiple-sort':{
+            deps:['jquery','bootstrap','bootstrap-table']
         }
     }
 });
