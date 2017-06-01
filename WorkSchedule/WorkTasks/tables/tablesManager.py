@@ -8,6 +8,7 @@ from ..models.models import *
 from ...WorkConfig.models import *
 from ...WorkWorkers.models.models import *
 
+from utils.TableConventor import TableConvertor
 
 class WorkTasksPanel1Table1Manager:
 
@@ -78,12 +79,23 @@ class WorkTasksPanel1Table2aManager:
                                      'workerscheduled_id__date': 'date',
                                      'workerscheduled_id__duration': 'scheduled'}, axis=1, inplace=True)
 
-        workerscheduled['date'] = workerscheduled['date'].apply(lambda x: str(x))
-        workerscheduled['scheduled'] = workerscheduled['scheduled'].apply(lambda x: x.total_seconds()/3600)
+        workerscheduled = TableConvertor.df_week_view(workerscheduled,duration='scheduled')
 
         data = workerscheduled
 
         return data
+
+    @classmethod
+    def edit(cls, parameters):
+
+        date = dt.strptime(parameters['date'].split('<br>')[0],'%Y-%m-%d').date()
+        duration = timedelta(hours=float(parameters['duration']))
+
+        name = Workers.objects.get(name= parameters['name'])
+        WorkerScheduled.objects.update_or_create(name=name,date=date,
+                                                 defaults={'duration':duration})
+
+        return
 
 
 class WorkTasksPanel1Table2bManager:
@@ -99,7 +111,6 @@ class WorkTasksPanel1Table2bManager:
         workers_available = WorkerAvailable.objects.filter(date__range=[period_start, period_end]).values('name__name',
                                                                                                           'date',
                                                                                                           'duration')
-        print(workers_available)
         workers_available = pd.DataFrame.from_records(workers_available, columns=['name__name',
                                                                                   'date',
                                                                                   'duration'
@@ -107,9 +118,21 @@ class WorkTasksPanel1Table2bManager:
 
         workers_available.rename_axis({'name__name': 'name',
                                        'duration': 'available'}, axis=1, inplace=True)
-        workers_available['date'] = workers_available['date'].apply(lambda x: str(x))
-        workers_available['available'] = workers_available['available'].apply(lambda x: x.total_seconds()/3600)
+
+        workers_available = TableConvertor.df_week_view(workers_available,duration='available')
 
         data = workers_available
 
         return data
+
+    @classmethod
+    def edit(cls, parameters):
+
+        date = dt.strptime(parameters['date'].split('<br>')[0],'%Y-%m-%d').date()
+        duration = timedelta(hours=float(parameters['duration']))
+
+        name = Workers.objects.get(name= parameters['name'])
+        WorkerAvailable.objects.update_or_create(name=name,date=date,
+                                                 defaults={'duration':duration})
+
+        return

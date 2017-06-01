@@ -13,13 +13,12 @@ define(function (require) {
         tableExport = require('tableExport'),
         bootstrap_table_editable = require('bootstrap-table-editable'),
         x_editable = require('x-editable'),
-        filter_control = require('filter-control'),
         flat_json = require('flat-json'),
         multiple_sort = require('multiple-sort');
 
     function run() {
-        var $table_container_id = $("#"+table2a_container_id),
-            $table_id = $("#"+table2a_id);
+        var $table_container_id = $("#"+WorkTasks_Panel1_Table2a_container_id),
+            $table_id = $("#"+WorkTasks_Panel1_Table2a_id);
 
         init($table_container_id,$table_id);
         event($table_id)
@@ -31,7 +30,16 @@ define(function (require) {
     }
 
     function event($table_id) {
+        //editable events
+        $table_id.on('editable-save.bs.table',function (editable, field, row, oldValue, $el) {
 
+            $.post(WorkTasks_Panel1_Table2a_url_edit,{'name':row['name'],'duration':row[field],'date':field},function () {
+
+            })
+        });
+        $table_id.on('editable-hidden.bs.table',function (field, row, $el, reason) {
+
+        });
     }
 
     return run

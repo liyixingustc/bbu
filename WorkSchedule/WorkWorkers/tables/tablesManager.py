@@ -7,6 +7,8 @@ from django.shortcuts import HttpResponse
 from ..models.models import *
 from ...WorkConfig.models import *
 
+from utils.TableConventor import TableConvertor
+
 
 class WorkWorkersPanel1Table1Manager:
 
@@ -34,7 +36,7 @@ class WorkWorkersPanel1Table1Manager:
                     row = pd.DataFrame([{'name': worker, 'date': date, 'duration': timedelta(hours=0)}])
                     workers_available = pd.concat([workers_available, row], ignore_index=True)
 
-        workers_available = cls.df_week_view(workers_available)
+        workers_available = TableConvertor.df_week_view(workers_available)
 
         workers_available.rename_axis({'name': 'name',
                                        'duration': 'available'}, axis=1, inplace=True)
@@ -55,15 +57,7 @@ class WorkWorkersPanel1Table1Manager:
 
         return
 
-    @classmethod
-    def df_week_view(cls, data, name='name', date='date', duration='duration'):
 
-        data[date] = (data[date].apply(lambda x: '{date}<br/>{week}'.format(date=str(x),week=x.strftime('%a'))))
-        data[duration] = data[duration].apply(lambda x: x.total_seconds()/3600)
-        data = pd.pivot_table(data,values=duration,index=name,columns=date).reset_index()
-        data.rename_axis(None,inplace=True)
-
-        return data
 
 
 class WorkWorkersPanel1Table2Manager:

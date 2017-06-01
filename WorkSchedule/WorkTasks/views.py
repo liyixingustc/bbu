@@ -28,6 +28,8 @@ class Page:
             if 'Table' in widget:
                 if func == 'Create':
                     return cls.Panel.Table.create(request, *args, **kwargs)
+                if func == 'Edit':
+                    return cls.Panel.Table.edit(request, *args, **kwargs)
         elif panel:
             pass
         elif page:
@@ -90,7 +92,6 @@ class Page:
                                 parameters['period_start'] = request.POST.get('start')
                                 parameters['period_end'] = request.POST.get('end')
                                 parameters['working_order'] = request.POST.get('row[working_order]')
-                                print(request.POST)
 
                                 tables_template_name = 'WorkTasks/WorkTasks_Panel1_Table2.html'
 
@@ -102,5 +103,36 @@ class Page:
 
                                 return render(request, tables_template_name, {'table2a': table2a,
                                                                               'table2b': table2b})
+
+                return JsonResponse({})
+
+            @staticmethod
+            def edit(request, *args, **kwargs):
+
+                page = kwargs['page']
+                panel = kwargs['panel']
+                widget = kwargs['widget']
+                func = kwargs['func']
+
+                if page == 'WorkTasks':
+                    if panel == 'Panel1':
+                        if widget == 'Table2a':
+                            if func == 'Edit':
+                                parameters = {}
+                                parameters['name'] = request.POST.get('name')
+                                parameters['duration'] = request.POST.get('duration')
+                                parameters['date'] = request.POST.get('date')
+
+                                WorkTasksPanel1Table2aManager.edit(parameters)
+                                return JsonResponse({})
+                        elif widget == 'Table2b':
+                            if func == 'Edit':
+                                parameters = {}
+                                parameters['name'] = request.POST.get('name')
+                                parameters['duration'] = request.POST.get('duration')
+                                parameters['date'] = request.POST.get('date')
+
+                                WorkTasksPanel1Table2bManager.edit(parameters)
+                                return JsonResponse({})
 
                 return JsonResponse({})

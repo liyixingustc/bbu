@@ -29,7 +29,7 @@
           <ul class="nav navbar-nav navbar-right">
             <li class="">
               <a href="javascript:" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                <img src="{% static 'bbu/lodgIQ-logo-title.png' %}" alt="">{{ request.user.username }}
+                <img src="{% static 'bbu/bbu-logo.svg' %}" alt="">{{ request.user.username }}
                 <span class=" fa fa-angle-down"></span>
               </a>
               <ul class="dropdown-menu dropdown-usermenu pull-right">
@@ -53,7 +53,7 @@
         <!-- menu profile quick info -->
         <div class="profile clearfix">
           <div class="profile_pic">
-            <img src="{% static 'bbu/lodgIQ-logo-title.png' %}" alt="..." class="img-circle profile_img">
+            <img src="{% static 'bbu/bbu-logo.svg' %}" alt="..." class="img-circle profile_img">
           </div>
           <div class="profile_info">
             <span>Welcome,</span>
@@ -111,6 +111,28 @@
     {% endblock sidebar%}
 
     <div class="right_col" role="main" style="min-height: 2259px;">
+      <div class="row tile_count">
+        <div class="col-md-3 col-sm-4 col-xs-6 tile_stats_count">
+          <span class="count_top"><i class="fa fa-edit"></i> Scheduled Tasks / Open Tasks</span>
+          <div class="count">25/50</div>
+          <span class="count_bottom"><i class="green">50% </i> Tasks Scheduled</span>
+        </div>
+        <div class="col-md-3 col-sm-4 col-xs-6 tile_stats_count">
+          <span class="count_top"><i class="fa fa-user"></i> Worker Scheduled / Worker Available</span>
+          <div class="count">10/32</div>
+          <span class="count_bottom"><i class="green">31.25% </i> Worker Occupied</span>
+        </div>
+        <div class="col-md-3 col-sm-4 col-xs-6 tile_stats_count">
+          <span class="count_top"><i class="fa fa-clock-o"></i> Scheduled hours / Estimate hours</span>
+          <div class="count green">100/200</div>
+          <span class="count_bottom"><i class="green">50% </i> Scheduled hour rate</span>
+        </div>
+        <div class="col-md-3 col-sm-4 col-xs-6 tile_stats_count">
+          <span class="count_top"><i class="fa fa-clock-o"></i> Scheduled hours / Available hours</span>
+          <div class="count">100/110</div>
+          <span class="count_bottom"><i class="red">90.9% </i> Occupied hour rate</span>
+        </div>
+      </div>
         {% block content_dashboard %}{% endblock content_dashboard %}
     </div>
 

@@ -13,7 +13,6 @@ define(function (require) {
         tableExport = require('tableExport'),
         bootstrap_table_editable = require('bootstrap-table-editable'),
         x_editable = require('x-editable'),
-        filter_control = require('filter-control'),
         flat_json = require('flat-json'),
         multiple_sort = require('multiple-sort');
 

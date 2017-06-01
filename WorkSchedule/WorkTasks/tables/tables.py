@@ -57,6 +57,8 @@ class WorkTasksPanel1Table2a(Table):
                  'td': '',
                  }
 
+        url = {'edit': 'Panel1/Table2a/Edit/'}
+
 class WorkTasksPanel1Table2b(Table):
 
     class Meta:
@@ -77,3 +79,5 @@ class WorkTasksPanel1Table2b(Table):
                  'th': '',
                  'td': '',
                  }
+
+        url = {'edit': 'Panel1/Table2b/Edit/'}

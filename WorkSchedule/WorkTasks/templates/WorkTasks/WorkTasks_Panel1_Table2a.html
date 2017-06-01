@@ -3,6 +3,7 @@
 {% block table_head_css %}
     <link rel="stylesheet" href="{% static 'bootstrap-table/dist/bootstrap-table.min.css' %}">
     <link rel="stylesheet" href="//rawgit.com/vitalets/x-editable/master/dist/bootstrap3-editable/css/bootstrap-editable.css">
+    <link rel="stylesheet" href="{% static 'switch-check/switch.css' %}">
 {% endblock table_head_css %}
 
 {% block table_container %}
@@ -18,14 +19,26 @@
                         {% block table_thead_before %}{% endblock table_thead_before %}
                         {% for row in table.auto.th %}
                             {% for column, th_attrs in row%}
+                                {% if column == 'name' %}
                                 <th data-valign="middle"
                                     data-align="center"
-                                    {{ th_attrs|safe }}>{{ column }}</th>
+                                    {{ th_attrs|safe }}>{{ column|safe }}</th>
+                                {% else %}
+                                <th data-valign="middle"
+                                    data-align="center"
+                                    data-editable="true"
+                                    data-editable-type="text"
+                                    data-editable-title="Enter hours"
+                                    {{ th_attrs|safe }}>{{ column|safe }}</th>
+                                {% endif %}
                             {% endfor %}
                         {% empty %}
                             <th>{{ table.empty_text }}</th>
                         {% endfor %}
-                        {% block table_thead_after %}{% endblock table_thead_after %}
+                        {% block table_thead_after %}
+                            <th data-field="state">
+                            </th>
+                        {% endblock table_thead_after %}
                     </tr>
                 </thead>
             {% endblock table.thead %}
@@ -39,7 +52,14 @@
                         {% empty %}
                             <td>{{ table.empty_text }}</td>
                         {% endfor %}
-                        {% block table_tbody_after %}{% endblock table_tbody_after %}
+                        {% block table_tbody_after %}
+                            <td class="bs-checkbox">
+                                <label class="switch">
+                                  <input type="checkbox" checked>
+                                  <div class="slider round"></div>
+                                </label>
+                            </td>
+                        {% endblock table_tbody_after %}
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -64,8 +84,9 @@
 </style>
 
 <script type="text/javascript">
-  var table2a_container_id = "{{ table.container_id }}",
-      table2a_id = "{{ table.table_id }}";
+  var WorkTasks_Panel1_Table2a_container_id = "{{ table.container_id }}",
+      WorkTasks_Panel1_Table2a_id = "{{ table.table_id }}",
+      WorkTasks_Panel1_Table2a_url_edit = "{{ table.url.edit }}";
   require(["{% static 'requirejs/config.js' %}"], function (config) {
     require(["{% static 'WorkTasks/js/WorkTasks_Panel1_Table2a.js' %}"],function(run){
         run()
