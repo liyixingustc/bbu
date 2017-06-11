@@ -41,13 +41,13 @@ define(function (require) {
 			resourceAreaWidth: '15%',
 			resourceLabelText: 'Workers',
 			resources: { // you can also specify a plain string like 'json/resources.json'
-				url: 'json/resources.json',
+				url: 'Panel1/TimeLine1/resources/',
 				error: function() {
 					$('#script-warning').show();
 				}
 			},
 			events: { // you can also specify a plain string like 'json/events.json'
-				url: 'json/events.json',
+				url: 'Panel1/TimeLine1/events/',
 				error: function() {
 					$('#script-warning').show();
 				}

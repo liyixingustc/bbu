@@ -5,6 +5,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.views.decorators.csrf import csrf_protect
 import pandas as pd
 from utils.mapper import mapper
+from .viewsManager import PageManager
 # Create your views here.
 
 
@@ -19,13 +20,19 @@ class Page:
 
     class Panel:
         class TimeLine:
-            def create(self, request, *args, **kwargs):
-                pass
+
+            def resources(self, request, *args, **kwargs):
+                response = PageManager.PanelManager.TimeLineManager.resources(request, *args, **kwargs)
+                return response
+            def events(self, request, *args, **kwargs):
+                response = PageManager.PanelManager.TimeLineManager.events(request, *args, **kwargs)
+                return response
 
 
 mapping = pd.DataFrame([
     {'page': 'WorkScheduler', 'panel': 'None', 'widget': 'None', 'func': 'index', 'register': Page.index},
-    {'page': 'WorkScheduler', 'panel': 'Panel1', 'widget': 'TimeLine1', 'func': 'create', 'register': Page.Panel.TimeLine.create},
+    {'page': 'WorkScheduler', 'panel': 'Panel1', 'widget': 'TimeLine1', 'func': 'resources', 'register': Page.Panel.TimeLine.resources},
+    {'page': 'WorkScheduler', 'panel': 'Panel1', 'widget': 'TimeLine1', 'func': 'events', 'register': Page.Panel.TimeLine.events},
 ])
 
 
