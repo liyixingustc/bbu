@@ -12,6 +12,9 @@ require.config({
         'bootstrap-datepicker':['/static/bootstrap-datepicker/dist/js/bootstrap-datepicker.min'],
         'gentelella' : ['/static/gentelella/build/js/custom.min'],
         'select2' : ['https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min','/static/select2/dist/js/select2.min'],
+        'moment' : ['/static/fullcalendar-scheduler/lib/moment.min'],
+        'fullcalendar' : ['/static/fullcalendar/dist/fullcalendar.min'],
+        'scheduler' : ['/static/fullcalendar-scheduler/scheduler.min'],
         // bootstrap table extensions
         'bootstrap-table-export' : ['/static/bootstrap-table/dist/extensions/export/bootstrap-table-export.min'],
         'tableExport' : ['http://rawgit.com/hhurz/tableExport.jquery.plugin/master/tableExport'],
@@ -42,6 +45,15 @@ require.config({
         },
         'select2':{
             deps:['jquery','bootstrap']
+        },
+        'moment':{
+            deps:[]
+        },
+        'fullcalendar':{
+            deps:['jquery','moment']
+        },
+        'scheduler':{
+            deps:['jquery','moment','fullcalendar']
         },
         // bootstrap table extensions
         'bootstrap-table-export':{

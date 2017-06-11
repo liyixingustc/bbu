@@ -42,7 +42,8 @@ class Tasks(models.Model):
     estimate_hour = models.DurationField(default=timedelta(hours=0))
     schedule_hour = models.DurationField(default=timedelta(hours=0))
     actual_hour = models.DurationField(default=timedelta(hours=0))
-    current_status = models.CharField(max_length=10,choices=status_choice)
+    current_status = models.CharField(max_length=10,choices=status_choice,default='new')
+
 
 class TasksStatus(models.Model):
 

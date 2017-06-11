@@ -47,6 +47,7 @@ INSTALLED_APPS += [
     'WorkSchedule.WorkConfig',
     'WorkSchedule.WorkTasks',
     'WorkSchedule.WorkWorkers',
+    'WorkSchedule.WorkScheduler',
 ]
 
 MIDDLEWARE = [

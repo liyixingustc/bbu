@@ -44,9 +44,3 @@ class WorkerActualTask(models.Model):
     task_id = models.ForeignKey(Tasks, db_column='task_id')
     created_on = models.DateTimeField(auto_now_add=True)
 
-
-
-
-
-
-
