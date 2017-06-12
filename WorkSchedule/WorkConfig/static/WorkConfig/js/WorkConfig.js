@@ -14,7 +14,8 @@ define(function (require) {
         $("#FileUpload").fileinput({
             uploadUrl: 'Panel1/Form1/FileUpload/',
             maxFilePreviewSize: 10240,
-            browseOnZoneClick: true
+            browseOnZoneClick: true,
+            uploadExtraData: {'csrfmiddlewaretoken': csrf_token}
         });
 
         $("#WorkConfigDataUpload-form").submit(function (e) {

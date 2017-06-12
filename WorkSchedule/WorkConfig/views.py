@@ -2,7 +2,7 @@ from django.shortcuts import render,HttpResponse,redirect
 from django.http import JsonResponse
 
 from django.contrib.admin.views.decorators import staff_member_required
-from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.csrf import csrf_protect,csrf_exempt
 import pandas as pd
 from utils.mapper import mapper
 from .viewsManager import PageManager
@@ -23,12 +23,12 @@ class Page:
 
             @staticmethod
             def submit(request, *args, **kwargs):
-                response = PageManager.PanelManager.TimeLineManager.resources(request, *args, **kwargs)
+                response = PageManager.PanelManager.FormManager.submit(request, *args, **kwargs)
                 return response
 
             @staticmethod
             def fileupload(request, *args, **kwargs):
-                response = PageManager.PanelManager.TimeLineManager.events(request, *args, **kwargs)
+                response = PageManager.PanelManager.FormManager.fileupload(request, *args, **kwargs)
                 return response
 
 
@@ -39,12 +39,12 @@ mapping = pd.DataFrame([
 ])
 
 
+@csrf_protect
 def as_view(request, *args, **kwargs):
     page = kwargs.get('page')
     panel = kwargs.get('panel')
     widget = kwargs.get('widget')
     func = kwargs.get('func')
-
     register = mapper(mapping, page, panel, widget, func)
     response = register(request, *args, **kwargs)
 

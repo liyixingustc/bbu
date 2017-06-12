@@ -1,3 +1,4 @@
+import os
 from django.http import JsonResponse
 import pandas as pd
 
@@ -7,9 +8,9 @@ from ..WorkTasks.models.models import *
 class PageManager:
 
     class PanelManager:
-        class TimeLineManager:
+        class FormManager:
             @staticmethod
-            def resources(request, *args, **kwargs):
+            def submit(request, *args, **kwargs):
                 date = request.GET.get('start')
                 workers = Workers.objects.all().values()
                 records = pd.DataFrame.from_records(workers)
@@ -18,7 +19,11 @@ class PageManager:
                 return JsonResponse(response,safe=False)
 
             @staticmethod
-            def events(request, *args, **kwargs):
-                date = request.GET.get('start')
+            def fileupload(request, *args, **kwargs):
+                file = request.FILES.get('FileUpload')
+                filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)),'media/input.xlsx')
+                with open(filepath, 'wb+') as destination:
+                    for chunk in file.chunks():
+                        destination.write(chunk)
 
                 return JsonResponse({})
