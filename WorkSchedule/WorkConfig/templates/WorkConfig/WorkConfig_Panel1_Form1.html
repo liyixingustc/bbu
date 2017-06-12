@@ -1,24 +1,28 @@
   <form method="post" id="WorkConfigDataUpload-form" class="form-horizontal form-label-left">
   {% csrf_token %}
     <div class="form-group">
-      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="PeriodStart">Period Start<span class="required">*</span>
+      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="FileType">File Type <span class="required">*</span>
       </label>
       <div class="col-md-6 col-sm-6 col-xs-12">
-        <input type="text" id="PeriodStart" name="PeriodStart" class="form-control col-md-7 col-xs-12 datepicker" placeholder="YYYY-MM-DD" data-inputmask="'mask': '99/99/9999'" style="width:80% " required>
+        <select id="FileType" name="FileType" class="select2_single form-control col-md-7 col-xs-12" style="width:80% " required>
+          <option value="Tasks">tasks</option>
+          <option value="WorkerAvail">worker available timesheet</option>
+        </select>
       </div>
     </div>
     <div class="form-group">
-      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="PeriodEnd">Period End<span class="required">*</span>
+      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="AsOfDate">As of Date<span class="required">*</span>
       </label>
       <div class="col-md-6 col-sm-6 col-xs-12">
-        <input type="text" id="PeriodEnd" name="PeriodEnd" class="form-control col-md-7 col-xs-12 datepicker" placeholder="YYYY-MM-DD" data-inputmask="'mask': '99/99/9999'" style="width:80% " required>
+        <input type="text" id="AsOfDate" name="AsOfDate" class="form-control col-md-7 col-xs-12 datepicker" placeholder="YYYY-MM-DD" data-inputmask="'mask': '99/99/9999'" style="width:80% " required>
       </div>
     </div>
     <div class="form-group">
-      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="ExcelUpload">Excel Upload<span class="required">*</span>
+      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="FileUpload">Excel Upload<span class="required">*</span>
       </label>
-      <div class="col-md-6 col-sm-6 col-xs-12">
-          <input type="file" id="ExcelUpload" name="ExcelUpload" class="form-control col-md-7 col-xs-12" style="width:80%;">
+      <div class="col-md-8 col-sm-8 col-xs-12">
+        <input id="FileUpload" name="FileUpload" type="file" multiple class="file-loading">
+        <div id="errorBlock" class="help-block"></div>
       </div>
     </div>
     <div class="form-group">

@@ -43,7 +43,7 @@ class Tasks(models.Model):
     schedule_hour = models.DurationField(default=timedelta(hours=0))
     actual_hour = models.DurationField(default=timedelta(hours=0))
     current_status = models.CharField(max_length=10,choices=status_choice,default='new')
-
+    as_of_date = models.DateField()
 
 class TasksStatus(models.Model):
 

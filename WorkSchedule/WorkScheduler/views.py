@@ -21,10 +21,13 @@ class Page:
     class Panel:
         class TimeLine:
 
-            def resources(self, request, *args, **kwargs):
+            @staticmethod
+            def resources(request, *args, **kwargs):
                 response = PageManager.PanelManager.TimeLineManager.resources(request, *args, **kwargs)
                 return response
-            def events(self, request, *args, **kwargs):
+
+            @staticmethod
+            def events(request, *args, **kwargs):
                 response = PageManager.PanelManager.TimeLineManager.events(request, *args, **kwargs)
                 return response
 

@@ -12,6 +12,10 @@ define(function (require) {
         fullcalendar = require('fullcalendar'),
         scheduler = require('scheduler');
 
+    var fullDate = new Date();
+    //convert month to 2 digits
+    var twoDigitMonth = ((fullDate.getMonth().length+1) === 1)? (fullDate.getMonth()+1) : '0' + (fullDate.getMonth()+1);
+    var currentDate = fullDate.getFullYear() + "-" + twoDigitMonth + "-" + fullDate.getDate();
 
     function run() {
 
@@ -21,7 +25,7 @@ define(function (require) {
     function init() {
 		$('#WorkScheduler_Panel1_Timeline1').fullCalendar({
             schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
-			now: '2017-05-07',
+			now: currentDate,
 			editable: true,
 			aspectRatio: 1.8,
 			scrollTime: '00:00',
@@ -38,8 +42,9 @@ define(function (require) {
 				}
 			},
 			eventOverlap: false, // will cause the event to take up entire resource height
-			resourceAreaWidth: '15%',
+			resourceAreaWidth: '10%',
 			resourceLabelText: 'Workers',
+            refetchResourcesOnNavigate: true,
 			resources: { // you can also specify a plain string like 'json/resources.json'
 				url: 'Panel1/TimeLine1/resources/',
 				error: function() {

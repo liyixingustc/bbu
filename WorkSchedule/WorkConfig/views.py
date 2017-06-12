@@ -3,40 +3,51 @@ from django.http import JsonResponse
 
 from django.contrib.admin.views.decorators import staff_member_required
 from django.views.decorators.csrf import csrf_protect
-
-from .tables.tables import *
-from .tables.tablesManager import *
-
-from datetime import datetime as dt
-
+import pandas as pd
+from utils.mapper import mapper
+from .viewsManager import PageManager
 # Create your views here.
 
 
-@staff_member_required(login_url='/login/')
-@csrf_protect
-def index(request, *args, **kwargs):
+class Page:
 
-    template_name = 'WorkConfig/{page}.html'.format(page=kwargs['page'])
+    @staticmethod
+    @staff_member_required(login_url='/login/')
+    @csrf_protect
+    def index(request, *args, **kwargs):
+        template_name = 'WorkConfig/{page}.html'.format(page=kwargs['page'])
+        return render(request, template_name)
 
-    return render(request, template_name)
+    class Panel:
+        class Form:
+
+            @staticmethod
+            def submit(request, *args, **kwargs):
+                response = PageManager.PanelManager.TimeLineManager.resources(request, *args, **kwargs)
+                return response
+
+            @staticmethod
+            def fileupload(request, *args, **kwargs):
+                response = PageManager.PanelManager.TimeLineManager.events(request, *args, **kwargs)
+                return response
 
 
-class Panel:
+mapping = pd.DataFrame([
+    {'page': 'WorkConfig', 'panel': 'None', 'widget': 'None', 'func': 'index', 'register': Page.index},
+    {'page': 'WorkConfig', 'panel': 'Panel1', 'widget': 'Form1', 'func': 'Submit', 'register': Page.Panel.Form.submit},
+    {'page': 'WorkConfig', 'panel': 'Panel1', 'widget': 'Form1', 'func': 'FileUpload', 'register': Page.Panel.Form.fileupload},
+])
 
-    class Form:
 
-        @classmethod
-        def submit(cls,request,*args,**kwargs):
+def as_view(request, *args, **kwargs):
+    page = kwargs.get('page')
+    panel = kwargs.get('panel')
+    widget = kwargs.get('widget')
+    func = kwargs.get('func')
 
-            page = kwargs['page']
-            panel = kwargs['panel']
-            widget = kwargs['widget']
-            func = kwargs['func']
+    register = mapper(mapping, page, panel, widget, func)
+    response = register(request, *args, **kwargs)
 
-            if page == 'WorkConfig':
-                if panel == 'Panel1':
-                    if widget == 'Form1':
-                        if func == 'Submit':
-                            pass
+    return response
 
-            return JsonResponse({})
+

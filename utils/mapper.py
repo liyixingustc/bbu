@@ -14,7 +14,7 @@ class mapper:
                                 (self.mapping['panel'] == self.panel)&
                                 (self.mapping['widget'] == self.widget)&
                                 (self.mapping['func'] == self.func)
-                                ]['register'][0]
+                                ]['register'].iloc[0]
 
         response = register(request, *args, **kwargs)
         return response

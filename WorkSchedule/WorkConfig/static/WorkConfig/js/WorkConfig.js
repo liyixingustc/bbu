@@ -5,11 +5,17 @@ define(function (require) {
     var $ = require('jquery'),
         bootstrap = require('bootstrap'),
         datepicker = require('bootstrap-datepicker'),
+        fileinput = require('bootstrap-fileinput'),
         gentelella = require('gentelella'),
         select2 = require('select2');
 
 
     $(function () {
+        $("#FileUpload").fileinput({
+            uploadUrl: 'Panel1/Form1/FileUpload/',
+            maxFilePreviewSize: 10240,
+            browseOnZoneClick: true
+        });
 
         $("#WorkConfigDataUpload-form").submit(function (e) {
 

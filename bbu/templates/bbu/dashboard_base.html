@@ -7,6 +7,7 @@
 
     <link href="{% static 'bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css'%}" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />
+    <link href="{% static 'bootstrap-fileinput/css/fileinput.min.css' %}" rel="stylesheet">
     <link href="{% static 'fullcalendar/dist/fullcalendar.min.css'%}" rel="stylesheet">
     <link href="{% static 'fullcalendar/dist/fullcalendar.print.min.css'%}" rel="stylesheet" media='print'/>
     <link href="{% static 'fullcalendar-scheduler/scheduler.css'%}" rel="stylesheet">
@@ -80,7 +81,7 @@
               {% if request.user.is_staff %}
               <li><a><i class="fa fa-edit"></i>Work Schedule<span class="fa fa-chevron-down"></span></a>
                 <ul class="nav child_menu">
-                  <li><a href="{% url 'WorkConfig' page='WorkConfig'%}" id="WorkConfig">Configuration</a></li>
+                  <li><a href="{% url 'WorkConfig_Page' page='WorkConfig' func='index'%}" id="WorkConfig">Configuration</a></li>
                   <li><a href="{% url 'WorkScheduler_Page' page='WorkScheduler' func='index'%}" id="WorkScheduler">Scheduler</a></li>
                   <li><a href="{% url 'WorkWorkers_Page' page='WorkWorkers' func='index'%}" id="WorkWorkers">Workers</a></li>
                   <li><a href="{% url 'WorkTasks_Page' page='WorkTasks' func='index'%}" id="WorkTasks">Tasks</a></li>
