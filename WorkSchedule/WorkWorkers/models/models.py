@@ -8,7 +8,7 @@ import datetime
 
 class WorkerAvailable(models.Model):
 
-    name = models.ForeignKey(Workers, db_column='name', to_field='name')
+    name = models.ForeignKey(Workers, verbose_name='name', db_column='name', to_field='name')
     date = models.DateField()
     duration = models.DurationField(default=timedelta(hours=0))
     time_start = models.DateTimeField(default=datetime.datetime.now)

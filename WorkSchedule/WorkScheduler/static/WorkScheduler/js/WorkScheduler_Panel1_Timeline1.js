@@ -42,7 +42,7 @@ define(function (require) {
 				}
 			},
 			eventOverlap: false, // will cause the event to take up entire resource height
-			resourceAreaWidth: '10%',
+			resourceAreaWidth: '25%',
 			resourceLabelText: 'Workers',
             refetchResourcesOnNavigate: true,
 			resources: { // you can also specify a plain string like 'json/resources.json'

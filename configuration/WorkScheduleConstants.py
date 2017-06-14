@@ -5,6 +5,7 @@ class WorkAvailSheet:
     TIME_OFF = ['OFF', 'HOLIDAY', 'P.Day', 'Vac.', 'Union Bus.', 'STD', 'SICK']
 
     class Shift1:
+        DEFAULT_TIME = '23:30-8:30'
         DEFAULT_TIME_START = time(hour=23, minute=30)
         DEFAULT_TIME_END = time(hour=8, minute=30)
 

@@ -3,7 +3,11 @@
 
 {% block content_dashboard %}
 
-{% include 'WorkScheduler/WorkScheduler_Panel1.html' %}
+<div class="row">
+  {% include 'WorkScheduler/WorkScheduler_Panel1.html' %}
+  {% include 'WorkScheduler/WorkScheduler_Panel2.html' %}
+</div>
+
 
 {% endblock content_dashboard %}
 
