@@ -38,6 +38,10 @@ class WorkSchedulerPanel2Table1Manager:
         tasks['estimate_hour'] = tasks['estimate_hour'].apply(lambda x: x.total_seconds()/3600)
         tasks['actual_hour'] = tasks['actual_hour'].apply(lambda x: x.total_seconds()/3600)
 
+        now_date = dt.now().date()
+        tasks['OLD'] = tasks['create_on'].apply(lambda x: int((now_date - x.date()).total_seconds()/(3600*24)))
+        tasks.drop('create_on',axis=1,inplace=True)
+
         data = tasks
 
         return data
