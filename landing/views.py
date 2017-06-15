@@ -27,7 +27,7 @@ def login(request):
                     auth.login(request, user)
                     # Redirect to a success page.
 
-                    return JsonResponse({'status':1,'message':'OK','url':'/WorkSchedule/1/WorkConfig'})
+                    return JsonResponse({'status':1,'message':'OK','url':'/WorkSchedule/1/WorkConfig/index'})
                 else:
                     # Return a 'disabled account' error message
                     return JsonResponse({'status':0,'message':'Disabled account'})

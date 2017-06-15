@@ -1,9 +1,12 @@
 from django.http import JsonResponse
+from django.shortcuts import render
 import pandas as pd
 from datetime import datetime as dt
 
 from ..WorkWorkers.models.models import *
 from ..WorkTasks.models.models import *
+from .tables.tables import *
+from .tables.tablesManager import *
 
 
 class PageManager:
@@ -43,3 +46,11 @@ class PageManager:
                 response += avail_response
 
                 return JsonResponse(response,safe=False)
+        class TableManager:
+            @staticmethod
+            def create(request, *args, **kwargs):
+
+                tables_template_name = 'WorkScheduler/WorkScheduler_Panel2_Table1.html'
+                data = WorkSchedulerPanel2Table1Manager.set_data()
+                table = WorkSchedulerPanel2Table1(data)
+                return render(request, tables_template_name, {'table': table})

@@ -8,27 +8,6 @@
 {% block table_container %}
 <div class="table-container" id = "{{table.container_id}}" hidden>
     {% block toolbar %}
-        <div id="{% block table_toolbar_id %}toolbar{% endblock table_toolbar_id %}">
-            <div class="form-inline role=form">
-                <div class="form-group">
-                    <button id="add" class="btn btn-primary" data-toggle="modal" data-target="#{{ table.form_id }}">
-                        <i class="glyphicon glyphicon-plus"></i> {% block toolbar_add %}Add{% endblock toolbar_add %}
-                    </button>
-                </div>
-                <div class="form-group">
-                    <button id="remove" class="btn btn-danger" disabled>
-                        <i class="glyphicon glyphicon-remove"></i> {% block toolbar_remove %}Delete{% endblock toolbar_remove %}
-                    </button>
-                </div>
-                <div class="form-group">
-                    <select class="form-control">
-                        <option value="">Export Basic</option>
-                        <option value="all">Export All</option>
-                        <option value="selected">Export Selected</option>
-                    </select>
-                </div>
-            </div>
-        </div>
     {% endblock toolbar %}
 
     {% block table %}
@@ -94,13 +73,12 @@
 </style>
 
 <script type="text/javascript">
-  var WorkWorkers_Panel1_Table1_container_id = "{{ table.container_id }}",
-      WorkWorkers_Panel1_Table1_id = "{{ table.table_id }}",
-      WorkWorkers_Panel1_Table1_url_detail = "{{ table.url.detail }}",
-      WorkWorkers_Panel1_Table1_url_edit = "{{ table.url.edit }}";
+  var WorkScheduler_Panel2_Table1_container_id = "{{ table.container_id }}",
+      WorkScheduler_Panel2_Table1_id = "{{ table.table_id }}",
+      WorkScheduler_Panel2_Table1_url_edit = "{{ table.url.edit }}";
 
   require(["{% static 'requirejs/config.js' %}"], function (config) {
-    require(["{% static 'WorkWorkers/js/WorkWorkers_Panel1_Table1.js' %}"],function(run){
+    require(["{% static 'WorkScheduler/js/WorkScheduler_Panel2_Table1.js' %}"],function(run){
         run()
     })
   });

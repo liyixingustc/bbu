@@ -20,7 +20,6 @@ class Page:
 
     class Panel:
         class TimeLine:
-
             @staticmethod
             def resources(request, *args, **kwargs):
                 response = PageManager.PanelManager.TimeLineManager.resources(request, *args, **kwargs)
@@ -30,12 +29,18 @@ class Page:
             def events(request, *args, **kwargs):
                 response = PageManager.PanelManager.TimeLineManager.events(request, *args, **kwargs)
                 return response
+        class Table:
+            @staticmethod
+            def create(request, *args, **kwargs):
+                response = PageManager.PanelManager.TableManager.create(request, *args, **kwargs)
+                return response
 
 
 mapping = pd.DataFrame([
     {'page': 'WorkScheduler', 'panel': 'None', 'widget': 'None', 'func': 'index', 'register': Page.index},
     {'page': 'WorkScheduler', 'panel': 'Panel1', 'widget': 'TimeLine1', 'func': 'resources', 'register': Page.Panel.TimeLine.resources},
     {'page': 'WorkScheduler', 'panel': 'Panel1', 'widget': 'TimeLine1', 'func': 'events', 'register': Page.Panel.TimeLine.events},
+    {'page': 'WorkScheduler', 'panel': 'Panel2', 'widget': 'Table1', 'func': 'create', 'register': Page.Panel.Table.create},
 ])
 
 
