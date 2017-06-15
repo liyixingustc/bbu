@@ -14,6 +14,7 @@ require.config({
         'gentelella' : ['/static/gentelella/build/js/custom.min'],
         'select2' : ['https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min','/static/select2/dist/js/select2.min'],
         'moment' : ['/static/fullcalendar-scheduler/lib/moment.min'],
+        'jquery-ui' : ['/static/fullcalendar-scheduler/lib/jquery-ui.min'],
         'fullcalendar' : ['/static/fullcalendar/dist/fullcalendar.min'],
         'scheduler' : ['/static/fullcalendar-scheduler/scheduler.min'],
         // bootstrap table extensions
@@ -52,6 +53,9 @@ require.config({
         },
         'moment':{
             deps:[]
+        },
+        'jquery-ui':{
+            deps:['jquery']
         },
         'fullcalendar':{
             deps:['jquery','moment']

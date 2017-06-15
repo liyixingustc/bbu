@@ -10,9 +10,9 @@ define(function (require) {
         select2 = require('select2'),
         // bootstrap table extensions
         bootstrap_table_export = require('bootstrap-table-export'),
-        tableExport = require('tableExport'),
-        bootstrap_table_editable = require('bootstrap-table-editable'),
-        x_editable = require('x-editable'),
+        // tableExport = require('tableExport'),
+        // bootstrap_table_editable = require('bootstrap-table-editable'),
+        // x_editable = require('x-editable'),
         flat_json = require('flat-json'),
         multiple_sort = require('multiple-sort');
 
@@ -40,15 +40,15 @@ define(function (require) {
     function event($table_id) {
 
         //editable events
-        $table_id.on('editable-save.bs.table',function (editable, field, row, oldValue, $el) {
-
-            $.post(WorkScheduler_Panel2_Table1_url_edit,{'name':row['name'],'duration':row[field],'date':field},function () {
-
-            })
-        });
-        $table_id.on('editable-hidden.bs.table',function (field, row, $el, reason) {
-
-        });
+        // $table_id.on('editable-save.bs.table',function (editable, field, row, oldValue, $el) {
+        //
+        //     $.post(WorkScheduler_Panel2_Table1_url_edit,{'name':row['name'],'duration':row[field],'date':field},function () {
+        //
+        //     })
+        // });
+        // $table_id.on('editable-hidden.bs.table',function (field, row, $el, reason) {
+        //
+        // });
     }
 
     return run
