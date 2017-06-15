@@ -4,7 +4,8 @@ from bootstrap_tables.tables.tables import Table
 class WorkWorkersPanel1Table1(Table):
 
     class Meta:
-        table_id = 'WorkWorkersPanel1Table1'
+        table_id = 'WorkWorkersPanel1Table1TableId'
+        container_id = 'WorkWorkersPanel1Table1ContainerId'
 
         attrs = {'table': """
                                 id="{table_id}"

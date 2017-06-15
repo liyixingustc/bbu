@@ -3,12 +3,14 @@ import pandas as pd
 from datetime import datetime as dt,timedelta
 import pytz
 from django.shortcuts import HttpResponse
+from django.db.models import Q
 
 from ..models.models import *
 from ...WorkConfig.models import *
 from ...WorkWorkers.models.models import *
 
 from utils.TableConventor import TableConvertor
+
 
 class WorkTasksPanel1Table1Manager:
 
@@ -21,31 +23,37 @@ class WorkTasksPanel1Table1Manager:
         period_end = dt.strptime(period_end, '%Y-%m-%d')
         period = pd.date_range(period_start, period_end)
 
-        tasks = Tasks.objects.filter(period_start__exact=period_start,
-                                     period_end__exact=period_end).values('line',
-                                                                          'working_order',
-                                                                          'schedule_hour',
-                                                                          'estimate_hour',
-                                                                          'description',
-                                                                          'working_type',
-                                                                          'priority',
-                                                                          'days_old',
-                                                                          'actual_hour')
+        tasks = Tasks.objects.filter(Q(current_status__in=['new', 'pending']) |
+                                     Q(current_status__in=['completed', 'cancelled'],
+                                       create_on__range=[period_start, period_end]))\
+            .values('line',
+                    'work_order',
+                    'current_status',
+                    'schedule_hour',
+                    'estimate_hour',
+                    'description',
+                    'work_type',
+                    'priority',
+                    'create_on',
+                    'actual_hour')
 
         tasks = pd.DataFrame.from_records(tasks, columns=['line',
-                                                          'working_order',
+                                                          'work_order',
+                                                          'current_status',
                                                           'schedule_hour',
                                                           'estimate_hour',
                                                           'description',
-                                                          'working_type',
+                                                          'work_type',
                                                           'priority',
-                                                          'days_old',
+                                                          'create_on',
                                                           'actual_hour'])
-
         tasks['schedule_hour'] = tasks['schedule_hour'].apply(lambda x: x.total_seconds()/3600)
         tasks['estimate_hour'] = tasks['estimate_hour'].apply(lambda x: x.total_seconds()/3600)
         tasks['actual_hour'] = tasks['actual_hour'].apply(lambda x: x.total_seconds()/3600)
-        tasks['days_old'] = tasks['days_old'].apply(lambda x: x.total_seconds()/(3600*24))
+
+        now_date = dt.now().date()
+        tasks['OLD'] = tasks['create_on'].apply(lambda x: int((now_date - x.date()).total_seconds()/(3600*24)))
+        tasks.drop('create_on',axis=1,inplace=True)
 
         data = tasks
 
