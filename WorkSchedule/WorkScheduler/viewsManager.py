@@ -35,7 +35,7 @@ class PageManager:
                                                                               'time_end'))
 
                 avail_events['rendering'] = 'background'
-                avail_events['color'] = 'green'
+                avail_events['color'] = 'light green'
                 avail_events.rename_axis({'name__id': 'resourceId',
                                           'time_start': 'start',
                                           'time_end': 'end'},axis=1,inplace=True)
@@ -46,6 +46,13 @@ class PageManager:
                 response += avail_response
 
                 return JsonResponse(response,safe=False)
+
+        class ModalManager:
+            @staticmethod
+            def extend_worker_avail(request, *args, **kwargs):
+                print(request)
+                return JsonResponse({})
+
         class TableManager:
             @staticmethod
             def create(request, *args, **kwargs):

@@ -29,6 +29,13 @@ class Page:
             def events(request, *args, **kwargs):
                 response = PageManager.PanelManager.TimeLineManager.events(request, *args, **kwargs)
                 return response
+
+        class Modal:
+            @staticmethod
+            def extend_worker_avail(request, *args, **kwargs):
+                response = PageManager.PanelManager.ModalManager.extend_worker_avail(request, *args, **kwargs)
+                return response
+
         class Table:
             @staticmethod
             def create(request, *args, **kwargs):
@@ -41,6 +48,7 @@ mapping = pd.DataFrame([
     {'page': 'WorkScheduler', 'panel': 'Panel1', 'widget': 'TimeLine1', 'func': 'resources', 'register': Page.Panel.TimeLine.resources},
     {'page': 'WorkScheduler', 'panel': 'Panel1', 'widget': 'TimeLine1', 'func': 'events', 'register': Page.Panel.TimeLine.events},
     {'page': 'WorkScheduler', 'panel': 'Panel2', 'widget': 'Table1', 'func': 'create', 'register': Page.Panel.Table.create},
+    {'page': 'WorkScheduler', 'panel': 'Panel1', 'widget': 'Modal1', 'func': 'extend_worker_avail', 'register': Page.Panel.Modal.extend_worker_avail},
 ])
 
 

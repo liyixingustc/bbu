@@ -1,0 +1,18 @@
+{% extends 'bbu/modal.html' %}
+
+{% block modal_id %}WorkSchedulerPanel1Modal1{% endblock %}
+
+{% block form_title %}Extend worker available time{% endblock form_title %}
+
+{% block modal-body %}
+    <h2><b>Are you sure to add extra available time for this worker?</b></h2>
+{% endblock modal-body %}
+
+{% block modal-footer %}
+    <button id="WorkSchedulerPanel1Modal1Yes" type="button" class="btn btn-info">
+        <span class="glyphicon glyphicon-ok"></span>
+    </button>
+    <button id="WorkSchedulerPanel1Modal1No" type="button" class="btn btn-danger" data-dismiss="modal">
+        <span class="glyphicon glyphicon-remove"></span>
+    </button>
+{% endblock modal-footer %}
