@@ -63,13 +63,14 @@ define(function (require) {
 			header: {
 				left: 'today prev,next',
 				center: 'title',
-				right: 'timelineDay,timelineThreeDays,agendaWeek,month'
+				right: 'timelineDay,timelineWeek,month'
 			},
 			defaultView: 'timelineDay',
 			views: {
-				timelineThreeDays: {
+				timelineCustomDay: {
 					type: 'timeline',
-					duration: { days: 3 }
+					duration: { days: 2},
+					minTime: '-02:00:00'
 				}
 			},
 			// eventOverlap: false, // will cause the event to take up entire resource height
@@ -121,18 +122,17 @@ define(function (require) {
 		$('#WorkSchedulerPanel1Modal1Yes').on('click',function () {
 			WorkSchedulerPanel1Modal1Choice = true;
 			var eventData;
-
 			if(WorkSchedulerPanel1Modal1Choice){
 				eventData = {
 					title: 'WorkerAvail',
 					resourceId: resource_global.id,
-					start: start_global,
-					end: end_global,
+					start: start_global.format(),
+					end: end_global.format(),
 					rendering: 'background',
 					color: 'light green',
 					overlap: true
 				};
-				$.post('Panel1/Modal1/',eventData,function () {
+                $.post('Panel1/Modal1/extend_worker_avail/',eventData,function () {
 
                 });
 				$WorkScheduler_Panel1_Timeline1.fullCalendar('renderEvent', eventData, true); // stick? = true
@@ -145,5 +145,4 @@ define(function (require) {
     }
 
     return run
-
 });

@@ -63,4 +63,3 @@ def as_view(request, *args, **kwargs):
 
     return response
 
-
