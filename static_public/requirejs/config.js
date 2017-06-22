@@ -15,7 +15,7 @@ require.config({
         'select2' : ['https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min','/static/select2/dist/js/select2.min'],
         'moment' : ['/static/fullcalendar-scheduler/lib/moment.min'],
         'jquery-ui' : ['/static/fullcalendar-scheduler/lib/jquery-ui.min'],
-        'fullcalendar' : ['/static/fullcalendar/dist/fullcalendar.min'],
+        'fullcalendar' : ['/static/full calendar/dist/fullcalendar.min'],
         'scheduler' : ['/static/fullcalendar-scheduler/scheduler.min'],
         // bootstrap table extensions
         'bootstrap-table-export' : ['/static/bootstrap-table/dist/extensions/export/bootstrap-table-export.min'],

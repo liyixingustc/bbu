@@ -36,7 +36,9 @@ define(function (require) {
 
 			$(this).data('event', {
 				title: $.trim($(this).children('td').eq(1).text()), // use the element's text as the event title
-				stick: true // maintain when user navigates (see docs on the renderEvent method)
+				stick: true, // maintain when user navigates (see docs on the renderEvent method)
+				constraint: 'WorkerAvail',
+				color: '#257e4a'
 			});
 
             // make the event draggable using jQuery UI
@@ -53,6 +55,7 @@ define(function (require) {
             schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
 			now: currentDate,
 			selectable: true,
+			selectHelper: true,
 			// selectOverlap: function(event) {
 			// 	return event.rendering === 'background';
 			// },
@@ -91,11 +94,22 @@ define(function (require) {
 			},
 
 			// events callback
+			eventRender: function(event, element) {
+            	console.log(event.id)
+            	console.log(element)
+				if(event.rendering !== 'background'){
+						element.find(".fc-content").prepend("<span class='closeon'>X</span>");
+				   element.find(".closeon").on('click', function() {
+						$WorkScheduler_Panel1_Timeline1.fullCalendar('removeEvents',event._id);
+						console.log('delete');
+						});
+				}
+			},
             drop: function(date, jsEvent, ui, resourceId) {
 				console.log('drop', date.format(), resourceId);
 
                 // if so, remove the element from the "Draggable Events" list
-                $(this).remove();
+                // $(this).remove();
 			},
 			select: function( start, end, jsEvent, view, resource) {
 

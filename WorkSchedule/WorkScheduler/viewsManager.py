@@ -19,10 +19,14 @@ class PageManager:
             def resources(request, *args, **kwargs):
                 start = request.GET.get('start')
                 workers = Workers.objects.all().values()
-                records = pd.DataFrame.from_records(workers)
-                records.rename_axis({'name':'title'},axis=1,inplace=True)
-                response = records.to_dict(orient='records')
-                return JsonResponse(response,safe=False)
+                if workers.exists():
+                    records = pd.DataFrame.from_records(workers)
+                    records.rename_axis({'name':'title'},axis=1,inplace=True)
+                    records['id'] = records['id'].astype('str')
+                    response = records.to_dict(orient='records')
+                    return JsonResponse(response,safe=False)
+                else:
+                    return JsonResponse({})
 
             @staticmethod
             def events(request, *args, **kwargs):
@@ -33,17 +37,22 @@ class PageManager:
 
                 # avail events
                 avail_records = WorkerAvailable.objects.filter(date__range=[start.date(), end.date()])
-                avail_events = pd.DataFrame.from_records(avail_records.values('name__id',
-                                                                              'time_start',
-                                                                              'time_end'))
+                if avail_records.exists():
+                    avail_events = pd.DataFrame.from_records(avail_records.values('name__id',
+                                                                                  'time_start',
+                                                                                  'time_end'))
 
-                avail_events['rendering'] = 'background'
-                avail_events['color'] = 'light green'
-                avail_events.rename_axis({'name__id': 'resourceId',
-                                          'time_start': 'start',
-                                          'time_end': 'end'},axis=1,inplace=True)
+                    avail_events['id'] = 'WorkerAvail'
+                    avail_events['rendering'] = 'background'
+                    avail_events['color'] = 'light green'
+                    avail_events.rename_axis({'name__id': 'resourceId',
+                                              'time_start': 'start',
+                                              'time_end': 'end'},axis=1,inplace=True)
+                    avail_events['resourceId'] = avail_events['resourceId'].astype('str')
 
-                avail_response = avail_events.to_dict(orient='records')
+                    avail_response = avail_events.to_dict(orient='records')
+                else:
+                    avail_response = []
 
                 response = []
                 response += avail_response
