@@ -30,6 +30,16 @@ class Page:
                 response = PageManager.PanelManager.TimeLineManager.events(request, *args, **kwargs)
                 return response
 
+            @staticmethod
+            def event_update(request, *args, **kwargs):
+                response = PageManager.PanelManager.TimeLineManager.event_update(request, *args, **kwargs)
+                return response
+
+            @staticmethod
+            def event_create(request, *args, **kwargs):
+                response = PageManager.PanelManager.TimeLineManager.event_update(request, *args, **kwargs)
+                return response
+
         class Modal:
             @staticmethod
             def extend_worker_avail(request, *args, **kwargs):
@@ -47,6 +57,8 @@ mapping = pd.DataFrame([
     {'page': 'WorkScheduler', 'panel': 'None', 'widget': 'None', 'func': 'index', 'register': Page.index},
     {'page': 'WorkScheduler', 'panel': 'Panel1', 'widget': 'TimeLine1', 'func': 'resources', 'register': Page.Panel.TimeLine.resources},
     {'page': 'WorkScheduler', 'panel': 'Panel1', 'widget': 'TimeLine1', 'func': 'events', 'register': Page.Panel.TimeLine.events},
+    {'page': 'WorkScheduler', 'panel': 'Panel1', 'widget': 'TimeLine1', 'func': 'event_update', 'register': Page.Panel.TimeLine.event_update},
+    {'page': 'WorkScheduler', 'panel': 'Panel1', 'widget': 'TimeLine1', 'func': 'event_create', 'register': Page.Panel.TimeLine.event_create},
     {'page': 'WorkScheduler', 'panel': 'Panel2', 'widget': 'Table1', 'func': 'create', 'register': Page.Panel.Table.create},
     {'page': 'WorkScheduler', 'panel': 'Panel1', 'widget': 'Modal1', 'func': 'extend_worker_avail', 'register': Page.Panel.Modal.extend_worker_avail},
 ])

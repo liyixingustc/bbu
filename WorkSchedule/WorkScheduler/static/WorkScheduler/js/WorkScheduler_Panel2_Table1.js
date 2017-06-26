@@ -14,30 +14,98 @@ define(function (require) {
         // bootstrap_table_editable = require('bootstrap-table-editable'),
         // x_editable = require('x-editable'),
         flat_json = require('flat-json'),
-        multiple_sort = require('multiple-sort');
+        multiple_sort = require('multiple-sort'),
+        filter_control = require('filter-control');
 
-    function run() {
-        var $table_container_id = $("#"+WorkScheduler_Panel2_Table1_container_id),
-            $table_id = $("#"+WorkScheduler_Panel2_Table1_id);
-        init($table_container_id,$table_id);
-        event($table_id);
+    var $table_container_id = $("#WorkSchedulerPanel2Table1ContainerId"),
+        $table_id = $("#WorkSchedulerPanel2Table1TableId");
+
+    function run(callback) {
+
+        init();
+        event();
+        if(typeof callback === "function"){
+            // $.when(init()).done(function (promise) {
+                callback()
+            // })
+        }
     }
 
-    function init($table_container_id,$table_id_) {
+    function init() {
 
         // $table_container_id.html('<div class="row">' +
         //     '<div class="col-md-2 col-md-offset-5">' +
         //         '<i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>' +
         //     '</div>' +
         //  '</div>');
-        // $table_container_id.load('Panel2/Table1/create/',function () {
-        //
-        // });
-        $table_id_.bootstrapTable();
-        $table_container_id.show()
+
+        $table_id.bootstrapTable({
+            height:700,
+            striped:true,
+            minimumCountColumns:2,
+            showFooter:false,
+            pagination:true,
+            // filterControl:true,
+            url:"Panel2/Table1/create/",
+            columns:[
+                {
+                    field: 'line',
+                    title: 'L',
+                    sortable: true,
+                    searchable: true,
+                    editable: true,
+                    align: 'center'
+                    // filterControl: 'select'
+                },
+                {
+                    field: 'work_order',
+                    title: 'WO',
+                    sortable: true,
+                    editable: true,
+                    align: 'center'
+                },
+                {
+                    field: 'description',
+                    title: 'description',
+                    sortable: true,
+                    editable: true,
+                    align: 'center'
+                },
+                {
+                    field: 'estimate_hour',
+                    title: 'EST',
+                    sortable: true,
+                    editable: true,
+                    align: 'center'
+                },
+                {
+                    field: 'work_type',
+                    title: 'type',
+                    sortable: true,
+                    editable: true,
+                    align: 'center'
+                },
+                {
+                    field: 'priority',
+                    title: 'priority',
+                    sortable: true,
+                    editable: true,
+                    align: 'center'
+                },
+                {
+                    field: 'OLD',
+                    title: 'OLD',
+                    sortable: true,
+                    editable: true,
+                    align: 'center'
+                }
+            ]
+        });
+        // $table_container_id.show()
     }
 
-    function event($table_id) {
+    function event() {
+
 
         //editable events
         // $table_id.on('editable-save.bs.table',function (editable, field, row, oldValue, $el) {

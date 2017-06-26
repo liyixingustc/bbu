@@ -1,15 +1,19 @@
 import os
-from django.http import JsonResponse
 import numpy as np
 import pandas as pd
 import re
 from datetime import datetime as dt
+import pytz
+
+from bbu.settings import TIME_ZONE
+from django.http import JsonResponse
 
 from ..WorkWorkers.models.models import *
 from ..WorkTasks.models.models import *
 
 from configuration.WorkScheduleConstants import WorkAvailSheet
 
+EST = pytz.timezone(TIME_ZONE)
 
 class PageManager:
     class PanelManager:
@@ -111,10 +115,12 @@ class PageManager:
                         if row['time'] in [' ', None, np.nan]:
                             start_datetime = dt(date.year, date.month, date.day,
                                                 WorkAvailSheet.Shift1.DEFAULT_TIME_START.hour,
-                                                WorkAvailSheet.Shift1.DEFAULT_TIME_START.minute)
+                                                WorkAvailSheet.Shift1.DEFAULT_TIME_START.minute,
+                                                tzinfo=EST)
                             end_datetime = dt(date.year, date.month, date.day,
                                               WorkAvailSheet.Shift1.DEFAULT_TIME_END.hour,
-                                              WorkAvailSheet.Shift1.DEFAULT_TIME_END.minute)
+                                              WorkAvailSheet.Shift1.DEFAULT_TIME_END.minute,
+                                              tzinfo=EST)
                             start_datetime += timedelta(days=-1)
                             duration = timedelta(hours=8)
                         else:
@@ -127,8 +133,8 @@ class PageManager:
                             end_hour, end_min = cls.str_to_int(parts['end_hour']), cls.str_to_int(parts['end_min'])
 
                             # init start timestamp and end timestamp
-                            start_datetime = dt(date.year, date.month, date.day, start_hour, start_min)
-                            end_datetime = dt(date.year, date.month, date.day, end_hour, end_min)
+                            start_datetime = dt(date.year, date.month, date.day, start_hour, start_min, tzinfo=EST)
+                            end_datetime = dt(date.year, date.month, date.day, end_hour, end_min, tzinfo=EST)
                             if start_hour < 12:
                                 start_hour += 12
                                 start_datetime += timedelta(days=-1, hours=12)
@@ -152,10 +158,12 @@ class PageManager:
                         if row['time'] in [' ', None, np.nan]:
                             start_datetime = dt(date.year, date.month, date.day,
                                                 WorkAvailSheet.Shift2.DEFAULT_TIME_START.hour,
-                                                WorkAvailSheet.Shift2.DEFAULT_TIME_START.minute)
+                                                WorkAvailSheet.Shift2.DEFAULT_TIME_START.minute,
+                                                tzinfo=EST)
                             end_datetime = dt(date.year, date.month, date.day,
                                               WorkAvailSheet.Shift2.DEFAULT_TIME_END.hour,
-                                              WorkAvailSheet.Shift2.DEFAULT_TIME_END.minute)
+                                              WorkAvailSheet.Shift2.DEFAULT_TIME_END.minute,
+                                              tzinfo=EST)
                             duration = timedelta(hours=8)
                         else:
                             regex = re.compile(r'((?P<start_hour>\d{1,2})?\w{0,2}):?((?P<start_min>\d{1,2})?\w{0,2})'
@@ -167,8 +175,8 @@ class PageManager:
                             end_hour, end_min = cls.str_to_int(parts['end_hour']), cls.str_to_int(parts['end_min'])
 
                             # init start timestamp and end timestamp
-                            start_datetime = dt(date.year, date.month, date.day, start_hour, start_min)
-                            end_datetime = dt(date.year, date.month, date.day, end_hour, end_min)
+                            start_datetime = dt(date.year, date.month, date.day, start_hour, start_min, tzinfo=EST)
+                            end_datetime = dt(date.year, date.month, date.day, end_hour, end_min, tzinfo=EST)
                             if 0 <= start_hour <= 6:
                                 start_hour += 12
                                 start_datetime += timedelta(hours=12)
@@ -193,10 +201,12 @@ class PageManager:
                         if row['time'] in [' ', None, np.nan]:
                             start_datetime = dt(date.year, date.month, date.day,
                                                 WorkAvailSheet.Shift3.DEFAULT_TIME_START.hour,
-                                                WorkAvailSheet.Shift3.DEFAULT_TIME_START.minute)
+                                                WorkAvailSheet.Shift3.DEFAULT_TIME_START.minute,
+                                                tzinfo=EST)
                             end_datetime = dt(date.year, date.month, date.day,
                                               WorkAvailSheet.Shift3.DEFAULT_TIME_END.hour,
-                                              WorkAvailSheet.Shift3.DEFAULT_TIME_END.minute)
+                                              WorkAvailSheet.Shift3.DEFAULT_TIME_END.minute,
+                                              tzinfo=EST)
                             end_datetime += timedelta(days=1)
                             duration = timedelta(hours=8)
                         else:
@@ -209,8 +219,8 @@ class PageManager:
                             end_hour, end_min = cls.str_to_int(parts['end_hour']), cls.str_to_int(parts['end_min'])
 
                             # init start timestamp and end timestamp
-                            start_datetime = dt(date.year, date.month, date.day, start_hour, start_min)
-                            end_datetime = dt(date.year, date.month, date.day, end_hour, end_min)
+                            start_datetime = dt(date.year, date.month, date.day, start_hour, start_min, tzinfo=EST)
+                            end_datetime = dt(date.year, date.month, date.day, end_hour, end_min, tzinfo=EST)
                             if 0 <= end_hour < 6:
                                 end_datetime += timedelta(days=1)
                             elif 6 <= end_hour <= 12:

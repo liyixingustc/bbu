@@ -29,25 +29,35 @@ define(function (require) {
 
     function init() {
 
+    	external_drag_init();
+
         /* initialize the external events
 		-----------------------------------------------------------------*/
-		$('tbody tr' ).each(function() {
-			// store data so the calendar knows to render an event upon drop
+        function external_drag_init() {
+			$('#WorkSchedulerPanel2Table1TableId').children('tbody').children('tr').each(function() {
+				// store data so the calendar knows to render an event upon drop
+				$(this).data('event', {
+					title: $.trim($(this).children('td').eq(1).text()), // use the element's text as the event title
+					stick: true, // maintain when user navigates (see docs on the renderEvent method)
+					constraint: 'WorkerAvail',
+					color: '#257e4a',
+					// parameters
+					taskId: $.trim($(this).children('td').eq(1).text())
+				});
 
-			$(this).data('event', {
-				title: $.trim($(this).children('td').eq(1).text()), // use the element's text as the event title
-				stick: true, // maintain when user navigates (see docs on the renderEvent method)
-				constraint: 'WorkerAvail',
-				color: '#257e4a'
+				// make the event draggable using jQuery UI
+				$(this).draggable({
+					zIndex: 999,
+					revert: true,      // will cause the event to go back to its
+					revertDuration: 0  //  original position after the drag
+				});
 			});
+        }
 
-            // make the event draggable using jQuery UI
-			$(this).draggable({
-				zIndex: 999,
-				revert: true,      // will cause the event to go back to its
-				revertDuration: 0  //  original position after the drag
-			});
-		});
+		$("#WorkSchedulerPanel2Table1TableId").on('page-change.bs.table',function (num,size) {
+            external_drag_init()
+        });
+
 
 		/* initialize the calendar
 		-----------------------------------------------------------------*/
@@ -95,14 +105,12 @@ define(function (require) {
 
 			// events callback
 			eventRender: function(event, element) {
-            	console.log(event.id)
-            	console.log(element)
 				if(event.rendering !== 'background'){
-						element.find(".fc-content").prepend("<span class='closeon'>X</span>");
-				   element.find(".closeon").on('click', function() {
+					element.find(".fc-content").prepend("<span class='closeon'>X</span>");
+					element.find(".closeon").on('click', function() {
 						$WorkScheduler_Panel1_Timeline1.fullCalendar('removeEvents',event._id);
 						console.log('delete');
-						});
+					});
 				}
 			},
             drop: function(date, jsEvent, ui, resourceId) {
@@ -123,9 +131,34 @@ define(function (require) {
 			},
 			eventReceive: function(event) { // called when a proper external event is dropped
 				console.log('eventReceive', event);
+				$("#WorkSchedulerPanel2Table1TableId").bootstrapTable('refresh');
+				setTimeout(function () {
+					external_drag_init()
+                },500)
 			},
 			eventDrop: function(event) { // called when an event (already on the calendar) is moved
 				console.log('eventDrop', event);
+
+				var eventData = {
+					resourceId: event.resourceId,
+					taskId: event.taskId,
+					start: event.start.format(),
+					end: event.end.format()
+				};
+
+                $.get('Panel1/TimeLine1/event_update/',eventData,function () {
+
+                });
+
+				$("#WorkSchedulerPanel2Table1TableId").bootstrapTable('refresh');
+				setTimeout(function () {
+					external_drag_init()
+                },500)
+            },
+			eventResize: function(event, delta, revertFunc) {
+
+				console.log(event,delta,revertFunc)
+
 			}
 		});
     }
@@ -156,6 +189,7 @@ define(function (require) {
 
 			$('#WorkSchedulerPanel1Modal1No').click();
 		});
+
     }
 
     return run

@@ -5,14 +5,19 @@ require.config({
 
     baseUrl:'static',
     paths : {
-        'jquery' : ['https://ajax.googleapis.com/ajax/libs/jquery/2.2.3/jquery.min'],
-        'bootstrap' : ['https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min',
-                       'static/gentelella/vendors/bootstrap/dist/css/bootstrap.min.css'],
+        'jquery' : ['/static/gentelella/vendors/jquery/dist/jquery.min'
+                    // ,'https://ajax.googleapis.com/ajax/libs/jquery/2.2.3/jquery.min'
+                    ],
+        'bootstrap' : [
+                        // 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min',
+                       '/static/gentelella/vendors/bootstrap/dist/js/bootstrap.min'],
         'bootstrap-table' : ['/static/bootstrap-table/dist/bootstrap-table.min'],
         'bootstrap-fileinput' : ['/static/bootstrap-fileinput/js/fileinput.min'],
         'bootstrap-datepicker':['/static/bootstrap-datepicker/dist/js/bootstrap-datepicker.min'],
         'gentelella' : ['/static/gentelella/build/js/custom.min'],
-        'select2' : ['https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min','/static/select2/dist/js/select2.min'],
+        'select2' : [
+                    // 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min',
+                     '/static/select2/dist/js/select2.min'],
         'moment' : ['/static/fullcalendar-scheduler/lib/moment.min'],
         'jquery-ui' : ['/static/fullcalendar-scheduler/lib/jquery-ui.min'],
         'fullcalendar' : ['/static/fullcalendar/dist/fullcalendar.min'],

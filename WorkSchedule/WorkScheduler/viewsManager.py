@@ -5,12 +5,14 @@ import pytz
 from datetime import datetime as dt
 from dateutil.parser import parse
 from django.db.models import Q
+from bbu.settings import TIME_ZONE
 
 from ..WorkWorkers.models.models import *
 from ..WorkTasks.models.models import *
 from .tables.tables import *
 from .tables.tablesManager import *
 
+EST = pytz.timezone(TIME_ZONE)
 
 class PageManager:
     class PanelManager:
@@ -58,6 +60,43 @@ class PageManager:
                 response += avail_response
 
                 return JsonResponse(response,safe=False)
+
+            @staticmethod
+            def event_create(request, *args, **kwargs):
+
+                print(request.GET)
+                start = request.GET.get('start')
+                end = request.GET.get('end')
+                resourceId = request.GET.get('resourceId')
+                taskId = request.GET.get('taskId')
+
+                start = parse(start).replace(tzinfo=pytz.utc)
+                end = parse(end).replace(tzinfo=pytz.utc)
+
+                print(start, end, resourceId, taskId)
+
+                response = []
+
+                return JsonResponse(response, safe=False)
+
+            @staticmethod
+            def event_update(request, *args, **kwargs):
+
+                print(request.GET)
+                start = request.GET.get('start')
+                end = request.GET.get('end')
+                resourceId = request.GET.get('resourceId')
+                taskId = request.GET.get('taskId')
+
+                start = parse(start).replace(tzinfo=pytz.utc)
+                end = parse(end).replace(tzinfo=pytz.utc)
+
+                print(start,end,resourceId,taskId)
+
+                response = []
+
+                return JsonResponse(response,safe=False)
+
 
         class ModalManager:
             @staticmethod
@@ -107,7 +146,9 @@ class PageManager:
             @staticmethod
             def create(request, *args, **kwargs):
 
-                tables_template_name = 'WorkScheduler/WorkScheduler_Panel2_Table1.html'
                 data = WorkSchedulerPanel2Table1Manager.set_data()
-                table = WorkSchedulerPanel2Table1(data)
-                return render(request, tables_template_name, {'table': table})
+                if not data.empty:
+                    response = data.to_dict(orient='records')
+                    return JsonResponse(response, safe=False)
+                else:
+                    return JsonResponse({})

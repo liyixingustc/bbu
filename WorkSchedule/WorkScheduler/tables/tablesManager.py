@@ -17,16 +17,18 @@ class WorkSchedulerPanel2Table1Manager:
     def set_data(cls):
 
         tasks = Tasks.objects.filter(current_status__in=['new', 'pending']).values('line',
-                                                                                     'work_order',
-                                                                                     'schedule_hour',
-                                                                                     'estimate_hour',
-                                                                                     'work_type',
-                                                                                     'priority',
-                                                                                     'create_on',
-                                                                                     'actual_hour')
+                                                                                   'work_order',
+                                                                                   'description',
+                                                                                   'schedule_hour',
+                                                                                   'estimate_hour',
+                                                                                   'work_type',
+                                                                                   'priority',
+                                                                                   'create_on',
+                                                                                   'actual_hour')
 
         tasks = pd.DataFrame.from_records(tasks, columns=['line',
                                                           'work_order',
+                                                          'description',
                                                           'schedule_hour',
                                                           'estimate_hour',
                                                           'work_type',

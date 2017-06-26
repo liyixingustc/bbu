@@ -1,57 +1,11 @@
 {% load static %}
 
-{% block table_head_css %}
-    <link rel="stylesheet" href="{% static 'bootstrap-table/dist/bootstrap-table.min.css' %}">
-    <link rel="stylesheet" href="//rawgit.com/vitalets/x-editable/master/dist/bootstrap3-editable/css/bootstrap-editable.css">
-{% endblock table_head_css %}
+<link rel="stylesheet" href="{% static 'bootstrap-table/dist/bootstrap-table.min.css' %}">
+<link rel="stylesheet" href="//rawgit.com/vitalets/x-editable/master/dist/bootstrap3-editable/css/bootstrap-editable.css">
 
-{% block table_container %}
-<div class="table-container" id = "{{table.container_id}}" hidden>
-    {% block toolbar %}
-    {% endblock toolbar %}
-
-    {% block table %}
-        <table {{ table.attrs.table| safe }}>
-            {% block table.thead %}
-                <thead>
-                    <tr>
-                        {% block table_thead_before %}{% endblock table_thead_before %}
-                        {% for row in table.auto.th %}
-                            {% for column, th_attrs in row%}
-                                <th data-valign="middle"
-                                    data-align="center"
-                                    {{ th_attrs|safe }}>{{ column|safe }}</th>
-                            {% endfor %}
-                        {% empty %}
-                            <th>{{ table.empty_text }}</th>
-                        {% endfor %}
-                        {% block table_thead_after %}{% endblock table_thead_after %}
-                    </tr>
-                </thead>
-            {% endblock table.thead %}
-            {% block table.tbody %}
-                <tbody>
-                    {% for row in table.auto.td %}
-                    <tr>
-                        {% block table_tbody_before %}{% endblock table_tbody_before %}
-                        {% for data,td_attrs in row %}
-                            <td {{ td_attrs|safe }}{{ table.attrs.td|safe}}>{{ data|safe }}</td>
-                        {% empty %}
-                            <td>{{ table.empty_text }}</td>
-                        {% endfor %}
-                        {% block table_tbody_after %}{% endblock table_tbody_after %}
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            {% endblock table.tbody %}
-            {% block table.tfoot %}
-                <tfoot>
-                </tfoot>
-            {% endblock table.tfoot %}
-        </table>
-    {% endblock %}
+<div class="table-container" id="WorkSchedulerPanel2Table1ContainerId">
+    <table id="WorkSchedulerPanel2Table1TableId"></table>
 </div>
-{% endblock table_container %}
 
 <style>
     .detail{
@@ -62,18 +16,3 @@
 
     }
 </style>
-
-<script type="text/javascript">
-  var WorkScheduler_Panel2_Table1_container_id = "{{ table.container_id }}",
-      WorkScheduler_Panel2_Table1_id = "{{ table.table_id }}",
-      WorkScheduler_Panel2_Table1_url_edit = "{{ table.url.edit }}";
-
-  require(["{% static 'requirejs/config.js' %}"], function (config) {
-    require(["{% static 'WorkScheduler/js/WorkScheduler_Panel2_Table1.js' %}"],function(run){
-        run();
-        require(["{% static 'WorkScheduler/js/WorkScheduler_Panel1_Timeline1.js' %}"],function(run){
-        run()
-    })
-    })
-  });
-</script>
