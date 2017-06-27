@@ -142,7 +142,6 @@ class PageManager:
                                 start_datetime += timedelta(hours=-12)
 
                             duration = end_datetime - start_datetime - timedelta(hours=1)
-
                         # update db
                         worker = Workers.objects.get_or_create(name=row['worker'])[0]
                         WorkerAvailable.objects.update_or_create(name=worker,

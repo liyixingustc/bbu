@@ -37,7 +37,7 @@ class Page:
 
             @staticmethod
             def event_create(request, *args, **kwargs):
-                response = PageManager.PanelManager.TimeLineManager.event_update(request, *args, **kwargs)
+                response = PageManager.PanelManager.TimeLineManager.event_create(request, *args, **kwargs)
                 return response
 
         class Modal:

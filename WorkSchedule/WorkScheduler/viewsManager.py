@@ -14,21 +14,55 @@ from .tables.tablesManager import *
 
 EST = pytz.timezone(TIME_ZONE)
 
+
 class PageManager:
     class PanelManager:
         class TimeLineManager:
             @staticmethod
             def resources(request, *args, **kwargs):
                 start = request.GET.get('start')
-                workers = Workers.objects.all().values()
+                end = request.GET.get('end')
+
+                if start:
+                    start = dt.strptime(start,'%Y-%m-%d').replace(tzinfo=EST)
+                if end:
+                    end = dt.strptime(end,'%Y-%m-%d').replace(tzinfo=EST)
+
+                workers = Workers.objects.all()
+                response = []
+
                 if workers.exists():
-                    records = pd.DataFrame.from_records(workers)
-                    records.rename_axis({'name':'title'},axis=1,inplace=True)
-                    records['id'] = records['id'].astype('str')
-                    response = records.to_dict(orient='records')
+                    workers = pd.DataFrame.from_records(workers.values('id','name'))
+                    workers['id'] = workers['id'].astype('str')
+
+                    worker_avail = WorkerAvailable.objects.filter(time_start__gte=start,time_end__lte=end)
+                    worker_scheduled = WorkerScheduled.objects.filter(time_start__gte=start,time_end__lte=end)
+
+                    for index,row in workers.iterrows():
+                        if worker_avail.exists():
+                            worker_avail_df = pd.DataFrame.from_records(worker_avail.values('name', 'duration'))
+                            avail = worker_avail_df[worker_avail_df['name'] == row['name']]['duration']
+                            avail = avail.sum()
+                            # print(avail)
+                        else:
+                            avail = timedelta(hours=0)
+                        if worker_scheduled.exists():
+                            worker_scheduled_df = pd.DataFrame.from_records(worker_scheduled.values('name', 'duration'))
+                            scheduled = worker_scheduled_df[worker_scheduled_df['name'] == row['name']]['duration']
+                            scheduled = scheduled.sum()
+                        else:
+                            scheduled = timedelta(hours=0)
+                            # print(scheduled)
+
+                        balance = avail - scheduled
+                        workers.set_value(index, 'Avail', float(balance.total_seconds()/3600))
+
+                    workers.rename_axis({'name':'title'},axis=1,inplace=True)
+
+                    response = workers.to_dict(orient='records')
                     return JsonResponse(response,safe=False)
                 else:
-                    return JsonResponse({})
+                    return JsonResponse(response,safe=False)
 
             @staticmethod
             def events(request, *args, **kwargs):
@@ -56,22 +90,59 @@ class PageManager:
                 else:
                     avail_response = []
 
+                # task events
+                event_records = WorkerScheduled.objects.filter(date__range=[start.date(), end.date()])
+                if event_records.exists():
+                    event_records = pd.DataFrame.from_records(event_records.values('id',
+                                                                                   'name__id',
+                                                                                   'task_id__work_order',
+                                                                                   'time_start',
+                                                                                   'time_end'))
+                    event_records.rename_axis({'id': 'workerscheduledId',
+                                               'name__id': 'resourceId',
+                                               'task_id__work_order': 'taskId',
+                                               'time_start': 'start',
+                                               'time_end': 'end'}, axis=1, inplace=True)
+                    event_records['resourceId'] = event_records['resourceId'].astype('str')
+                    event_records['title'] = event_records['taskId']
+                    event_records['constraint'] = 'WorkerAvail'
+
+                    event_records = event_records.to_dict(orient='records')
+                else:
+                    event_records = []
+
                 response = []
                 response += avail_response
+                response += event_records
 
                 return JsonResponse(response,safe=False)
 
             @staticmethod
             def event_create(request, *args, **kwargs):
 
-                print(request.GET)
                 start = request.GET.get('start')
                 end = request.GET.get('end')
                 resourceId = request.GET.get('resourceId')
                 taskId = request.GET.get('taskId')
 
-                start = parse(start).replace(tzinfo=pytz.utc)
-                end = parse(end).replace(tzinfo=pytz.utc)
+                if start:
+                    start = parse(start).replace(tzinfo=EST)
+                if end:
+                    end = parse(end).replace(tzinfo=EST)
+                else:
+                    end = start + timedelta(hours=2)
+
+                duration = end - start
+
+                worker = Workers.objects.get(id__exact=resourceId)
+                task = Tasks.objects.get(work_order__exact=taskId)
+
+                worker_scheduled = WorkerScheduled.objects.update_or_create(name=worker,
+                                                                            date=start.date(),
+                                                                            time_start=start,
+                                                                            time_end=end,
+                                                                            task_id=task,
+                                                                            defaults={'duration': duration})
 
                 print(start, end, resourceId, taskId)
 
@@ -82,21 +153,37 @@ class PageManager:
             @staticmethod
             def event_update(request, *args, **kwargs):
 
-                print(request.GET)
                 start = request.GET.get('start')
                 end = request.GET.get('end')
                 resourceId = request.GET.get('resourceId')
                 taskId = request.GET.get('taskId')
+                workerscheduledId = request.GET.get('workerscheduledId')
+                print(start,end)
+                if start:
+                    start = parse(start).replace(tzinfo=EST)
+                if end:
+                    end = parse(end).replace(tzinfo=EST)
+                else:
+                    end = start + timedelta(hours=2)
+                print(start,end)
+                duration = end - start
 
-                start = parse(start).replace(tzinfo=pytz.utc)
-                end = parse(end).replace(tzinfo=pytz.utc)
+                worker = Workers.objects.get(id__exact=resourceId)
+                task = Tasks.objects.get(work_order__exact=taskId)
 
-                print(start,end,resourceId,taskId)
+                WorkerScheduled.objects.filter(id__exact=workerscheduledId).update(name=worker,
+                                                                                   date=start.date(),
+                                                                                   duration=duration,
+                                                                                   time_start=start,
+                                                                                   time_end=end,
+                                                                                   task_id=task
+                                                                                   )
+
+                # print(start,end,resourceId,taskId)
 
                 response = []
 
                 return JsonResponse(response,safe=False)
-
 
         class ModalManager:
             @staticmethod
@@ -105,8 +192,8 @@ class PageManager:
                 start = request.POST.get('start')
                 end = request.POST.get('end')
 
-                start = parse(start).replace(tzinfo=pytz.utc)
-                end = parse(end).replace(tzinfo=pytz.utc)
+                start = parse(start).replace(tzinfo=EST)
+                end = parse(end).replace(tzinfo=EST)
                 worker = Workers.objects.get(id=worker_id)
 
                 avails = WorkerAvailable.objects.filter(Q(time_start__range=[start,end])|

@@ -88,8 +88,41 @@ define(function (require) {
 			},
 			// eventOverlap: false, // will cause the event to take up entire resource height
 			resourceAreaWidth: '25%',
-			resourceLabelText: 'Workers',
+			// resourceLabelText: 'Workers',
             refetchResourcesOnNavigate: true,
+			resourceColumns: [
+				{
+					labelText: 'Workers',
+					field: 'title',
+					width: "80%"
+				},
+				{
+					labelText: 'Hrs',
+					field: 'Avail',
+					width: "20%",
+					render: function(resource, el) {
+
+						if (resource.Avail>0) {
+							el.css({
+								"color": "black",
+							    "background-color" : "LightGreen"
+    						});
+						}
+						else if(resource.Avail===0){
+							el.css({
+								"color": "black",
+							    "background-color" : "Azure"
+    						});
+						}
+						else if(resource.Avail<0){
+							el.css({
+								"color": "white",
+							    "background-color" : "Red"
+    						});
+						}
+					}
+				}
+			],
 			resources: { // you can also specify a plain string like 'json/resources.json'
 				url: 'Panel1/TimeLine1/resources/',
 				error: function() {
@@ -131,10 +164,23 @@ define(function (require) {
 			},
 			eventReceive: function(event) { // called when a proper external event is dropped
 				console.log('eventReceive', event);
-				$("#WorkSchedulerPanel2Table1TableId").bootstrapTable('refresh');
-				setTimeout(function () {
-					external_drag_init()
-                },500)
+
+				var eventData = {
+					resourceId: event.resourceId,
+					taskId: event.taskId,
+					start: event.start.format()
+					// end: event.end.format()
+				};
+
+				$.get('Panel1/TimeLine1/event_create/',eventData,function () {
+
+					$WorkScheduler_Panel1_Timeline1.fullCalendar('refetchEvents');
+					$WorkScheduler_Panel1_Timeline1.fullCalendar('refetchResources');
+					$("#WorkSchedulerPanel2Table1TableId").bootstrapTable('refresh');
+					setTimeout(function () {
+						external_drag_init()
+					},500)
+                });
 			},
 			eventDrop: function(event) { // called when an event (already on the calendar) is moved
 				console.log('eventDrop', event);
@@ -142,23 +188,40 @@ define(function (require) {
 				var eventData = {
 					resourceId: event.resourceId,
 					taskId: event.taskId,
+					workerscheduledId: event.workerscheduledId,
 					start: event.start.format(),
 					end: event.end.format()
 				};
 
                 $.get('Panel1/TimeLine1/event_update/',eventData,function () {
-
+					$WorkScheduler_Panel1_Timeline1.fullCalendar('refetchEvents');
+					$WorkScheduler_Panel1_Timeline1.fullCalendar('refetchResources');
+					$("#WorkSchedulerPanel2Table1TableId").bootstrapTable('refresh');
+					setTimeout(function () {
+						external_drag_init()
+					},500)
                 });
-
-				$("#WorkSchedulerPanel2Table1TableId").bootstrapTable('refresh');
-				setTimeout(function () {
-					external_drag_init()
-                },500)
             },
 			eventResize: function(event, delta, revertFunc) {
 
-				console.log(event,delta,revertFunc)
+				console.log(event,delta,revertFunc);
 
+				var eventData = {
+					resourceId: event.resourceId,
+					taskId: event.taskId,
+					workerscheduledId: event.workerscheduledId,
+					start: event.start.format(),
+					end: event.end.format()
+				};
+
+				$.get('Panel1/TimeLine1/event_update/',eventData,function () {
+					$WorkScheduler_Panel1_Timeline1.fullCalendar('refetchEvents');
+					$WorkScheduler_Panel1_Timeline1.fullCalendar('refetchResources');
+					$("#WorkSchedulerPanel2Table1TableId").bootstrapTable('refresh');
+					setTimeout(function () {
+						external_drag_init()
+					},500)
+                });
 			}
 		});
     }
