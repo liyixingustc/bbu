@@ -10,6 +10,8 @@ from bbu.settings import TIME_ZONE
 from ..WorkWorkers.models.models import *
 from ..WorkTasks.models.models import *
 
+import openpyxl
+
 EST = pytz.timezone(TIME_ZONE)
 
 
@@ -98,7 +100,8 @@ class PageManager:
                                                  'task_id__work_order':'Work Order',
                                                  'task_id__priority':'Priority',
                                                  'task_id__description':'Description',
-                                                 'task_id__estimate_hour':'EST'},inplace=True)
+                                                 'task_id__estimate_hour':'EST'},axis=1,inplace=True)
+                worker_scheduled_df['EST'] = worker_scheduled_df['EST'].apply(lambda x: x.total_seconds()/3600)
 
                 print(worker_scheduled_df)
 
