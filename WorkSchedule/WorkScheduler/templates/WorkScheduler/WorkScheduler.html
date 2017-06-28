@@ -2,11 +2,34 @@
 {% load static %}
 
 {% block content_dashboard %}
+  <div class="row tile_count">
+{#    <div class="col-md-3 col-sm-4 col-xs-6 tile_stats_count" id="WorkSchedulerPanel">#}
+{#      <span class="count_top"><i class="fa fa-edit"></i> Scheduled Tasks / Open Tasks</span>#}
+{#      <div class="count">25/50</div>#}
+{#      <span class="count_bottom"><i class="green">50% </i> Tasks Scheduled</span>#}
+{#    </div>#}
+    <div class="col-md-3 col-sm-4 col-xs-6 tile_stats_count">
+      <span class="count_top"><i class="fa fa-clock-o"></i> Scheduled Hrs / Available Hrs</span>
+      <div class="count" id="WorkSchedulerPanle3KPIBoard1Stats1">*/*</div>
+      <span class="count_bottom"><i class="green" id="WorkSchedulerPanle3KPIBoard1Stats2">*% </i> Worker Occupied</span>
+    </div>
+{#    <div class="col-md-3 col-sm-4 col-xs-6 tile_stats_count">#}
+{#      <span class="count_top"><i class="fa fa-clock-o"></i> Scheduled hours / Estimate hours</span>#}
+{#      <div class="count green">100/200</div>#}
+{#      <span class="count_bottom"><i class="green">50% </i> Scheduled hour rate</span>#}
+{#    </div>#}
+{#    <div class="col-md-3 col-sm-4 col-xs-6 tile_stats_count">#}
+{#      <span class="count_top"><i class="fa fa-clock-o"></i> Scheduled hours / Available hours</span>#}
+{#      <div class="count">100/110</div>#}
+{#      <span class="count_bottom"><i class="red">90.9% </i> Occupied hour rate</span>#}
+{#    </div>#}
+  </div>
 
-<div class="row">
-  {% include 'WorkScheduler/WorkScheduler_Panel1.html' %}
-  {% include 'WorkScheduler/WorkScheduler_Panel2.html' %}
-</div>
+
+  <div class="row">
+    {% include 'WorkScheduler/WorkScheduler_Panel1.html' %}
+    {% include 'WorkScheduler/WorkScheduler_Panel2.html' %}
+  </div>
 
 
 {% endblock content_dashboard %}

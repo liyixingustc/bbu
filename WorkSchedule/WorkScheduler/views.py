@@ -52,6 +52,12 @@ class Page:
                 response = PageManager.PanelManager.TableManager.create(request, *args, **kwargs)
                 return response
 
+        class KPIBoard:
+            @staticmethod
+            def update(request, *args, **kwargs):
+                response = PageManager.PanelManager.KPIBoardManager.update(request, *args, **kwargs)
+                return response
+
 
 mapping = pd.DataFrame([
     {'page': 'WorkScheduler', 'panel': 'None', 'widget': 'None', 'func': 'index', 'register': Page.index},
@@ -61,6 +67,7 @@ mapping = pd.DataFrame([
     {'page': 'WorkScheduler', 'panel': 'Panel1', 'widget': 'TimeLine1', 'func': 'event_create', 'register': Page.Panel.TimeLine.event_create},
     {'page': 'WorkScheduler', 'panel': 'Panel2', 'widget': 'Table1', 'func': 'create', 'register': Page.Panel.Table.create},
     {'page': 'WorkScheduler', 'panel': 'Panel1', 'widget': 'Modal1', 'func': 'extend_worker_avail', 'register': Page.Panel.Modal.extend_worker_avail},
+    {'page': 'WorkScheduler', 'panel': 'Panel3', 'widget': 'KPIBoard', 'func': 'update','register': Page.Panel.KPIBoard.update},
 ])
 
 

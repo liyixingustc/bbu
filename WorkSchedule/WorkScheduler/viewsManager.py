@@ -239,3 +239,38 @@ class PageManager:
                     return JsonResponse(response, safe=False)
                 else:
                     return JsonResponse({})
+
+        class KPIBoardManager:
+            @staticmethod
+            def update(request, *args, **kwargs):
+
+                start = request.GET.get('start')
+                end = request.GET.get('end')
+
+                if start:
+                    start = dt.strptime(start,'%Y-%m-%d').replace(tzinfo=EST)
+                if end:
+                    end = dt.strptime(end,'%Y-%m-%d').replace(tzinfo=EST)
+                worker_avail = WorkerAvailable.objects.filter(time_start__gte=start, time_end__lte=end)
+                worker_scheduled = WorkerScheduled.objects.filter(time_start__gte=start, time_end__lte=end)
+                if worker_avail.exists():
+                    worker_avail_df = pd.DataFrame.from_records(worker_avail.values('duration'))
+                    avail = worker_avail_df['duration'].sum().total_seconds() / 3600
+                else:
+                    avail = 0
+                if worker_scheduled.exists():
+                    worker_scheduled_df = pd.DataFrame.from_records(worker_scheduled.values('duration'))
+                    scheduled = worker_scheduled_df['duration'].sum().total_seconds() / 3600
+                else:
+                    scheduled = 0
+
+                avail_remain = avail - scheduled
+                task_remain = 0
+
+                response = {'avail': avail,
+                            'scheduled': scheduled,
+                            'avail_remain': avail_remain,
+                            'task_remain': task_remain}
+
+                return JsonResponse(response)
+

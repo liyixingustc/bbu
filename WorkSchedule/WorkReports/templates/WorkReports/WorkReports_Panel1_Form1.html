@@ -1,0 +1,33 @@
+  <form method="post" id="WorkReportsPanel1Form1FormId" class="form-horizontal form-label-left">
+  {% csrf_token %}
+    <div class="form-group">
+      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="ReportType">Report Type <span class="required">*</span>
+      </label>
+      <div class="col-md-6 col-sm-6 col-xs-12">
+        <select id="ReportType" name="ReportType" class="select2_single form-control col-md-7 col-xs-12" style="width:80% " required>
+          <option value="WorkAssignmentsSummary">Work Assignments Summary</option>
+          <option value="WorkOrderBacklog">Work Order Backlog</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="PeriodStart">Period Start<span class="required">*</span>
+      </label>
+      <div class="col-md-6 col-sm-6 col-xs-12">
+        <input type="text" id="PeriodStart" name="PeriodStart" class="form-control col-md-7 col-xs-12 datepicker" placeholder="YYYY-MM-DD" data-inputmask="'mask': '99/99/9999'" style="width:80% " required>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="PeriodEnd">Period End<span class="required">*</span>
+      </label>
+      <div class="col-md-6 col-sm-6 col-xs-12">
+        <input type="text" id="PeriodEnd" name="PeriodEnd" class="form-control col-md-7 col-xs-12 datepicker" placeholder="YYYY-MM-DD" data-inputmask="'mask': '99/99/9999'" style="width:80% " required>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="control-label col-md-3 col-sm-3 col-xs-12"></label>
+      <div class="col-md-6 col-sm-6 col-xs-12">
+        <button type="submit" class="btn btn-primary " id="WorkReportsPanel1Form1Submit">Create Report</button>
+      </div>
+    </div>
+  </form>

@@ -23,7 +23,7 @@ define(function (require) {
 
     function run() {
 
-        init();
+		init();
         event();
     }
 
@@ -222,7 +222,15 @@ define(function (require) {
 						external_drag_init()
 					},500)
                 });
-			}
+			},
+			loading: function (isLoading, view) {
+
+            	if (isLoading === false){
+            		var start = view.currentRange.start.format(),
+						end = view.currentRange.end.format();
+					KPI_board_update(start,end)
+				}
+            }
 		});
     }
 
@@ -252,7 +260,31 @@ define(function (require) {
 
 			$('#WorkSchedulerPanel1Modal1No').click();
 		});
+    }
 
+	function KPI_board_update(start, end) {
+    	var data = {'start':start,
+					'end':end};
+		$.get('Panel3/KPIBoard/update/', data, function (result) {
+
+			var scheduled = result['scheduled'],
+				avail = result['avail'],
+				percent = 0,
+				$WorkSchedulerPanle3KPIBoard1Stats1 = $("#WorkSchedulerPanle3KPIBoard1Stats1"),
+				$WorkSchedulerPanle3KPIBoard1Stats2 = $("#WorkSchedulerPanle3KPIBoard1Stats2");
+
+			if(avail===0){percent=0}
+			else if(avail>0){percent=scheduled/avail}
+
+			$WorkSchedulerPanle3KPIBoard1Stats1.text(scheduled +"/"+ avail);
+			$WorkSchedulerPanle3KPIBoard1Stats2.text(Math.round(percent*100)+"%");
+			if(percent>=0.5){
+				$WorkSchedulerPanle3KPIBoard1Stats2.attr('class','red')
+			}
+			else if(percent<0.5){
+				$WorkSchedulerPanle3KPIBoard1Stats2.attr('class','green')
+			}
+        });
     }
 
     return run

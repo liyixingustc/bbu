@@ -28,4 +28,5 @@ urlpatterns += [
     url(r'^WorkSchedule/2/', include('WorkSchedule.WorkWorkers.urls')),
     url(r'^WorkSchedule/3/', include('WorkSchedule.WorkTasks.urls')),
     url(r'^WorkSchedule/4/', include('WorkSchedule.WorkScheduler.urls')),
+    url(r'^WorkSchedule/5/', include('WorkSchedule.WorkReports.urls')),
 ]
