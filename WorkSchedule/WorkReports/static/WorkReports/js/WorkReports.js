@@ -96,7 +96,7 @@ define(function (require) {
             $.get('Panel1/Form1/submit/',data,function () {
                 $form_refresh.html("Create Report");
             });
-            // window.location.href = 'reservation_trace/download/';
+            window.location.href = 'Panel1/Form1/download/';
             return false
         });
     }

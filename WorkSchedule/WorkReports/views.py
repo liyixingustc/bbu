@@ -38,11 +38,17 @@ class Page:
                 response = PageManager.PanelManager.FormManager.submit(request, *args, **kwargs)
                 return response
 
+            @staticmethod
+            def download(request, *args, **kwargs):
+                response = PageManager.PanelManager.FormManager.download(request, *args, **kwargs)
+                return response
+
 
 mapping = pd.DataFrame([
     {'page': 'WorkReports', 'panel': 'None', 'widget': 'None', 'func': 'index', 'register': Page.index},
     {'page': 'WorkReports', 'panel': 'Panel1', 'widget': 'Table1', 'func': 'create', 'register': Page.Panel.Table.create},
     {'page': 'WorkReports', 'panel': 'Panel1', 'widget': 'Form1', 'func': 'submit', 'register': Page.Panel.Form.submit},
+    {'page': 'WorkReports', 'panel': 'Panel1', 'widget': 'Form1', 'func': 'download', 'register': Page.Panel.Form.download},
 ])
 
 
