@@ -96,11 +96,13 @@ class PageManager:
                     event_records = pd.DataFrame.from_records(event_records.values('id',
                                                                                    'name__id',
                                                                                    'task_id__work_order',
+                                                                                   'task_id__description',
                                                                                    'time_start',
                                                                                    'time_end'))
                     event_records.rename_axis({'id': 'workerscheduledId',
                                                'name__id': 'resourceId',
                                                'task_id__work_order': 'taskId',
+                                               'task_id__description': 'description',
                                                'time_start': 'start',
                                                'time_end': 'end'}, axis=1, inplace=True)
                     event_records['resourceId'] = event_records['resourceId'].astype('str')
@@ -251,8 +253,12 @@ class PageManager:
                     start = dt.strptime(start,'%Y-%m-%d').replace(tzinfo=EST)
                 if end:
                     end = dt.strptime(end,'%Y-%m-%d').replace(tzinfo=EST)
+
                 worker_avail = WorkerAvailable.objects.filter(time_start__gte=start, time_end__lte=end)
                 worker_scheduled = WorkerScheduled.objects.filter(time_start__gte=start, time_end__lte=end)
+                tasks = Tasks.objects.filter(Q(current_status__in=['new', 'pending']) |
+                                             Q(create_on__range=[start, end], current_status__in=['completed']))
+
                 if worker_avail.exists():
                     worker_avail_df = pd.DataFrame.from_records(worker_avail.values('duration'))
                     avail = worker_avail_df['duration'].sum().total_seconds() / 3600
@@ -263,9 +269,14 @@ class PageManager:
                     scheduled = worker_scheduled_df['duration'].sum().total_seconds() / 3600
                 else:
                     scheduled = 0
+                if tasks.exists():
+                    tasks_df = pd.DataFrame.from_records(tasks.values('estimate_hour'))
+                    tasks_est = tasks_df['estimate_hour'].sum().total_seconds() / 3600
+                else:
+                    tasks_est = 0
 
                 avail_remain = avail - scheduled
-                task_remain = 0
+                task_remain = tasks_est - scheduled
 
                 response = {'avail': avail,
                             'scheduled': scheduled,

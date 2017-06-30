@@ -22,6 +22,11 @@ require.config({
         'jquery-ui' : ['/static/fullcalendar-scheduler/lib/jquery-ui.min'],
         'fullcalendar' : ['/static/fullcalendar/dist/fullcalendar.min'],
         'scheduler' : ['/static/fullcalendar-scheduler/scheduler.min'],
+        'qTip2' : ['/static/qTip2/dist/jquery.qtip.min'],
+        'pnotify' : ['/static/gentelella/vendors/pnotify/dist/pnotify'],
+        'pnotify-buttons' : ['/static/gentelella/vendors/pnotify/dist/pnotify.buttons'],
+        'pnotify-nonblock' : ['/static/gentelella/vendors/pnotify/dist/pnotify.nonblock'],
+        'pnotify-animate' : ['/static/gentelella/vendors/pnotify/dist/pnotify.animate'],
         // bootstrap table extensions
         'bootstrap-table-export' : ['/static/bootstrap-table/dist/extensions/export/bootstrap-table-export.min'],
         'tableExport' : ['http://rawgit.com/hhurz/tableExport.jquery.plugin/master/tableExport'],
@@ -67,6 +72,12 @@ require.config({
         },
         'scheduler':{
             deps:['jquery','moment','fullcalendar']
+        },
+        'qTip2':{
+            deps:['jquery','bootstrap']
+        },
+        'pnotify':{
+            deps:['jquery','bootstrap']
         },
         // bootstrap table extensions
         'bootstrap-table-export':{

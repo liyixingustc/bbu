@@ -50,7 +50,7 @@ define(function (require) {
             columns:[
                 {
                     field: 'line',
-                    title: 'L',
+                    title: 'Line',
                     sortable: true,
                     searchable: true,
                     editable: true,

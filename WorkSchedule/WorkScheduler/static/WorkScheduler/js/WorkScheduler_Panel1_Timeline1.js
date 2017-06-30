@@ -11,7 +11,12 @@ define(function (require) {
         moment = require('moment'),
         jqueryUI = require('jquery-ui'),
         fullcalendar = require('fullcalendar'),
-        scheduler = require('scheduler');
+        scheduler = require('scheduler'),
+    	PNotify = require('pnotify'),
+		PNotify_buttons = require('pnotify-buttons'),
+		PNotify_nonblock = require('pnotify-nonblock'),
+		PNotify_animate = require('pnotify-animate'),
+		qTip2 = require('qTip2');
 
     var fullDate = new Date();
     //convert month to 2 digits
@@ -38,9 +43,9 @@ define(function (require) {
 				// store data so the calendar knows to render an event upon drop
 				$(this).data('event', {
 					title: $.trim($(this).children('td').eq(1).text()), // use the element's text as the event title
-					stick: true, // maintain when user navigates (see docs on the renderEvent method)
+					// stick: true, // maintain when user navigates (see docs on the renderEvent method)
 					constraint: 'WorkerAvail',
-					color: '#257e4a',
+					// color: '#257e4a',
 					// parameters
 					taskId: $.trim($(this).children('td').eq(1).text())
 				});
@@ -138,13 +143,13 @@ define(function (require) {
 
 			// events callback
 			eventRender: function(event, element) {
-				if(event.rendering !== 'background'){
-					element.find(".fc-content").prepend("<span class='closeon'>X</span>");
-					element.find(".closeon").on('click', function() {
-						$WorkScheduler_Panel1_Timeline1.fullCalendar('removeEvents',event._id);
-						console.log('delete');
-					});
-				}
+				// if(event.rendering !== 'background'){
+				// 	element.find(".fc-content").prepend("<span class='closeon'>X</span>");
+				// 	element.find(".closeon").on('click', function() {
+				// 		$WorkScheduler_Panel1_Timeline1.fullCalendar('removeEvents',event._id);
+				// 		console.log('delete');
+				// 	});
+				// }
 			},
             drop: function(date, jsEvent, ui, resourceId) {
 				console.log('drop', date.format(), resourceId);
@@ -223,6 +228,26 @@ define(function (require) {
 					},500)
                 });
 			},
+			// eventClick:function(event, jsEvent, view){
+            	// console.log(event)
+			// },
+            eventMouseover:function (event, jsEvent, view) {
+				var tooltip = '<div class="tooltipevent" style="width:100px;height:100px;background:#ccc;position:absolute;z-index:10001;">' + event.description + '</div>';
+				console.log(event)
+				$("body").append(tooltip);
+				$(this).mouseover(function(e) {
+					$(this).css('z-index', 10000);
+					$('.tooltipevent').fadeIn('500');
+					$('.tooltipevent').fadeTo('10', 1.9);
+				}).mousemove(function(e) {
+					$('.tooltipevent').css('top', e.pageY + 10);
+					$('.tooltipevent').css('left', e.pageX + 20);
+				});
+            },
+			eventMouseout: function(calEvent, jsEvent) {
+				 $(this).css('z-index', 8);
+				 $('.tooltipevent').remove();
+			},
 			loading: function (isLoading, view) {
 
             	if (isLoading === false){
@@ -251,9 +276,25 @@ define(function (require) {
 					overlap: true
 				};
                 $.post('Panel1/Modal1/extend_worker_avail/',eventData,function () {
+					$WorkScheduler_Panel1_Timeline1.fullCalendar('refetchEvents');
+					$WorkScheduler_Panel1_Timeline1.fullCalendar('refetchResources');
 
+					var notice = new PNotify({
+										title: 'Success!',
+										text: 'You have successfully extended the worker available hours',
+										type: 'success',
+										sound: false,
+										animate_speed: 'fast',
+										styling: 'bootstrap3',
+										nonblock: {
+											nonblock: true
+										}
+									});
+					notice.get().click(function() {
+						notice.remove();
+					});
                 });
-				$WorkScheduler_Panel1_Timeline1.fullCalendar('renderEvent', eventData, true); // stick? = true
+
 				WorkSchedulerPanel1Modal1Choice = false
 			}
 			$WorkScheduler_Panel1_Timeline1.fullCalendar('unselect');
@@ -269,21 +310,42 @@ define(function (require) {
 
 			var scheduled = result['scheduled'],
 				avail = result['avail'],
-				percent = 0,
+				avail_remain = result['avail_remain'],
+				task_remain = result['task_remain'],
+				percent1 = 0,
+				percent2 = 0,
 				$WorkSchedulerPanle3KPIBoard1Stats1 = $("#WorkSchedulerPanle3KPIBoard1Stats1"),
-				$WorkSchedulerPanle3KPIBoard1Stats2 = $("#WorkSchedulerPanle3KPIBoard1Stats2");
+				$WorkSchedulerPanle3KPIBoard1Stats2 = $("#WorkSchedulerPanle3KPIBoard1Stats2"),
+				WorkSchedulerPanle3KPIBoard2Stats1 = $("#WorkSchedulerPanle3KPIBoard2Stats1"),
+				WorkSchedulerPanle3KPIBoard2Stats2 = $("#WorkSchedulerPanle3KPIBoard2Stats2");
 
-			if(avail===0){percent=0}
-			else if(avail>0){percent=scheduled/avail}
 
-			$WorkSchedulerPanle3KPIBoard1Stats1.text(scheduled +"/"+ avail);
-			$WorkSchedulerPanle3KPIBoard1Stats2.text(Math.round(percent*100)+"%");
-			if(percent>=0.5){
-				$WorkSchedulerPanle3KPIBoard1Stats2.attr('class','red')
-			}
-			else if(percent<0.5){
+			// KPIboard 1 setting
+			if(avail===0){percent1=0}
+			else if(avail>0){percent1=scheduled/avail}
+
+			$WorkSchedulerPanle3KPIBoard1Stats1.text(Math.round(scheduled)+"/"+ Math.round(avail)+" hrs");
+			$WorkSchedulerPanle3KPIBoard1Stats2.text(Math.round(percent1*100)+"%");
+			if(percent1<1){
 				$WorkSchedulerPanle3KPIBoard1Stats2.attr('class','green')
 			}
+			else if(percent1>=1){
+				$WorkSchedulerPanle3KPIBoard1Stats2.attr('class','red')
+			}
+
+			// KPIboard 2 setting
+			if(task_remain===0){percent2=0}
+			else if(task_remain>0){percent2=avail_remain/task_remain}
+
+			WorkSchedulerPanle3KPIBoard2Stats1.text(Math.round(avail_remain) +"/"+ Math.round(task_remain)+" hrs");
+			WorkSchedulerPanle3KPIBoard2Stats2.text(Math.round(percent2*100)+"%");
+			if(percent2>=1){
+				WorkSchedulerPanle3KPIBoard2Stats2.attr('class','green')
+			}
+			else if(percent2<1){
+				WorkSchedulerPanle3KPIBoard2Stats2.attr('class','red')
+			}
+
         });
     }
 
