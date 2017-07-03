@@ -112,10 +112,12 @@ define(function (require) {
         select2 = require('select2');
 
     $(function () {
-        $('.select2_single').select2();
+        $('.select2_single').select2({
+            allowClear: true
+        });
         $(".select2_multiple").select2({
-          maximumSelectionLength: 4,
-          placeholder: "With Max Selection limit 4",
+          // maximumSelectionLength: 4,
+          // placeholder: "With Max Selection limit 4",
           allowClear: true
         });
         $(".datepicker").datepicker({
