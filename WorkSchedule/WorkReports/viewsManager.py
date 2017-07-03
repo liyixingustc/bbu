@@ -80,9 +80,10 @@ class PageManager:
         class FormManager:
             @staticmethod
             def submit(request, *args, **kwargs):
-                ReportType = request.GET.get('ReportType')
+                report_type = request.GET.get('ReportType')
                 start = request.GET.get('PeriodStart')
                 end = request.GET.get('PeriodEnd')
+                worker = request.GET.get('Worker')
 
                 if start:
                     start = dt.strptime(start,'%Y-%m-%d').replace(tzinfo=EST)

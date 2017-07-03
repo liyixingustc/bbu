@@ -113,6 +113,11 @@ define(function (require) {
 
     $(function () {
         $('.select2_single').select2();
+        $(".select2_multiple").select2({
+          maximumSelectionLength: 4,
+          placeholder: "With Max Selection limit 4",
+          allowClear: true
+        });
         $(".datepicker").datepicker({
             todayHighlight: true,
             format: "yyyy-mm-dd"
