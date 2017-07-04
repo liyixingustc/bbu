@@ -46,6 +46,7 @@ class PageManager:
 
                 # data init
                 # common tasks
+                print(data)
                 new_tasks_list = data['Work Order'].tolist()
                 archived_tasks_list = tasks['work_order'].tolist()
                 common_list = list(set(new_tasks_list) & set(archived_tasks_list))
