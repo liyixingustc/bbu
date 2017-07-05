@@ -1,5 +1,6 @@
 from django.http import JsonResponse
 from django.shortcuts import render
+import numpy as np
 import pandas as pd
 import pytz
 from datetime import datetime as dt
@@ -80,7 +81,7 @@ class PageManager:
 
                     avail_events['id'] = 'WorkerAvail'
                     avail_events['rendering'] = 'background'
-                    avail_events['color'] = 'light green'
+                    avail_events['color'] = 'lightgreen'
                     avail_events.rename_axis({'name__id': 'resourceId',
                                               'time_start': 'start',
                                               'time_end': 'end'},axis=1,inplace=True)
@@ -97,17 +98,27 @@ class PageManager:
                                                                                    'name__id',
                                                                                    'task_id__work_order',
                                                                                    'task_id__description',
+                                                                                   'task_id__priority',
+                                                                                   'task_id__estimate_hour',
+                                                                                   'duration',
                                                                                    'time_start',
                                                                                    'time_end'))
                     event_records.rename_axis({'id': 'workerscheduledId',
                                                'name__id': 'resourceId',
                                                'task_id__work_order': 'taskId',
                                                'task_id__description': 'description',
+                                               'task_id__priority': 'priority',
+                                               'task_id__estimate_hour': 'est',
+                                               'duration': 'duration',
                                                'time_start': 'start',
                                                'time_end': 'end'}, axis=1, inplace=True)
                     event_records['resourceId'] = event_records['resourceId'].astype('str')
                     event_records['title'] = event_records['taskId']
                     event_records['constraint'] = 'WorkerAvail'
+                    event_records['percent'] = event_records['duration']/event_records['est']
+                    event_records['percent'] = event_records['percent'].apply(lambda x: np.round(x, 2))
+                    event_records['remaining_hours'] = event_records['est'] - event_records['duration']
+                    event_records['remaining_hours'] = event_records['remaining_hours'].apply(lambda x:round(x.total_seconds()/3600))
 
                     event_records = event_records.to_dict(orient='records')
                 else:

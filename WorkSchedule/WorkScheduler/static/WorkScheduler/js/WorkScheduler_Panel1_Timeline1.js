@@ -12,6 +12,8 @@ define(function (require) {
         jqueryUI = require('jquery-ui'),
         fullcalendar = require('fullcalendar'),
         scheduler = require('scheduler'),
+		nprogress = require('nprogress'),
+        progressbar = require('bootstrap-progressbar'),
     	PNotify = require('pnotify'),
 		PNotify_buttons = require('pnotify-buttons'),
 		PNotify_nonblock = require('pnotify-nonblock'),
@@ -150,6 +152,48 @@ define(function (require) {
 				// 		console.log('delete');
 				// 	});
 				// }
+
+				if(event.rendering !== 'background'){
+
+					var color = 'grey';
+
+					switch (event.priority){
+						case 's':color = 'yellow';break;
+						case 'u':color = 'red';break;
+						case '1':color = 'green';break;
+						case '2':color = 'blue';break;
+						case '3':color = 'tan';break;
+						case undefined:color = 'grey';break;
+					}
+					// <span class="fc-title" style="position: relative; top: 0px; left: 0px;">17004298</span>
+
+					var html_content =
+					    '<div class="progress" style="height: 36px">\
+						  <div class="progress-bar progress-bar-striped active progress-bar-'+color+'" role="progressbar"\
+						  aria-valuenow="'+event.percent*100+'" aria-valuemin="0" aria-valuemax="100" style="width:100%">\
+							<span>'+event.taskId+'</br>complete: '+Math.round(event.percent*100)+'%</span>\
+						  </div>\
+						 </div>';
+
+					element.find('.fc-content').html(html_content);
+					element.css({'margin':'0','padding':'0','border':'0','background-color':'transparent'});
+					element.find('.progress').css({'margin':'0','padding':'0','border':'0'});
+					element.find('.progress .progress-bar').css({'margin':'0','padding':'0','border':'0','position':'static'});
+					// console.log(element)
+				}
+			},
+			eventAfterRender:function( event, element, view ) {
+            	// console.log(element)
+				if(event.rendering !== 'background'){
+					// element.find('.progress .progress-bar').progressbar({display_text: 'center', use_percentage: false});
+					var qtip_html =
+						'Complete: ' + Math.round(event.percent*100)+ '%<br/>\
+						Task description:' + event.description
+						;
+					element.qtip({
+						content: qtip_html
+					});
+				}
 			},
             drop: function(date, jsEvent, ui, resourceId) {
 				console.log('drop', date.format(), resourceId);
@@ -232,21 +276,21 @@ define(function (require) {
             	// console.log(event)
 			// },
             eventMouseover:function (event, jsEvent, view) {
-				var tooltip = '<div class="tooltipevent" style="width:100px;height:100px;background:#ccc;position:absolute;z-index:10001;">' + event.description + '</div>';
-				console.log(event)
-				$("body").append(tooltip);
-				$(this).mouseover(function(e) {
-					$(this).css('z-index', 10000);
-					$('.tooltipevent').fadeIn('500');
-					$('.tooltipevent').fadeTo('10', 1.9);
-				}).mousemove(function(e) {
-					$('.tooltipevent').css('top', e.pageY + 10);
-					$('.tooltipevent').css('left', e.pageX + 20);
-				});
+				// var tooltip = '<div class="tooltipevent" style="width:100px;height:100px;background:#ccc;position:absolute;z-index:10001;">' + event.description + '</div>';
+				// console.log(event)
+				// $("body").append(tooltip);
+				// $(this).mouseover(function(e) {
+				// 	$(this).css('z-index', 10000);
+				// 	$('.tooltipevent').fadeIn('500');
+				// 	$('.tooltipevent').fadeTo('10', 1.9);
+				// }).mousemove(function(e) {
+				// 	$('.tooltipevent').css('top', e.pageY + 10);
+				// 	$('.tooltipevent').css('left', e.pageX + 20);
+				// });
             },
 			eventMouseout: function(calEvent, jsEvent) {
-				 $(this).css('z-index', 8);
-				 $('.tooltipevent').remove();
+				 // $(this).css('z-index', 8);
+				 // $('.tooltipevent').remove();
 			},
 			loading: function (isLoading, view) {
 
@@ -348,6 +392,10 @@ define(function (require) {
 
         });
     }
+
+    // $(function () {
+    // 	$('.progress .progress-bar').progressbar();
+    // });
 
     return run
 });

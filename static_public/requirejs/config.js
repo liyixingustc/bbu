@@ -14,7 +14,7 @@ require.config({
         'bootstrap-table' : ['/static/bootstrap-table/dist/bootstrap-table.min'],
         'bootstrap-fileinput' : ['/static/bootstrap-fileinput/js/fileinput.min'],
         'bootstrap-datepicker':['/static/bootstrap-datepicker/dist/js/bootstrap-datepicker.min'],
-        'gentelella' : ['/static/gentelella/build/js/custom.min'],
+        'gentelella' : ['/static/gentelella/build/js/custom'],
         'select2' : [
                     // 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min',
                      '/static/select2/dist/js/select2.min'],
@@ -27,6 +27,12 @@ require.config({
         'pnotify-buttons' : ['/static/gentelella/vendors/pnotify/dist/pnotify.buttons'],
         'pnotify-nonblock' : ['/static/gentelella/vendors/pnotify/dist/pnotify.nonblock'],
         'pnotify-animate' : ['/static/gentelella/vendors/pnotify/dist/pnotify.animate'],
+        // progressbar
+        'nprogress' : ['/static/gentelella/vendors/nprogress/nprogress'],
+        'bootstrap-progressbar' : [
+            '/static/gentelella/vendors/bootstrap-progressbar/bootstrap-progressbar.min',
+            // '/static/bootstrap-progressbar/bootstrap-progressbar.min'
+        ],
         // bootstrap table extensions
         'bootstrap-table-export' : ['/static/bootstrap-table/dist/extensions/export/bootstrap-table-export.min'],
         'tableExport' : ['http://rawgit.com/hhurz/tableExport.jquery.plugin/master/tableExport'],
@@ -77,6 +83,9 @@ require.config({
             deps:['jquery','bootstrap']
         },
         'pnotify':{
+            deps:['jquery','bootstrap']
+        },
+        'bootstrap-progressbar':{
             deps:['jquery','bootstrap']
         },
         // bootstrap table extensions
