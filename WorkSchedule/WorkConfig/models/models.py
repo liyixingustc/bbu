@@ -19,10 +19,10 @@ class Workers(models.Model):
 
 
 class Documents(models.Model):
-    name = models.CharField(max_length=30, null=True, blank=True)
+    name = models.CharField(max_length=30, null=True, blank=True, unique=True)
     date = models.DateTimeField(default=datetime.datetime.now)
     document = models.FileField(upload_to='WorkSchedule/WorkConfig/excel')
-    created_by = models.ForeignKey(User,default=1)
+    created_by = models.ForeignKey(User, db_column='created_by', default=1)
     created_on = models.DateTimeField(default=datetime.datetime.now)
 
 

@@ -9,6 +9,10 @@ import datetime
 
 # Create your models here.
 
+source_choice = (('manual', 'manual'),
+                 ('file', 'file'),
+                 ('somax', 'somax'),
+                )
 
 class WorkerAvailable(models.Model):
 
@@ -18,9 +22,10 @@ class WorkerAvailable(models.Model):
     deduction = models.DurationField(default=WorkAvailSheet.DEDUCTION)
     time_start = models.DateTimeField(default=datetime.datetime.now)
     time_end = models.DateTimeField(default=datetime.datetime.now)
-    created_by = models.ForeignKey(User,default=1)
+    created_by = models.ForeignKey(User, db_column='created_by', default=1)
     created_on = models.DateTimeField(default=datetime.datetime.now)
-
+    source = models.CharField(max_length=10, choices=source_choice, default='manual')
+    document = models.ForeignKey(Documents, db_column='document', to_field='name', null=True, blank=True)
 
 class WorkerScheduled(models.Model):
 
@@ -31,8 +36,10 @@ class WorkerScheduled(models.Model):
     time_start = models.DateTimeField(default=datetime.datetime.now)
     time_end = models.DateTimeField(default=datetime.datetime.now)
     task_id = models.ForeignKey(Tasks, db_column='task_id')
-    created_by = models.ForeignKey(User,default=1)
+    created_by = models.ForeignKey(User, db_column='created_by', default=1)
     created_on = models.DateTimeField(default=datetime.datetime.now)
+    source = models.CharField(max_length=10, choices=source_choice, default='manual')
+    document = models.ForeignKey(Documents, db_column='document', to_field='name', null=True, blank=True)
 
 
 class WorkerActual(models.Model):
@@ -44,8 +51,10 @@ class WorkerActual(models.Model):
     time_start = models.DateTimeField(default=datetime.datetime.now)
     time_end = models.DateTimeField(default=datetime.datetime.now)
     task_id = models.ForeignKey(Tasks, db_column='task_id')
-    created_by = models.ForeignKey(User, default=1)
+    created_by = models.ForeignKey(User, db_column='created_by', default=1)
     created_on = models.DateTimeField(default=datetime.datetime.now)
+    source = models.CharField(max_length=10, choices=source_choice, default='manual')
+    document = models.ForeignKey(Documents, db_column='document', to_field='name', null=True, blank=True)
 
 #
 # class WorkerScheduledTask(models.Model):
