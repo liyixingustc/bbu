@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 from accounts.models import User
 from ...WorkConfig.models.models import *
@@ -14,16 +15,17 @@ source_choice = (('manual', 'manual'),
                  ('somax', 'somax'),
                 )
 
+
 class WorkerAvailable(models.Model):
 
     name = models.ForeignKey(Workers, verbose_name='name', db_column='name', to_field='name')
     date = models.DateField()
     duration = models.DurationField(default=timedelta(hours=0))
     deduction = models.DurationField(default=WorkAvailSheet.DEDUCTION)
-    time_start = models.DateTimeField(default=datetime.datetime.now)
-    time_end = models.DateTimeField(default=datetime.datetime.now)
+    time_start = models.DateTimeField(default=timezone.now)
+    time_end = models.DateTimeField(default=timezone.now)
     created_by = models.ForeignKey(User, db_column='created_by', default=1)
-    created_on = models.DateTimeField(default=datetime.datetime.now)
+    created_on = models.DateTimeField(default=timezone.now())
     source = models.CharField(max_length=10, choices=source_choice, default='manual')
     document = models.ForeignKey(Documents, db_column='document', to_field='name', null=True, blank=True)
 
@@ -33,11 +35,11 @@ class WorkerScheduled(models.Model):
     date = models.DateField()
     duration = models.DurationField(default=timedelta(hours=0))
     deduction = models.DurationField(default=WorkAvailSheet.DEDUCTION)
-    time_start = models.DateTimeField(default=datetime.datetime.now)
-    time_end = models.DateTimeField(default=datetime.datetime.now)
+    time_start = models.DateTimeField(default=timezone.now)
+    time_end = models.DateTimeField(default=timezone.now)
     task_id = models.ForeignKey(Tasks, db_column='task_id')
     created_by = models.ForeignKey(User, db_column='created_by', default=1)
-    created_on = models.DateTimeField(default=datetime.datetime.now)
+    created_on = models.DateTimeField(default=timezone.now)
     source = models.CharField(max_length=10, choices=source_choice, default='manual')
     document = models.ForeignKey(Documents, db_column='document', to_field='name', null=True, blank=True)
 
@@ -48,11 +50,11 @@ class WorkerActual(models.Model):
     date = models.DateField()
     duration = models.DurationField(default=timedelta(hours=0))
     deduction = models.DurationField(default=WorkAvailSheet.DEDUCTION)
-    time_start = models.DateTimeField(default=datetime.datetime.now)
-    time_end = models.DateTimeField(default=datetime.datetime.now)
+    time_start = models.DateTimeField(default=timezone.now)
+    time_end = models.DateTimeField(default=timezone.now)
     task_id = models.ForeignKey(Tasks, db_column='task_id')
     created_by = models.ForeignKey(User, db_column='created_by', default=1)
-    created_on = models.DateTimeField(default=datetime.datetime.now)
+    created_on = models.DateTimeField(default=timezone.now)
     source = models.CharField(max_length=10, choices=source_choice, default='manual')
     document = models.ForeignKey(Documents, db_column='document', to_field='name', null=True, blank=True)
 

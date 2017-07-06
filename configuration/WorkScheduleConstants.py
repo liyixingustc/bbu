@@ -4,7 +4,7 @@ from datetime import datetime as dt, time, timedelta
 class WorkAvailSheet:
 
     DEDUCTION = timedelta(hours=1)
-    TIME_OFF = ['OFF', 'HOLIDAY', 'P.Day', 'Vac.', 'Union Bus.', 'STD', 'SICK']
+    TIME_OFF = ['OFF', 'HOLIDAY', 'Hol.', 'P.Day', 'Vac.', 'Vac','Union Bus.', 'STD', 'SICK']
 
     class Shift1:
         DEFAULT_TIME = '23:30-8:30'

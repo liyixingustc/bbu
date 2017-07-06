@@ -13,7 +13,7 @@ define(function (require) {
         $FileUpload = $('#FileUpload'),
         $Processor = $('#Processor'),
 
-        FileType = $FileType.val(),
+        FileType = $FileType.val() ,
         Processor = $Processor.val();
 
 
@@ -29,20 +29,36 @@ define(function (require) {
             case 'WorkerAvail':Processor = 'WorkerAvailProcessor';break;
 
         }
-        console.log(FileType,Processor)
+
         $FileUpload.fileinput({
             uploadUrl: 'Panel1/Form1/FileUpload/',
             maxFilePreviewSize: 10240,
             browseOnZoneClick: true,
-            uploadExtraData: {'csrfmiddlewaretoken': csrf_token,
-                              'FileType':FileType,
-                              'Processor':Processor}
+            uploadExtraData: function (previewId, index){
+                return {
+                    'csrfmiddlewaretoken': csrf_token,
+                    'FileType':FileType,
+                    'Processor':Processor
+                };
+            }
         });
     }
 
     function event() {
-        $FileType.on('change',function () {
-            $FileUpload.fileinput('clear')
+        $FileType.change(function () {
+            $FileUpload.fileinput('clear');
+            FileType = $(this).val();
+
+            switch (FileType){
+            case 'Tasks': Processor = 'TasksLoadProcessor';break;
+            case 'WorkerAvail':Processor = 'WorkerAvailProcessor';break;
+
+        }
+
+        });
+
+        $Processor.change(function () {
+            Processor = $(this).val();
         });
 
         $("#WorkConfigDataUpload-form").submit(function (e) {

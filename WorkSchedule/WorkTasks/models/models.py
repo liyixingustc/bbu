@@ -36,7 +36,7 @@ class Tasks(models.Model):
     description = models.CharField(max_length=150, null=True)
     work_type = models.CharField(max_length=10, choices=working_type_choice, null=True, blank=True)
     priority = models.CharField(max_length=10, choices=priority_choice, null=True, blank=True)
-    create_on = models.DateTimeField(null=True, blank=True)
+    create_on = models.DateTimeField(null=True, blank=True) # change field name
     requested_by = models.CharField(max_length=30, null=True, blank=True)
     estimate_hour = models.DurationField(default=timedelta(hours=0))
     schedule_hour = models.DurationField(default=timedelta(hours=0))

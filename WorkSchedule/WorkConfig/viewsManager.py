@@ -4,8 +4,9 @@ import pandas as pd
 import re
 from datetime import datetime as dt
 import pytz
+import time
 
-from bbu.settings import TIME_ZONE
+from bbu.settings import TIME_ZONE, BASE_DIR
 from django.http import JsonResponse
 
 from ..WorkWorkers.models.models import *
@@ -15,6 +16,7 @@ from configuration.WorkScheduleConstants import WorkAvailSheet
 from utils.UDatetime import UDatetime
 
 EST = pytz.timezone(TIME_ZONE)
+
 
 class PageManager:
     class PanelManager:
@@ -30,7 +32,7 @@ class PageManager:
                 if file_type == 'Tasks':
                     cls.tasks_load(as_of_date)
                 elif file_type == 'WorkerAvail':
-                    cls.worker_avail_load()
+                    cls.worker_avail_processor()
 
                 return JsonResponse({})
 
@@ -85,36 +87,41 @@ class PageManager:
                 return JsonResponse({})
 
             @classmethod
-            def worker_avail_load(cls):
+            def worker_avail_processor(cls):
 
-                if os.path.exists(cls.media_input_filepath):
-                    data = pd.read_excel(cls.media_input_filepath, header=0, skiprows=[0, 1, 2, 4], skip_footer=5,
-                                         parse_cols='A:H')
-                    data.rename(columns={data.columns[0]: "worker"}, inplace=True)
+                files = Documents.objects.filter(status__exact='new',file_type__exact='WorkerAvail')
+                if files.exists():
+                    for file in files:
+                        path = BASE_DIR+file.document.url
+                        if os.path.exists(path):
+                            data = pd.read_excel(path, header=0, skiprows=[0, 1, 2, 4], skip_footer=4, parse_cols='A:H')
+                            data.rename(columns={data.columns[0]: "worker"}, inplace=True)
 
-                    # data init
-                    shift1 = data.iloc[0:11]
-                    cls.worker_avail_processor(shift1, 'shift1')
+                            # data init
+                            shift1 = data.iloc[0:11]
+                            cls.worker_avail_shift_processor(shift1, 'shift1')
 
-                    shift2 = data.iloc[12:23]
-                    cls.worker_avail_processor(shift2, 'shift2')
+                            shift2 = data.iloc[12:23]
+                            cls.worker_avail_shift_processor(shift2, 'shift2')
 
-                    shift3 = data.iloc[-11:]
-                    cls.worker_avail_processor(shift3, 'shift3')
+                            shift3 = data.iloc[35:46]
+                            cls.worker_avail_shift_processor(shift3, 'shift3')
 
-                    return JsonResponse({})
-                else:
-                    return JsonResponse({})
+                            pass
+                        else:
+                            pass
+
+                return JsonResponse({})
 
             @classmethod
-            def worker_avail_processor(cls, data, shift):
+            def worker_avail_shift_processor(cls, data, shift):
 
                 data = data.dropna(how='all')
                 data_melt = pd.melt(data, id_vars=["worker"],
                                     var_name="date", value_name="time")
 
                 result = data_melt[~data_melt['time'].isin(WorkAvailSheet.TIME_OFF)]
-                result['duration'] = timedelta(hours=0)
+                result = result.assign(duration=timedelta(hours=0))
 
                 if shift == 'shift1':
                     for index, row in result.iterrows():
@@ -134,7 +141,12 @@ class PageManager:
                             regex = re.compile(r'((?P<start_hour>\d{1,2})?\w{0,2}):?((?P<start_min>\d{1,2})?\w{0,2})'
                                                r'\s*-\s*'
                                                r'((?P<end_hour>\d{1,2})?\w{0,2}):?((?P<end_min>\d{1,2})?\w{0,2}).*')
-                            parts = regex.match(row['time']).groupdict()
+                            parts = regex.match(row['time'])
+                            if parts:
+                                parts = parts.groupdict()
+                            else:
+                                continue
+
                             start_hour, start_min = cls.str_to_int(parts['start_hour']), \
                                 cls.str_to_int(parts['start_min'])
                             end_hour, end_min = cls.str_to_int(parts['end_hour']), cls.str_to_int(parts['end_min'])
@@ -175,7 +187,12 @@ class PageManager:
                             regex = re.compile(r'((?P<start_hour>\d{1,2})?\w{0,2}):?((?P<start_min>\d{1,2})?\w{0,2})'
                                                r'\s*-\s*'
                                                r'((?P<end_hour>\d{1,2})?\w{0,2}):?((?P<end_min>\d{1,2})?\w{0,2}).*')
-                            parts = regex.match(row['time']).groupdict()
+                            parts = regex.match(row['time'])
+                            if parts:
+                                parts = parts.groupdict()
+                            else:
+                                continue
+
                             start_hour, start_min = cls.str_to_int(parts['start_hour']), \
                                 cls.str_to_int(parts['start_min'])
                             end_hour, end_min = cls.str_to_int(parts['end_hour']), cls.str_to_int(parts['end_min'])
@@ -219,7 +236,12 @@ class PageManager:
                             regex = re.compile(r'((?P<start_hour>\d{1,2})?\w{0,2}):?((?P<start_min>\d{1,2})?\w{0,2})'
                                                r'\s*-\s*'
                                                r'((?P<end_hour>\d{1,2})?\w{0,2}):?((?P<end_min>\d{1,2})?\w{0,2}).*')
-                            parts = regex.match(row['time']).groupdict()
+                            parts = regex.match(row['time'])
+                            if parts:
+                                parts = parts.groupdict()
+                            else:
+                                continue
+
                             start_hour, start_min = cls.str_to_int(parts['start_hour']), \
                                 cls.str_to_int(parts['start_min'])
                             end_hour, end_min = cls.str_to_int(parts['end_hour']), cls.str_to_int(parts['end_min'])
@@ -264,13 +286,14 @@ class PageManager:
                     try:
                         document = Documents.objects.get(name__exact=file.name)
                         document.document.delete(False)
-                        Documents.objects.update_or_create(name=file.name,
-                                                           defaults={'document': file,
-                                                                     'status': 'new',
-                                                                     'file_type': FileType,
-                                                                     'processor': Processor,
-                                                                     'created_by': request.user})
                     except Exception as e:
                         pass
+
+                    Documents.objects.update_or_create(name=file.name,
+                                                       defaults={'document': file,
+                                                                 'status': 'new',
+                                                                 'file_type': FileType,
+                                                                 'processor': Processor,
+                                                                 'created_by': request.user})
 
                 return JsonResponse({})
