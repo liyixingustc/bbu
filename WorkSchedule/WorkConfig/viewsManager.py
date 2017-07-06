@@ -12,6 +12,7 @@ from ..WorkWorkers.models.models import *
 from ..WorkTasks.models.models import *
 
 from configuration.WorkScheduleConstants import WorkAvailSheet
+from utils.UDatetime import UDatetime
 
 EST = pytz.timezone(TIME_ZONE)
 
@@ -255,9 +256,21 @@ class PageManager:
 
             @classmethod
             def fileupload(cls,request, *args, **kwargs):
-                file = request.FILES.get('FileUpload')
-                with open(cls.media_input_filepath, 'wb+') as destination:
-                    for chunk in file.chunks():
-                        destination.write(chunk)
+                if request.method == 'POST' and request.FILES.get('FileUpload'):
+                    file = request.FILES.get('FileUpload')
+                    FileType = request.POST.get('FileType')
+                    Processor = request.POST.get('Processor')
+
+                    try:
+                        document = Documents.objects.get(name__exact=file.name)
+                        document.document.delete(False)
+                        Documents.objects.update_or_create(name=file.name,
+                                                           defaults={'document': file,
+                                                                     'status': 'new',
+                                                                     'file_type': FileType,
+                                                                     'processor': Processor,
+                                                                     'created_by': request.user})
+                    except Exception as e:
+                        pass
 
                 return JsonResponse({})

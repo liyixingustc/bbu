@@ -9,7 +9,13 @@ define(function (require) {
         gentelella = require('gentelella'),
         select2 = require('select2');
 
-    var $FileUpload = $('#FileUpload');
+    var $FileType = $('#FileType'),
+        $FileUpload = $('#FileUpload'),
+        $Processor = $('#Processor'),
+
+        FileType = $FileType.val(),
+        Processor = $Processor.val();
+
 
     $(function () {
         init();
@@ -17,16 +23,25 @@ define(function (require) {
     });
 
     function init() {
+
+        switch (FileType){
+            case 'Tasks': Processor = 'TasksLoadProcessor';break;
+            case 'WorkerAvail':Processor = 'WorkerAvailProcessor';break;
+
+        }
+        console.log(FileType,Processor)
         $FileUpload.fileinput({
             uploadUrl: 'Panel1/Form1/FileUpload/',
             maxFilePreviewSize: 10240,
             browseOnZoneClick: true,
-            uploadExtraData: {'csrfmiddlewaretoken': csrf_token}
+            uploadExtraData: {'csrfmiddlewaretoken': csrf_token,
+                              'FileType':FileType,
+                              'Processor':Processor}
         });
     }
 
     function event() {
-        $("#FileType").on('change',function () {
+        $FileType.on('change',function () {
             $FileUpload.fileinput('clear')
         });
 
