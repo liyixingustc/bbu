@@ -13,6 +13,7 @@ from ..WorkWorkers.models.models import *
 from ..WorkTasks.models.models import *
 from .tables.tables import *
 from .tables.tablesManager import *
+from utils.UDatetime import UDatetime
 
 EST = pytz.timezone(TIME_ZONE)
 
@@ -25,10 +26,9 @@ class PageManager:
                 start = request.GET.get('start')
                 end = request.GET.get('end')
 
-                if start:
-                    start = dt.strptime(start,'%Y-%m-%d').replace(tzinfo=EST)
-                if end:
-                    end = dt.strptime(end,'%Y-%m-%d').replace(tzinfo=EST)
+                start = UDatetime.datetime_str_init(start)
+                end = UDatetime.datetime_str_init(end, start, timedelta(days=1))
+                print(start,end)
 
                 workers = Workers.objects.all()
                 response = []
@@ -57,7 +57,7 @@ class PageManager:
                             # print(scheduled)
 
                         balance = avail - scheduled
-                        workers.set_value(index, 'Avail', float(balance.total_seconds()/3600))
+                        workers.set_value(index, 'Avail', np.round((balance.total_seconds()/3600),1))
 
                     workers.rename_axis({'name':'title'},axis=1,inplace=True)
 
@@ -70,8 +70,10 @@ class PageManager:
             def events(request, *args, **kwargs):
                 start = request.GET.get('start')
                 end = request.GET.get('end')
-                start = dt.strptime(start, '%Y-%m-%d')
-                end = dt.strptime(end, '%Y-%m-%d')
+
+                start = UDatetime.datetime_str_init(start)
+                end = UDatetime.datetime_str_init(end, start, timedelta(days=1))
+                print(start,end)
 
                 # avail events
                 avail_records = WorkerAvailable.objects.filter(date__range=[start.date(), end.date()])
@@ -87,6 +89,8 @@ class PageManager:
                                               'time_start': 'start',
                                               'time_end': 'end'},axis=1,inplace=True)
                     avail_events['resourceId'] = avail_events['resourceId'].astype('str')
+                    avail_events['start'] = avail_events['start'].apply(lambda x:x.astimezone(EST))
+                    avail_events['end'] = avail_events['end'].apply(lambda x:x.astimezone(EST))
 
                     avail_response = avail_events.to_dict(orient='records')
                 else:
@@ -139,12 +143,9 @@ class PageManager:
                 resourceId = request.GET.get('resourceId')
                 taskId = request.GET.get('taskId')
 
-                if start:
-                    start = parse(start).replace(tzinfo=EST)
-                if end:
-                    end = parse(end).replace(tzinfo=EST)
-                else:
-                    end = start + timedelta(hours=2)
+                start = UDatetime.datetime_str_init(start)
+                end = UDatetime.datetime_str_init(end, start, timedelta(hours=2))
+                print(start,end)
 
                 duration = end - start
 
@@ -172,14 +173,11 @@ class PageManager:
                 resourceId = request.GET.get('resourceId')
                 taskId = request.GET.get('taskId')
                 workerscheduledId = request.GET.get('workerscheduledId')
+
+                start = UDatetime.datetime_str_init(start)
+                end = UDatetime.datetime_str_init(end, start, timedelta(hours=2))
                 print(start,end)
-                if start:
-                    start = parse(start).replace(tzinfo=EST)
-                if end:
-                    end = parse(end).replace(tzinfo=EST)
-                else:
-                    end = start + timedelta(hours=2)
-                print(start,end)
+
                 duration = end - start
 
                 worker = Workers.objects.get(id__exact=resourceId)
@@ -261,10 +259,9 @@ class PageManager:
                 start = request.GET.get('start')
                 end = request.GET.get('end')
 
-                if start:
-                    start = dt.strptime(start,'%Y-%m-%d').replace(tzinfo=EST)
-                if end:
-                    end = dt.strptime(end,'%Y-%m-%d').replace(tzinfo=EST)
+                start = UDatetime.datetime_str_init(start)
+                end = UDatetime.datetime_str_init(end, start, timedelta(days=1))
+                print(start,end)
 
                 worker_avail = WorkerAvailable.objects.filter(time_start__gte=start, time_end__lte=end)
                 worker_scheduled = WorkerScheduled.objects.filter(time_start__gte=start, time_end__lte=end)

@@ -76,6 +76,7 @@ define(function (require) {
 			// selectOverlap: function(event) {
 			// 	return event.rendering === 'background';
 			// },
+			firstDay:6,
 			editable: true,
 			droppable: true,
 			aspectRatio: 1.8,
@@ -85,12 +86,14 @@ define(function (require) {
 				center: 'title',
 				right: 'timelineDay,timelineWeek,month'
 			},
-			defaultView: 'timelineDay',
+
+			defaultView: 'timelineCustomDay',
 			views: {
 				timelineCustomDay: {
 					type: 'timeline',
-					duration: { days: 2},
-					minTime: '-02:00:00'
+					duration: { days: 1},
+					minTime: '-02:00:00',
+					maxTime: '26:00:00'
 				}
 			},
 			// eventOverlap: false, // will cause the event to take up entire resource height

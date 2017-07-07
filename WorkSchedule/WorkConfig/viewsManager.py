@@ -132,14 +132,12 @@ class PageManager:
 
                         # init time
                         if row['time'] in [' ', None, np.nan]:
-                            start_datetime = dt(date.year, date.month, date.day,
-                                                WorkAvailSheet.Shift1.DEFAULT_TIME_START.hour,
-                                                WorkAvailSheet.Shift1.DEFAULT_TIME_START.minute,
-                                                tzinfo=EST)
-                            end_datetime = dt(date.year, date.month, date.day,
-                                              WorkAvailSheet.Shift1.DEFAULT_TIME_END.hour,
-                                              WorkAvailSheet.Shift1.DEFAULT_TIME_END.minute,
-                                              tzinfo=EST)
+                            start_datetime = EST.localize(dt(date.year, date.month, date.day,
+                                                             WorkAvailSheet.Shift1.DEFAULT_TIME_START.hour,
+                                                             WorkAvailSheet.Shift1.DEFAULT_TIME_START.minute))
+                            end_datetime = EST.localize(dt(date.year, date.month, date.day,
+                                                           WorkAvailSheet.Shift1.DEFAULT_TIME_END.hour,
+                                                           WorkAvailSheet.Shift1.DEFAULT_TIME_END.minute))
                             start_datetime += timedelta(days=-1)
                             duration = timedelta(hours=9)
                         else:
@@ -157,8 +155,8 @@ class PageManager:
                             end_hour, end_min = cls.str_to_int(parts['end_hour']), cls.str_to_int(parts['end_min'])
 
                             # init start timestamp and end timestamp
-                            start_datetime = dt(date.year, date.month, date.day, start_hour, start_min, tzinfo=EST)
-                            end_datetime = dt(date.year, date.month, date.day, end_hour, end_min, tzinfo=EST)
+                            start_datetime = EST.localize(dt(date.year, date.month, date.day, start_hour, start_min))
+                            end_datetime = EST.localize(dt(date.year, date.month, date.day, end_hour, end_min))
                             if start_hour < 12:
                                 start_hour += 12
                                 start_datetime += timedelta(days=-1, hours=12)
@@ -186,14 +184,12 @@ class PageManager:
 
                         # init time
                         if row['time'] in [' ', None, np.nan]:
-                            start_datetime = dt(date.year, date.month, date.day,
-                                                WorkAvailSheet.Shift2.DEFAULT_TIME_START.hour,
-                                                WorkAvailSheet.Shift2.DEFAULT_TIME_START.minute,
-                                                tzinfo=EST)
-                            end_datetime = dt(date.year, date.month, date.day,
-                                              WorkAvailSheet.Shift2.DEFAULT_TIME_END.hour,
-                                              WorkAvailSheet.Shift2.DEFAULT_TIME_END.minute,
-                                              tzinfo=EST)
+                            start_datetime = EST.localize(dt(date.year, date.month, date.day,
+                                                             WorkAvailSheet.Shift2.DEFAULT_TIME_START.hour,
+                                                             WorkAvailSheet.Shift2.DEFAULT_TIME_START.minute))
+                            end_datetime = EST.localize(dt(date.year, date.month, date.day,
+                                                           WorkAvailSheet.Shift2.DEFAULT_TIME_END.hour,
+                                                           WorkAvailSheet.Shift2.DEFAULT_TIME_END.minute))
                             duration = timedelta(hours=9)
                         else:
                             regex = re.compile(r'((?P<start_hour>\d{1,2})?\w{0,2}):?((?P<start_min>\d{1,2})?\w{0,2})'
@@ -210,8 +206,8 @@ class PageManager:
                             end_hour, end_min = cls.str_to_int(parts['end_hour']), cls.str_to_int(parts['end_min'])
 
                             # init start timestamp and end timestamp
-                            start_datetime = dt(date.year, date.month, date.day, start_hour, start_min, tzinfo=EST)
-                            end_datetime = dt(date.year, date.month, date.day, end_hour, end_min, tzinfo=EST)
+                            start_datetime = EST.localize(dt(date.year, date.month, date.day, start_hour, start_min))
+                            end_datetime = EST.localize(dt(date.year, date.month, date.day, end_hour, end_min))
                             if 0 <= start_hour <= 6:
                                 start_hour += 12
                                 start_datetime += timedelta(hours=12)
@@ -240,14 +236,12 @@ class PageManager:
 
                         # init time
                         if row['time'] in [' ', None, np.nan]:
-                            start_datetime = dt(date.year, date.month, date.day,
-                                                WorkAvailSheet.Shift3.DEFAULT_TIME_START.hour,
-                                                WorkAvailSheet.Shift3.DEFAULT_TIME_START.minute,
-                                                tzinfo=EST)
-                            end_datetime = dt(date.year, date.month, date.day,
-                                              WorkAvailSheet.Shift3.DEFAULT_TIME_END.hour,
-                                              WorkAvailSheet.Shift3.DEFAULT_TIME_END.minute,
-                                              tzinfo=EST)
+                            start_datetime = EST.localize(dt(date.year, date.month, date.day,
+                                                             WorkAvailSheet.Shift3.DEFAULT_TIME_START.hour,
+                                                             WorkAvailSheet.Shift3.DEFAULT_TIME_START.minute))
+                            end_datetime = EST.localize(dt(date.year, date.month, date.day,
+                                                           WorkAvailSheet.Shift3.DEFAULT_TIME_END.hour,
+                                                           WorkAvailSheet.Shift3.DEFAULT_TIME_END.minute))
                             end_datetime += timedelta(days=1)
                             duration = timedelta(hours=9)
                         else:
@@ -265,8 +259,8 @@ class PageManager:
                             end_hour, end_min = cls.str_to_int(parts['end_hour']), cls.str_to_int(parts['end_min'])
 
                             # init start timestamp and end timestamp
-                            start_datetime = dt(date.year, date.month, date.day, start_hour, start_min, tzinfo=EST)
-                            end_datetime = dt(date.year, date.month, date.day, end_hour, end_min, tzinfo=EST)
+                            start_datetime = EST.localize(dt(date.year, date.month, date.day, start_hour, start_min))
+                            end_datetime = EST.localize(dt(date.year, date.month, date.day, end_hour, end_min))
                             if 0 <= end_hour < 6:
                                 end_datetime += timedelta(days=1)
                             elif 6 <= end_hour <= 12:

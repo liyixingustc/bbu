@@ -3,23 +3,38 @@ import time
 import calendar
 import pytz
 from datetime import datetime, timedelta
-from dateutil import parser, tz
+from dateutil import tz
+from dateutil.parser import parse
+from tzlocal import get_localzone
 
 
 class UDatetime:
 
-    locoal_tz = tz.tzlocal()
+    local_tz = get_localzone()
 
     def __init__(self):
         pass
 
     @property
     def now_local(self):
-        return datetime.now(tz=tz.tzlocal())
+        return datetime.now(tz=self.local_tz)
 
-    @staticmethod
-    def to_local(date):
-        return date.astimezone(tz=tz.tzlocal())
+    @classmethod
+    def to_local(cls, date):
+        return date.astimezone(tz=cls.local_tz)
+
+    @classmethod
+    def datetime_str_init(cls, timestamp,
+                          default_base=dt.datetime.now(),
+                          default_delta=timedelta(days=0)):
+        if timestamp:
+            timestamp = parse(timestamp)
+            if not timestamp.tzinfo:
+                timestamp = cls.local_tz.localize(timestamp)
+        else:
+            timestamp = default_base + default_delta
+
+        return timestamp
 
     @staticmethod
     def check_date(start, end):
