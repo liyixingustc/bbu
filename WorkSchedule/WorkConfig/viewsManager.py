@@ -99,22 +99,24 @@ class PageManager:
 
                             # data init
                             shift1 = data.iloc[0:11]
-                            cls.worker_avail_shift_processor(shift1, 'shift1')
+                            cls.worker_avail_shift_processor(shift1, 'shift1', file)
 
                             shift2 = data.iloc[12:23]
-                            cls.worker_avail_shift_processor(shift2, 'shift2')
+                            cls.worker_avail_shift_processor(shift2, 'shift2', file)
 
                             shift3 = data.iloc[35:46]
-                            cls.worker_avail_shift_processor(shift3, 'shift3')
+                            cls.worker_avail_shift_processor(shift3, 'shift3', file)
 
-                            pass
+                        # update documents
+                        #     Documents.objects.filter(id=file.id).update(status='loaded')
+
                         else:
                             pass
 
                 return JsonResponse({})
 
             @classmethod
-            def worker_avail_shift_processor(cls, data, shift):
+            def worker_avail_shift_processor(cls, data, shift, file):
 
                 data = data.dropna(how='all')
                 data_melt = pd.melt(data, id_vars=["worker"],
@@ -126,6 +128,9 @@ class PageManager:
                 if shift == 'shift1':
                     for index, row in result.iterrows():
                         date = row['date']
+                        deduction = timedelta(hours=1)
+
+                        # init time
                         if row['time'] in [' ', None, np.nan]:
                             start_datetime = dt(date.year, date.month, date.day,
                                                 WorkAvailSheet.Shift1.DEFAULT_TIME_START.hour,
@@ -136,7 +141,7 @@ class PageManager:
                                               WorkAvailSheet.Shift1.DEFAULT_TIME_END.minute,
                                               tzinfo=EST)
                             start_datetime += timedelta(days=-1)
-                            duration = timedelta(hours=8)
+                            duration = timedelta(hours=9)
                         else:
                             regex = re.compile(r'((?P<start_hour>\d{1,2})?\w{0,2}):?((?P<start_min>\d{1,2})?\w{0,2})'
                                                r'\s*-\s*'
@@ -160,7 +165,8 @@ class PageManager:
                             else:
                                 start_datetime += timedelta(hours=-12)
 
-                            duration = end_datetime - start_datetime - timedelta(hours=1)
+                            duration = end_datetime - start_datetime
+
                         # update db
                         worker = Workers.objects.get_or_create(name=row['worker'])[0]
                         WorkerAvailable.objects.update_or_create(name=worker,
@@ -168,11 +174,17 @@ class PageManager:
                                                                  defaults={
                                                                      'duration': duration,
                                                                      'time_start': start_datetime,
-                                                                     'time_end': end_datetime
+                                                                     'time_end': end_datetime,
+                                                                     'deduction': deduction,
+                                                                     'source': 'file',
+                                                                     'document': file
                                                                  })
                 elif shift == 'shift2':
                     for index, row in result.iterrows():
                         date = row['date']
+                        deduction = timedelta(hours=1)
+
+                        # init time
                         if row['time'] in [' ', None, np.nan]:
                             start_datetime = dt(date.year, date.month, date.day,
                                                 WorkAvailSheet.Shift2.DEFAULT_TIME_START.hour,
@@ -182,7 +194,7 @@ class PageManager:
                                               WorkAvailSheet.Shift2.DEFAULT_TIME_END.hour,
                                               WorkAvailSheet.Shift2.DEFAULT_TIME_END.minute,
                                               tzinfo=EST)
-                            duration = timedelta(hours=8)
+                            duration = timedelta(hours=9)
                         else:
                             regex = re.compile(r'((?P<start_hour>\d{1,2})?\w{0,2}):?((?P<start_min>\d{1,2})?\w{0,2})'
                                                r'\s*-\s*'
@@ -207,7 +219,7 @@ class PageManager:
                                 end_hour += 12
                                 end_datetime += timedelta(hours=12)
 
-                            duration = end_datetime - start_datetime - timedelta(hours=1)
+                            duration = end_datetime - start_datetime
 
                         # update db
                         worker = Workers.objects.get_or_create(name=row['worker'])[0]
@@ -216,11 +228,17 @@ class PageManager:
                                                                  defaults={
                                                                      'duration': duration,
                                                                      'time_start': start_datetime,
-                                                                     'time_end': end_datetime
+                                                                     'time_end': end_datetime,
+                                                                     'deduction': deduction,
+                                                                     'source': 'file',
+                                                                     'document': file
                                                                  })
                 elif shift == 'shift3':
                     for index, row in result.iterrows():
                         date = row['date']
+                        deduction = timedelta(hours=1)
+
+                        # init time
                         if row['time'] in [' ', None, np.nan]:
                             start_datetime = dt(date.year, date.month, date.day,
                                                 WorkAvailSheet.Shift3.DEFAULT_TIME_START.hour,
@@ -231,7 +249,7 @@ class PageManager:
                                               WorkAvailSheet.Shift3.DEFAULT_TIME_END.minute,
                                               tzinfo=EST)
                             end_datetime += timedelta(days=1)
-                            duration = timedelta(hours=8)
+                            duration = timedelta(hours=9)
                         else:
                             regex = re.compile(r'((?P<start_hour>\d{1,2})?\w{0,2}):?((?P<start_min>\d{1,2})?\w{0,2})'
                                                r'\s*-\s*'
@@ -265,7 +283,10 @@ class PageManager:
                                                                  defaults={
                                                                      'duration': duration,
                                                                      'time_start': start_datetime,
-                                                                     'time_end': end_datetime
+                                                                     'time_end': end_datetime,
+                                                                     'deduction': deduction,
+                                                                     'source': 'file',
+                                                                     'document': file
                                                                  })
 
             @staticmethod

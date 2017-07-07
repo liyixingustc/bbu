@@ -25,7 +25,7 @@ class WorkerAvailable(models.Model):
     time_start = models.DateTimeField(default=timezone.now)
     time_end = models.DateTimeField(default=timezone.now)
     created_by = models.ForeignKey(User, db_column='created_by', default=1)
-    created_on = models.DateTimeField(default=timezone.now())
+    created_on = models.DateTimeField(default=timezone.now)
     source = models.CharField(max_length=10, choices=source_choice, default='manual')
     document = models.ForeignKey(Documents, db_column='document', to_field='name', null=True, blank=True)
 
