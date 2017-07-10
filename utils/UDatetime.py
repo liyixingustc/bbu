@@ -50,3 +50,13 @@ class UDatetime:
                 return start.date()
         else:
             return start.date() + timedelta(days=1)
+
+    @staticmethod
+    def get_overlap(r1_start, r1_end, r2_start, r2_end):
+        latest_start = max(r1_start, r1_end)
+        earliest_end = min(r2_start, r2_end)
+        delta = (earliest_end - latest_start).total_seconds()/3600
+        if delta > 0:
+            return delta
+        else:
+            return 0

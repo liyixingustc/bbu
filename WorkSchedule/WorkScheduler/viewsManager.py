@@ -37,19 +37,29 @@ class PageManager:
                     workers = pd.DataFrame.from_records(workers.values('id','name'))
                     workers['id'] = workers['id'].astype('str')
 
-                    worker_avail = WorkerAvailable.objects.filter(time_start__gte=start,time_end__lte=end)
-                    worker_scheduled = WorkerScheduled.objects.filter(time_start__gte=start,time_end__lte=end)
+                    worker_avail = WorkerAvailable.objects.filter(Q(time_start__gte=start, time_end__lte=end) |
+                                                                  Q(time_end__range=[start, end]) |
+                                                                  Q(time_start__range=[start, end]))
+                    worker_scheduled = WorkerScheduled.objects.filter(Q(time_start__gte=start, time_end__lte=end) |
+                                                                      Q(time_end__range=[start, end]) |
+                                                                      Q(time_start__range=[start, end]))
 
                     for index,row in workers.iterrows():
                         if worker_avail.exists():
-                            worker_avail_df = pd.DataFrame.from_records(worker_avail.values('name', 'duration'))
+                            worker_avail_df = pd.DataFrame.from_records(worker_avail.values('name',
+                                                                                            'duration',
+                                                                                            'deduction',
+                                                                                            'time_start',
+                                                                                            'time_end'))
                             avail = worker_avail_df[worker_avail_df['name'] == row['name']]['duration']
                             avail = avail.sum()
                             # print(avail)
                         else:
                             avail = timedelta(hours=0)
                         if worker_scheduled.exists():
-                            worker_scheduled_df = pd.DataFrame.from_records(worker_scheduled.values('name', 'duration'))
+                            worker_scheduled_df = pd.DataFrame.from_records(worker_scheduled.values('name',
+                                                                                                    'duration',
+                                                                                                    'deduction'))
                             scheduled = worker_scheduled_df[worker_scheduled_df['name'] == row['name']]['duration']
                             scheduled = scheduled.sum()
                         else:
@@ -59,7 +69,7 @@ class PageManager:
                         balance = avail - scheduled
                         workers.set_value(index, 'Avail', np.round((balance.total_seconds()/3600),1))
 
-                    workers.rename_axis({'name':'title'},axis=1,inplace=True)
+                    workers.rename_axis({'name': 'title'},axis=1,inplace=True)
 
                     response = workers.to_dict(orient='records')
                     return JsonResponse(response,safe=False)
@@ -106,6 +116,7 @@ class PageManager:
                                                                                    'task_id__priority',
                                                                                    'task_id__estimate_hour',
                                                                                    'duration',
+                                                                                   'deduction',
                                                                                    'time_start',
                                                                                    'time_end'))
                     event_records.rename_axis({'id': 'workerscheduledId',
@@ -115,15 +126,19 @@ class PageManager:
                                                'task_id__priority': 'priority',
                                                'task_id__estimate_hour': 'est',
                                                'duration': 'duration',
+                                               'deduction': 'deduction',
                                                'time_start': 'start',
                                                'time_end': 'end'}, axis=1, inplace=True)
                     event_records['resourceId'] = event_records['resourceId'].astype('str')
                     event_records['title'] = event_records['taskId']
                     event_records['constraint'] = 'WorkerAvail'
-                    event_records['percent'] = event_records['duration']/event_records['est']
+                    event_records['percent'] = (event_records['duration'] - event_records['deduction'])/event_records['est']
                     event_records['percent'] = event_records['percent'].apply(lambda x: np.round(x, 2))
-                    event_records['remaining_hours'] = event_records['est'] - event_records['duration']
+                    event_records['remaining_hours'] = event_records['est'] - event_records['duration'] + event_records['deduction']
                     event_records['remaining_hours'] = event_records['remaining_hours'].apply(lambda x:round(x.total_seconds()/3600))
+
+                    event_records['start'] = event_records['start'].apply(lambda x:x.astimezone(EST))
+                    event_records['end'] = event_records['end'].apply(lambda x:x.astimezone(EST))
 
                     event_records = event_records.to_dict(orient='records')
                 else:
@@ -263,8 +278,13 @@ class PageManager:
                 end = UDatetime.datetime_str_init(end, start, timedelta(days=1))
                 print(start,end)
 
-                worker_avail = WorkerAvailable.objects.filter(time_start__gte=start, time_end__lte=end)
-                worker_scheduled = WorkerScheduled.objects.filter(time_start__gte=start, time_end__lte=end)
+                worker_avail = WorkerAvailable.objects.filter(Q(time_start__gte=start, time_end__lte=end) |
+                                                              Q(time_end__range=[start, end]) |
+                                                              Q(time_start__range=[start, end]))
+                worker_scheduled = WorkerScheduled.objects.filter(Q(time_start__gte=start, time_end__lte=end) |
+                                                                  Q(time_end__range=[start, end]) |
+                                                                  Q(time_start__range=[start, end]))
+
                 tasks = Tasks.objects.filter(Q(current_status__in=['new', 'pending']) |
                                              Q(create_on__range=[start, end], current_status__in=['completed']))
 

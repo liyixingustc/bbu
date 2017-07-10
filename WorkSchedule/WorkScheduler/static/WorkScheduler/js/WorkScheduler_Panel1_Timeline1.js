@@ -84,10 +84,10 @@ define(function (require) {
 			header: {
 				left: 'today prev,next',
 				center: 'title',
-				right: 'timelineDay,timelineWeek,month'
+				right: 'timelineCustomDay,timelineDay,timelineWeek,month'
 			},
 
-			defaultView: 'timelineCustomDay',
+			defaultView: 'timelineDay',
 			views: {
 				timelineCustomDay: {
 					type: 'timeline',
@@ -157,7 +157,7 @@ define(function (require) {
 				// }
 
 				if(event.rendering !== 'background'){
-
+					console.log(event)
 					var color = 'grey';
 
 					switch (event.priority){
