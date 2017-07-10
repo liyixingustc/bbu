@@ -38,6 +38,7 @@ class WorkerScheduled(models.Model):
     time_start = models.DateTimeField(default=timezone.now)
     time_end = models.DateTimeField(default=timezone.now)
     task_id = models.ForeignKey(Tasks, db_column='task_id')
+    available_id = models.ForeignKey(WorkerAvailable, db_column='available_id')
     created_by = models.ForeignKey(User, db_column='created_by', default=1)
     created_on = models.DateTimeField(default=timezone.now)
     source = models.CharField(max_length=10, choices=source_choice, default='manual')

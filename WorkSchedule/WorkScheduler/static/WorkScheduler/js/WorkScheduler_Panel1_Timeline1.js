@@ -92,8 +92,8 @@ define(function (require) {
 				timelineCustomDay: {
 					type: 'timeline',
 					duration: { days: 1},
-					minTime: '-02:00:00',
-					maxTime: '26:00:00'
+					minTime: '-01:00:00',
+					maxTime: '25:00:00'
 				}
 			},
 			// eventOverlap: false, // will cause the event to take up entire resource height

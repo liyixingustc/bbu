@@ -36,10 +36,23 @@ class UDatetime:
 
         return timestamp
 
-    @staticmethod
-    def check_date(start, end):
+    @classmethod
+    def pick_date_by_one_date(cls, date):
+
+        ahead = date - cls.local_tz.localize(datetime(date.year, date.month, date.day))
+        behind = cls.local_tz.localize(datetime(date.year, date.month, date.day+1)) - date
+        if ahead.total_seconds() >= behind.total_seconds() and behind.total_seconds() <= (3600*6):
+            picked_date = (date + timedelta(days=1)).date()
+        elif ahead.total_seconds() < behind.total_seconds() and ahead.total_seconds() <= (3600*6):
+            picked_date = (date - timedelta(days=1)).date()
+        else:
+            picked_date = date.date()
+        return picked_date
+
+    @classmethod
+    def pick_date_by_two_date(cls, start, end):
         if start.date() == end.date():
-            return start.date()
+            return start.date(), end.date()
         elif start.date() + timedelta(days=1) == end.date():
             middle = datetime(start.year, start.month, start.day+1, 0, 0)
             ahead = middle - start
@@ -51,12 +64,20 @@ class UDatetime:
         else:
             return start.date() + timedelta(days=1)
 
-    @staticmethod
-    def get_overlap(r1_start, r1_end, r2_start, r2_end):
-        latest_start = max(r1_start, r1_end)
-        earliest_end = min(r2_start, r2_end)
-        delta = (earliest_end - latest_start).total_seconds()/3600
-        if delta > 0:
+    @classmethod
+    def get_overlap(cls, r1_start, r1_end, r2_start, r2_end):
+
+        r1_start = r1_start.astimezone(cls.local_tz)
+        r1_end = r1_end.astimezone(cls.local_tz)
+        r2_start = r2_start.astimezone(cls.local_tz)
+        r2_end = r2_end.astimezone(cls.local_tz)
+
+        latest_start = max(r1_start, r2_start)
+        earliest_end = min(r1_end, r2_end)
+
+        delta = earliest_end - latest_start
+
+        if delta.total_seconds() > 0:
             return delta
         else:
-            return 0
+            return timedelta(hours=0)

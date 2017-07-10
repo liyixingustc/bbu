@@ -28,7 +28,9 @@ class PageManager:
 
                 start = UDatetime.datetime_str_init(start)
                 end = UDatetime.datetime_str_init(end, start, timedelta(days=1))
-                print(start,end)
+
+                start_date = UDatetime.pick_date_by_one_date(start)
+                end_date = UDatetime.pick_date_by_one_date(end)
 
                 workers = Workers.objects.all()
                 response = []
@@ -37,40 +39,51 @@ class PageManager:
                     workers = pd.DataFrame.from_records(workers.values('id','name'))
                     workers['id'] = workers['id'].astype('str')
 
-                    worker_avail = WorkerAvailable.objects.filter(Q(time_start__gte=start, time_end__lte=end) |
-                                                                  Q(time_end__range=[start, end]) |
-                                                                  Q(time_start__range=[start, end]))
-                    worker_scheduled = WorkerScheduled.objects.filter(Q(time_start__gte=start, time_end__lte=end) |
-                                                                      Q(time_end__range=[start, end]) |
-                                                                      Q(time_start__range=[start, end]))
+                    worker_avail = WorkerAvailable.objects.filter(date__range=[start_date, end_date])
+                    worker_scheduled = WorkerScheduled.objects.filter(date__range=[start_date, end_date])
 
                     for index, row in workers.iterrows():
+
+                        avail = timedelta(hours=0)
+                        avail_deduct = timedelta(hours=0)
                         if worker_avail.exists():
                             worker_avail_df = pd.DataFrame.from_records(worker_avail.values('name',
                                                                                             'duration',
                                                                                             'deduction',
                                                                                             'time_start',
                                                                                             'time_end'))
-                            avail = worker_avail_df[worker_avail_df['name'] == row['name']]['duration']
-                            avail = avail.sum()
-                            print(worker_avail_df)
-                        else:
-                            avail = timedelta(hours=0)
+                            avail_df = worker_avail_df[worker_avail_df['name'] == row['name']]
+
+                            for index_avail, row_avail in avail_df.iterrows():
+                                avail += UDatetime.get_overlap(start, end,
+                                                               row_avail['time_start'],
+                                                               row_avail['time_end'])
+                                avail_deduct += row_avail['deduction']
+
+                        scheduled = timedelta(hours=0)
+                        scheduled_deduct = timedelta(hours=0)
                         if worker_scheduled.exists():
                             worker_scheduled_df = pd.DataFrame.from_records(worker_scheduled.values('name',
                                                                                                     'duration',
-                                                                                                    'deduction'))
-                            scheduled = worker_scheduled_df[worker_scheduled_df['name'] == row['name']]['duration']
-                            scheduled = scheduled.sum()
-                        else:
-                            scheduled = timedelta(hours=0)
-                            # print(scheduled)
+                                                                                                    'deduction',
+                                                                                                    'time_start',
+                                                                                                    'time_end'))
+                            scheduled_df = worker_scheduled_df[worker_scheduled_df['name'] == row['name']]
 
-                        balance = avail - scheduled
+                            for index_scheduled, row_scheduled in scheduled_df.iterrows():
+                                scheduled += UDatetime.get_overlap(start, end,
+                                                                   row_scheduled['time_start'],
+                                                                   row_scheduled['time_end'])
+                                scheduled_deduct += row_scheduled['deduction']
+
+                        if scheduled_deduct.total_seconds()> 0:
+                            balance = avail - scheduled
+                        else:
+                            balance = avail - scheduled - avail_deduct
+
                         workers.set_value(index, 'Avail', np.round((balance.total_seconds()/3600), 1))
 
                     workers.rename_axis({'name': 'title'}, axis=1, inplace=True)
-
                     response = workers.to_dict(orient='records')
                     return JsonResponse(response, safe=False)
                 else:
@@ -83,12 +96,12 @@ class PageManager:
 
                 start = UDatetime.datetime_str_init(start)
                 end = UDatetime.datetime_str_init(end, start, timedelta(days=1))
-                print(start,end)
+
+                start_date = UDatetime.pick_date_by_one_date(start)
+                end_date = UDatetime.pick_date_by_one_date(end)
 
                 # avail events
-                avail_records = WorkerAvailable.objects.filter(Q(time_start__gte=start, time_end__lte=end) |
-                                                               Q(time_end__range=[start, end]) |
-                                                               Q(time_start__range=[start, end]))
+                avail_records = WorkerAvailable.objects.filter(date__range=[start_date, end_date])
                 if avail_records.exists():
                     avail_events = pd.DataFrame.from_records(avail_records.values('name__id',
                                                                                   'time_start',
@@ -109,9 +122,7 @@ class PageManager:
                     avail_response = []
 
                 # task events
-                event_records = WorkerScheduled.objects.filter(Q(time_start__gte=start, time_end__lte=end) |
-                                                               Q(time_end__range=[start, end]) |
-                                                               Q(time_start__range=[start, end]))
+                event_records = WorkerScheduled.objects.filter(date__range=[start_date, end_date])
 
                 if event_records.exists():
                     event_records = pd.DataFrame.from_records(event_records.values('id',
