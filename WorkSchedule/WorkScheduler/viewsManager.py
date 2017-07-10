@@ -44,7 +44,7 @@ class PageManager:
                                                                       Q(time_end__range=[start, end]) |
                                                                       Q(time_start__range=[start, end]))
 
-                    for index,row in workers.iterrows():
+                    for index, row in workers.iterrows():
                         if worker_avail.exists():
                             worker_avail_df = pd.DataFrame.from_records(worker_avail.values('name',
                                                                                             'duration',
@@ -53,7 +53,7 @@ class PageManager:
                                                                                             'time_end'))
                             avail = worker_avail_df[worker_avail_df['name'] == row['name']]['duration']
                             avail = avail.sum()
-                            # print(avail)
+                            print(worker_avail_df)
                         else:
                             avail = timedelta(hours=0)
                         if worker_scheduled.exists():
@@ -67,14 +67,14 @@ class PageManager:
                             # print(scheduled)
 
                         balance = avail - scheduled
-                        workers.set_value(index, 'Avail', np.round((balance.total_seconds()/3600),1))
+                        workers.set_value(index, 'Avail', np.round((balance.total_seconds()/3600), 1))
 
-                    workers.rename_axis({'name': 'title'},axis=1,inplace=True)
+                    workers.rename_axis({'name': 'title'}, axis=1, inplace=True)
 
                     response = workers.to_dict(orient='records')
-                    return JsonResponse(response,safe=False)
+                    return JsonResponse(response, safe=False)
                 else:
-                    return JsonResponse(response,safe=False)
+                    return JsonResponse(response, safe=False)
 
             @staticmethod
             def events(request, *args, **kwargs):
@@ -86,7 +86,9 @@ class PageManager:
                 print(start,end)
 
                 # avail events
-                avail_records = WorkerAvailable.objects.filter(date__range=[start.date(), end.date()])
+                avail_records = WorkerAvailable.objects.filter(Q(time_start__gte=start, time_end__lte=end) |
+                                                               Q(time_end__range=[start, end]) |
+                                                               Q(time_start__range=[start, end]))
                 if avail_records.exists():
                     avail_events = pd.DataFrame.from_records(avail_records.values('name__id',
                                                                                   'time_start',
@@ -97,17 +99,20 @@ class PageManager:
                     avail_events['color'] = 'lightgreen'
                     avail_events.rename_axis({'name__id': 'resourceId',
                                               'time_start': 'start',
-                                              'time_end': 'end'},axis=1,inplace=True)
+                                              'time_end': 'end'},axis=1, inplace=True)
                     avail_events['resourceId'] = avail_events['resourceId'].astype('str')
-                    avail_events['start'] = avail_events['start'].apply(lambda x:x.astimezone(EST))
-                    avail_events['end'] = avail_events['end'].apply(lambda x:x.astimezone(EST))
+                    avail_events['start'] = avail_events['start'].apply(lambda x: x.astimezone(EST))
+                    avail_events['end'] = avail_events['end'].apply(lambda x: x.astimezone(EST))
 
                     avail_response = avail_events.to_dict(orient='records')
                 else:
                     avail_response = []
 
                 # task events
-                event_records = WorkerScheduled.objects.filter(date__range=[start.date(), end.date()])
+                event_records = WorkerScheduled.objects.filter(Q(time_start__gte=start, time_end__lte=end) |
+                                                               Q(time_end__range=[start, end]) |
+                                                               Q(time_start__range=[start, end]))
+
                 if event_records.exists():
                     event_records = pd.DataFrame.from_records(event_records.values('id',
                                                                                    'name__id',
@@ -137,8 +142,8 @@ class PageManager:
                     event_records['remaining_hours'] = event_records['est'] - event_records['duration'] + event_records['deduction']
                     event_records['remaining_hours'] = event_records['remaining_hours'].apply(lambda x:round(x.total_seconds()/3600))
 
-                    event_records['start'] = event_records['start'].apply(lambda x:x.astimezone(EST))
-                    event_records['end'] = event_records['end'].apply(lambda x:x.astimezone(EST))
+                    event_records['start'] = event_records['start'].apply(lambda x: x.astimezone(EST))
+                    event_records['end'] = event_records['end'].apply(lambda x: x.astimezone(EST))
 
                     event_records = event_records.to_dict(orient='records')
                 else:
