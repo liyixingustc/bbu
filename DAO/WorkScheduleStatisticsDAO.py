@@ -41,10 +41,16 @@ class WorkScheduleStatisticsDAO:
         if worker_avail.exists():
             pass
 
-            
-    
+    @classmethod
+    def avail_effect_dao(cls, start, end, worker_names=None, date_model='round'):
+        pass
+
     @classmethod
     def scheduled_dao(cls, start, end, worker_names=None, date_model='round'):
+        pass
+
+    @classmethod
+    def scheduled_effect_dao(cls, start, end, worker_names=None, date_model='round'):
         pass
     
     @classmethod

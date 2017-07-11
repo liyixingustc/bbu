@@ -25,9 +25,10 @@ define(function (require) {
     var twoDigitMonth = ((fullDate.getMonth().length+1) === 1)? (fullDate.getMonth()+1) : '0' + (fullDate.getMonth()+1);
     var currentDate = fullDate.getFullYear() + "-" + twoDigitMonth + "-" + fullDate.getDate();
 	var $WorkScheduler_Panel1_Timeline1 = $('#WorkScheduler_Panel1_Timeline1');
-	var WorkSchedulerPanel1Modal1Choice = false;
+	var WorkSchedulerPanel1Modal1Choice = false,
+		WorkSchedulerPanel1Modal2Choice = false;
 	var start_background_global, end_background_global, resource_global;
-	var start_event_global, end_event_global;
+	var event_data_global = 1;
 
     function run() {
 
@@ -175,7 +176,10 @@ define(function (require) {
 					    '<div class="progress" style="height: 36px">\
 						  <div class="progress-bar progress-bar-striped active progress-bar-'+color+'" role="progressbar"\
 						  aria-valuenow="'+event.percent*100+'" aria-valuemin="0" aria-valuemax="100" style="width:100%">\
-							<span>'+event.taskId+'</br>complete: '+Math.round(event.percent*100)+'%</span>\
+							<span>\
+								'+event.taskId+'</br>' +
+						        'complete: '+Math.round(event.percent*100)+'%\
+						    </span>\
 						  </div>\
 						 </div>';
 
@@ -278,10 +282,16 @@ define(function (require) {
 			},
 			eventClick:function(event, jsEvent, view){
             	$('#WorkSchedulerPanel1Modal2Create').click();
+				event_data_global = {
+					resourceId: event.resourceId,
+					taskId: event.taskId,
+					workerscheduledId: event.workerscheduledId,
+					deduction: event.deduction,
+					start: event.start.format(),
+					end: event.end.format()
+				};
 
-            	// start_background_global = start;
-            	// end_background_global = end;
-            	// resource_global = resource;
+				$("#Deduction").val(event.deduction);
 
 				return false;
 			},
@@ -356,20 +366,13 @@ define(function (require) {
 			$('#WorkSchedulerPanel1Modal1No').click();
 		});
 
-		$('#WorkSchedulerPanel1Modal2Yes').on('click',function () {
+		$('#WorkSchedulerPanel1Modal2FormId').submit(function (e) {
 			WorkSchedulerPanel1Modal2Choice = true;
-			var eventData;
+			var form_data = $(this).serializeObject();
 			if(WorkSchedulerPanel1Modal2Choice){
-				eventData = {
-					title: 'WorkerAvail',
-					resourceId: resource_global.id,
-					start: start_background_global.format(),
-					end: end_background_global.format(),
-					rendering: 'background',
-					color: 'light green',
-					overlap: true
-				};
-                $.post('Panel1/Modal1/extend_worker_avail/',eventData,function () {
+				var eventData = $.extend({}, form_data, event_data_global);
+
+                $.get('Panel1/Modal2/tasks_submit/',eventData,function () {
 					$WorkScheduler_Panel1_Timeline1.fullCalendar('refetchEvents');
 					$WorkScheduler_Panel1_Timeline1.fullCalendar('refetchResources');
 
@@ -393,7 +396,8 @@ define(function (require) {
 			}
 			$WorkScheduler_Panel1_Timeline1.fullCalendar('unselect');
 
-			$('#WorkSchedulerPanel1Modal1No').click();
+			$('#WorkSchedulerPanel1Modal2No').click();
+			return false
 		});
     }
 

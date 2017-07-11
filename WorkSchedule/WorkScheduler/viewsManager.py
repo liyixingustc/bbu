@@ -152,6 +152,8 @@ class PageManager:
 
                     event_records['start'] = event_records['start'].apply(lambda x: x.astimezone(EST))
                     event_records['end'] = event_records['end'].apply(lambda x: x.astimezone(EST))
+                    event_records['duration'] = event_records['duration'].apply(lambda x: round(x.total_seconds()/3600))
+                    event_records['deduction'] = event_records['deduction'].apply(lambda x: round(x.total_seconds()/3600, 2))
 
                     event_records = event_records.to_dict(orient='records')
                 else:
@@ -182,19 +184,31 @@ class PageManager:
 
                 worker = Workers.objects.get(id__exact=resourceId)
                 task = Tasks.objects.get(work_order__exact=taskId)
-                available_id = WorkerAvailable.objects.filter(time_start__lte=start,
+                available_ids = WorkerAvailable.objects.filter(time_start__lte=start,
                                                               time_end__gte=end,
                                                               name__exact=worker)
-                if available_id.count() > 0:
-                    available_id = available_id[0]
+                if available_ids.count() > 0:
+                    available_id = available_ids[0]
+                    work_scheduled = WorkerScheduled.objects.filter(available_id__exact=available_id)
 
-                worker_scheduled = WorkerScheduled.objects.update_or_create(name=worker,
-                                                                            date=date,
-                                                                            time_start=start,
-                                                                            time_end=end,
-                                                                            task_id=task,
-                                                                            available_id=available_id,
-                                                                            defaults={'duration': duration})
+                    if work_scheduled.exists():
+
+                        work_scheduled_df = pd.DataFrame.from_records(work_scheduled.values('deduction',
+                                                                                            'available_id__deduction'))
+                        scheduled_deduction_former = work_scheduled_df['deduction'].sum()
+                        available_deduction_former = work_scheduled_df['available_id__deduction'].sum()
+                        deduction = max(available_deduction_former - scheduled_deduction_former, timedelta(hours=0))
+                    else:
+                        deduction = available_id.deduction
+
+                    worker_scheduled = WorkerScheduled.objects.update_or_create(name=worker,
+                                                                                date=date,
+                                                                                time_start=start,
+                                                                                time_end=end,
+                                                                                task_id=task,
+                                                                                available_id=available_id,
+                                                                                defaults={'duration': duration,
+                                                                                          'deduction': deduction})
 
 
                 response = []
@@ -249,9 +263,9 @@ class PageManager:
                 end = parse(end).replace(tzinfo=EST)
                 worker = Workers.objects.get(id=worker_id)
 
-                avails = WorkerAvailable.objects.filter(Q(time_start__range=[start,end])|
-                                                        Q(time_end__range=[start, end])|
-                                                        Q(time_start__lte=start,time_end__gte=end),
+                avails = WorkerAvailable.objects.filter(Q(time_start__range=[start, end]) |
+                                                        Q(time_end__range=[start, end]) |
+                                                        Q(time_start__lte=start, time_end__gte=end),
                                                         name__exact=worker)
 
                 if avails.exists():
@@ -284,8 +298,23 @@ class PageManager:
 
             @staticmethod
             def tasks_submit(request, *args, **kwargs):
+                command_type = request.GET.get('CommandType')
+                start = request.GET.get('start')
+                end = request.GET.get('end')
+                resourceId = request.GET.get('resourceId')
+                taskId = request.GET.get('taskId')
+                workerscheduledId = request.GET.get('workerscheduledId')
+                deduction = request.GET.get('Deduction')
 
-                return JsonResponse({})
+                if command_type == 'Revise':
+                    deduction = timedelta(hours=float(deduction))
+                    WorkerScheduled.objects.filter(id__exact=workerscheduledId).update(deduction=deduction)
+                elif command_type == 'Remove':
+                    WorkerScheduled.objects.filter(id__exact=workerscheduledId).delete()
+
+                response = []
+
+                return JsonResponse(response, safe=False)
 
         class TableManager:
             @staticmethod

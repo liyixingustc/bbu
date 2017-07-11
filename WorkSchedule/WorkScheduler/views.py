@@ -45,6 +45,10 @@ class Page:
             def extend_worker_avail(request, *args, **kwargs):
                 response = PageManager.PanelManager.ModalManager.extend_worker_avail(request, *args, **kwargs)
                 return response
+            @staticmethod
+            def tasks_submit(request, *args, **kwargs):
+                response = PageManager.PanelManager.ModalManager.tasks_submit(request, *args, **kwargs)
+                return response
 
         class Table:
             @staticmethod
@@ -67,6 +71,7 @@ mapping = pd.DataFrame([
     {'page': 'WorkScheduler', 'panel': 'Panel1', 'widget': 'TimeLine1', 'func': 'event_create', 'register': Page.Panel.TimeLine.event_create},
     {'page': 'WorkScheduler', 'panel': 'Panel2', 'widget': 'Table1', 'func': 'create', 'register': Page.Panel.Table.create},
     {'page': 'WorkScheduler', 'panel': 'Panel1', 'widget': 'Modal1', 'func': 'extend_worker_avail', 'register': Page.Panel.Modal.extend_worker_avail},
+    {'page': 'WorkScheduler', 'panel': 'Panel1', 'widget': 'Modal2', 'func': 'tasks_submit','register': Page.Panel.Modal.tasks_submit},
     {'page': 'WorkScheduler', 'panel': 'Panel3', 'widget': 'KPIBoard', 'func': 'update','register': Page.Panel.KPIBoard.update},
 ])
 
