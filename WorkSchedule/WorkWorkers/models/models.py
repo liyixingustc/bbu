@@ -29,6 +29,7 @@ class WorkerAvailable(models.Model):
     source = models.CharField(max_length=10, choices=source_choice, default='manual')
     document = models.ForeignKey(Documents, db_column='document', to_field='name', null=True, blank=True)
 
+
 class WorkerScheduled(models.Model):
 
     name = models.ForeignKey(Workers, db_column='name', to_field='name')

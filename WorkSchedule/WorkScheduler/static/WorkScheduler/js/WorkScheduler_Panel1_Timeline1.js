@@ -26,7 +26,8 @@ define(function (require) {
     var currentDate = fullDate.getFullYear() + "-" + twoDigitMonth + "-" + fullDate.getDate();
 	var $WorkScheduler_Panel1_Timeline1 = $('#WorkScheduler_Panel1_Timeline1');
 	var WorkSchedulerPanel1Modal1Choice = false;
-	var start_global, end_global, resource_global;
+	var start_background_global, end_background_global, resource_global;
+	var start_event_global, end_event_global;
 
     function run() {
 
@@ -208,8 +209,8 @@ define(function (require) {
 
             	$('#WorkSchedulerPanel1Modal1Create').click();
 
-            	start_global = start;
-            	end_global = end;
+            	start_background_global = start;
+            	end_background_global = end;
             	resource_global = resource;
 
 				return false;
@@ -275,9 +276,15 @@ define(function (require) {
 					},500)
                 });
 			},
-			// eventClick:function(event, jsEvent, view){
-            	// console.log(event)
-			// },
+			eventClick:function(event, jsEvent, view){
+            	$('#WorkSchedulerPanel1Modal2Create').click();
+
+            	// start_background_global = start;
+            	// end_background_global = end;
+            	// resource_global = resource;
+
+				return false;
+			},
             eventMouseover:function (event, jsEvent, view) {
 				// var tooltip = '<div class="tooltipevent" style="width:100px;height:100px;background:#ccc;position:absolute;z-index:10001;">' + event.description + '</div>';
 				// console.log(event)
@@ -316,8 +323,8 @@ define(function (require) {
 				eventData = {
 					title: 'WorkerAvail',
 					resourceId: resource_global.id,
-					start: start_global.format(),
-					end: end_global.format(),
+					start: start_background_global.format(),
+					end: end_background_global.format(),
 					rendering: 'background',
 					color: 'light green',
 					overlap: true
@@ -343,6 +350,46 @@ define(function (require) {
                 });
 
 				WorkSchedulerPanel1Modal1Choice = false
+			}
+			$WorkScheduler_Panel1_Timeline1.fullCalendar('unselect');
+
+			$('#WorkSchedulerPanel1Modal1No').click();
+		});
+
+		$('#WorkSchedulerPanel1Modal2Yes').on('click',function () {
+			WorkSchedulerPanel1Modal2Choice = true;
+			var eventData;
+			if(WorkSchedulerPanel1Modal2Choice){
+				eventData = {
+					title: 'WorkerAvail',
+					resourceId: resource_global.id,
+					start: start_background_global.format(),
+					end: end_background_global.format(),
+					rendering: 'background',
+					color: 'light green',
+					overlap: true
+				};
+                $.post('Panel1/Modal1/extend_worker_avail/',eventData,function () {
+					$WorkScheduler_Panel1_Timeline1.fullCalendar('refetchEvents');
+					$WorkScheduler_Panel1_Timeline1.fullCalendar('refetchResources');
+
+					var notice = new PNotify({
+										title: 'Success!',
+										text: 'You have successfully extended the worker available hours',
+										type: 'success',
+										sound: false,
+										animate_speed: 'fast',
+										styling: 'bootstrap3',
+										nonblock: {
+											nonblock: true
+										}
+									});
+					notice.get().click(function() {
+						notice.remove();
+					});
+                });
+
+				WorkSchedulerPanel1Modal2Choice = false
 			}
 			$WorkScheduler_Panel1_Timeline1.fullCalendar('unselect');
 

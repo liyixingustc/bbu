@@ -52,9 +52,9 @@ class UDatetime:
     @classmethod
     def pick_date_by_two_date(cls, start, end):
         if start.date() == end.date():
-            return start.date(), end.date()
+            return start.date()
         elif start.date() + timedelta(days=1) == end.date():
-            middle = datetime(start.year, start.month, start.day+1, 0, 0)
+            middle = cls.local_tz.localize(datetime(start.year, start.month, start.day+1))
             ahead = middle - start
             behind = end - middle
             if behind >= ahead:

@@ -76,10 +76,7 @@ class PageManager:
                                                                    row_scheduled['time_end'])
                                 scheduled_deduct += row_scheduled['deduction']
 
-                        if scheduled_deduct.total_seconds()> 0:
-                            balance = avail - scheduled
-                        else:
-                            balance = avail - scheduled - avail_deduct
+                        balance = avail - scheduled - max(avail_deduct - scheduled_deduct, timedelta(hours=0))
 
                         workers.set_value(index, 'Avail', np.round((balance.total_seconds()/3600), 1))
 
@@ -176,21 +173,29 @@ class PageManager:
 
                 start = UDatetime.datetime_str_init(start)
                 end = UDatetime.datetime_str_init(end, start, timedelta(hours=2))
+
+                date = UDatetime.pick_date_by_two_date(start, end)
+
                 print(start,end)
 
                 duration = end - start
 
                 worker = Workers.objects.get(id__exact=resourceId)
                 task = Tasks.objects.get(work_order__exact=taskId)
+                available_id = WorkerAvailable.objects.filter(time_start__lte=start,
+                                                              time_end__gte=end,
+                                                              name__exact=worker)
+                if available_id.count() > 0:
+                    available_id = available_id[0]
 
                 worker_scheduled = WorkerScheduled.objects.update_or_create(name=worker,
-                                                                            date=start.date(),
+                                                                            date=date,
                                                                             time_start=start,
                                                                             time_end=end,
                                                                             task_id=task,
+                                                                            available_id=available_id,
                                                                             defaults={'duration': duration})
 
-                print(start, end, resourceId, taskId)
 
                 response = []
 
@@ -207,22 +212,27 @@ class PageManager:
 
                 start = UDatetime.datetime_str_init(start)
                 end = UDatetime.datetime_str_init(end, start, timedelta(hours=2))
-                print(start,end)
+
+                date = UDatetime.pick_date_by_two_date(start, end)
 
                 duration = end - start
 
                 worker = Workers.objects.get(id__exact=resourceId)
                 task = Tasks.objects.get(work_order__exact=taskId)
+                available_id = WorkerAvailable.objects.filter(time_start__lte=start,
+                                                              time_end__gte=end,
+                                                              name__exact=worker)
+                if available_id.count() > 0:
+                    available_id = available_id[0]
 
                 WorkerScheduled.objects.filter(id__exact=workerscheduledId).update(name=worker,
-                                                                                   date=start.date(),
+                                                                                   date=date,
                                                                                    duration=duration,
                                                                                    time_start=start,
                                                                                    time_end=end,
-                                                                                   task_id=task
+                                                                                   task_id=task,
+                                                                                   available_id=available_id
                                                                                    )
-
-                # print(start,end,resourceId,taskId)
 
                 response = []
 
@@ -263,12 +273,17 @@ class PageManager:
                                                              time_start=start_new,
                                                              time_end=end_new)
                 else:
-                    duration=end-start
+                    duration = end - start
                     WorkerAvailable.objects.update_or_create(name=worker,
                                                              date=start.date(),
                                                              duration=duration,
                                                              time_start=start,
                                                              time_end=end)
+
+                return JsonResponse({})
+
+            @staticmethod
+            def tasks_submit(request, *args, **kwargs):
 
                 return JsonResponse({})
 
@@ -292,14 +307,12 @@ class PageManager:
 
                 start = UDatetime.datetime_str_init(start)
                 end = UDatetime.datetime_str_init(end, start, timedelta(days=1))
-                print(start,end)
 
-                worker_avail = WorkerAvailable.objects.filter(Q(time_start__gte=start, time_end__lte=end) |
-                                                              Q(time_end__range=[start, end]) |
-                                                              Q(time_start__range=[start, end]))
-                worker_scheduled = WorkerScheduled.objects.filter(Q(time_start__gte=start, time_end__lte=end) |
-                                                                  Q(time_end__range=[start, end]) |
-                                                                  Q(time_start__range=[start, end]))
+                start_date = UDatetime.pick_date_by_one_date(start)
+                end_date = UDatetime.pick_date_by_one_date(end)
+
+                worker_avail = WorkerAvailable.objects.filter(date__range=[start_date, end_date])
+                worker_scheduled = WorkerScheduled.objects.filter(date__range=[start_date, end_date])
 
                 tasks = Tasks.objects.filter(Q(current_status__in=['new', 'pending']) |
                                              Q(create_on__range=[start, end], current_status__in=['completed']))
