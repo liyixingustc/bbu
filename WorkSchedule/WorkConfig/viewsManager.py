@@ -39,52 +39,70 @@ class PageManager:
             @classmethod
             def tasks_load(cls, as_of_date):
 
-                if os.path.exists(cls.media_input_filepath):
-                    data = pd.read_excel(cls.media_input_filepath)
+                files = Documents.objects.filter(status__exact='new', file_type__exact='Tasks')
+                if files.exists():
+                    for file in files:
+                        path = BASE_DIR + file.document.url
+                        if os.path.exists(path):
+                            data = pd.read_excel(path)
+
+                            tasks_obj = Tasks.objects.filter(current_status__in=['new', 'pending']).values()
+                            tasks = pd.DataFrame.from_records(tasks_obj)
+
+                            # data init
+                            # common tasks
+                            if data.empty:
+                                new_tasks_list = []
+                            else:
+                                new_tasks_list = data['Work Order'].tolist()
+                            if tasks.empty:
+                                archived_tasks_list = []
+                            else:
+                                archived_tasks_list = tasks['work_order'].tolist()
+                            common_list = list(set(new_tasks_list) & set(archived_tasks_list))
+
+                            # update archived tasks to complete
+                            if common_list:
+                                tasks_update_to_complete = tasks[tasks['work_order'].isin(common_list)]
+                                for index, row in tasks_update_to_complete:
+                                    if row['actual_hour'] == 0:
+                                        row['actual_hour'] = row['schedule_hour']
+                                    Tasks.objects.filter(work_order=row['work_type']).update(current_status='completed',
+                                                                                             actual_hour=row['actual_hour'])
+
+                            # add new tasks
+                            tasks_new_to_add = data[~data['Work Order'].isin(common_list)]
+                            tasks_new_to_add['Priority'] = tasks_new_to_add['Priority'].apply(lambda x:
+                                                                                              str(x).upper()if x
+                                                                                              else None
+                                                                                              )
+                            tasks_new_to_add['Date Kitted'] = tasks_new_to_add['Date Kitted'].apply(lambda x:
+                                                                                                    EST.localize(x) if x
+                                                                                                    else UDatetime.now_local)
+                            tasks_new_to_add['line'] = tasks_new_to_add['Date Kitted'].apply(lambda x:
+                                                                                                    x if x else '1')
+
+                            if not tasks_new_to_add.empty:
+                                for index, row in tasks_new_to_add.iterrows():
+                                    Tasks.objects.update_or_create(work_order=row['Work Order'],
+                                                                   defaults={'line': '1',
+                                                                             'equipment': row['Charge To Name'],
+                                                                             'description': row['Description'],
+                                                                             'work_type': 'CM',
+                                                                             'priority': row['Priority'],
+                                                                             'create_on': row['Date Kitted'],
+                                                                             'requested_by': row['Requested by'],
+                                                                             'estimate_hour': timedelta(hours=int(row['Man Hrs'])),
+                                                                             'current_status': 'new'
+                                                                             })
+
+                            # update documents
+                            Documents.objects.filter(id=file.id).update(status='loaded')
+
+                            return JsonResponse({})
                 else:
                     return JsonResponse({})
 
-                tasks_obj = Tasks.objects.filter(current_status__in=['new', 'pending']).values()
-                tasks = pd.DataFrame.from_records(tasks_obj)
-
-                # data init
-                # common tasks
-                if data.empty:
-                    new_tasks_list = []
-                else:
-                    new_tasks_list = data['Work Order'].tolist()
-                if tasks.empty:
-                    archived_tasks_list = []
-                else:
-                    archived_tasks_list = tasks['work_order'].tolist()
-                common_list = list(set(new_tasks_list) & set(archived_tasks_list))
-
-                # update archived tasks to complete
-                if common_list:
-                    tasks_update_to_complete = tasks[tasks['work_order'].isin(common_list)]
-                    for index, row in tasks_update_to_complete:
-                        if row['actual_hour'] == 0:
-                            row['actual_hour'] = row['schedule_hour']
-                        Tasks.objects.filter(work_order=row['work_type']).update(current_status='completed',
-                                                                                 actual_hour=row['actual_hour'])
-
-                # add new tasks
-                tasks_new_to_add = data[~data['Work Order'].isin(common_list)]
-                if not tasks_new_to_add.empty:
-                    for index, row in tasks_new_to_add.iterrows():
-                        Tasks.objects.update_or_create(work_order=row['Work Order'],
-                                                       defaults={'line': '1',
-                                                                 'equipment': row['Charge To Name'],
-                                                                 'description': row['Description'],
-                                                                 'work_type': 'CM',
-                                                                 'priority': '1',
-                                                                 'create_on': row['Date Kitted'],
-                                                                 'requested_by': row['Requested by'],
-                                                                 'estimate_hour': timedelta(hours=int(row['Man Hrs'])),
-                                                                 'current_status': 'new'
-                                                                 })
-
-                return JsonResponse({})
 
             @classmethod
             def worker_avail_processor(cls):
@@ -107,8 +125,8 @@ class PageManager:
                             shift3 = data.iloc[35:46]
                             cls.worker_avail_shift_processor(shift3, 'shift3', file)
 
-                        # update documents
-                        #     Documents.objects.filter(id=file.id).update(status='loaded')
+                            # update documents
+                            Documents.objects.filter(id=file.id).update(status='loaded')
 
                         else:
                             pass

@@ -159,12 +159,10 @@ define(function (require) {
 				// }
 
 				if(event.rendering !== 'background'){
-					console.log(event)
 					var color = 'grey';
-
 					switch (event.priority){
-						case 's':color = 'yellow';break;
-						case 'u':color = 'red';break;
+						case 'S':color = 'yellow';break;
+						case 'U':color = 'red';break;
 						case '1':color = 'green';break;
 						case '2':color = 'blue';break;
 						case '3':color = 'tan';break;
