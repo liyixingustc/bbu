@@ -259,8 +259,9 @@ class PageManager:
                 start = request.POST.get('start')
                 end = request.POST.get('end')
 
-                start = parse(start).replace(tzinfo=EST)
-                end = parse(end).replace(tzinfo=EST)
+                start = UDatetime.datetime_str_init(start)
+                end = UDatetime.datetime_str_init(end, start, timedelta(hours=2))
+
                 worker = Workers.objects.get(id=worker_id)
 
                 avails = WorkerAvailable.objects.filter(Q(time_start__range=[start, end]) |
@@ -271,18 +272,21 @@ class PageManager:
                 if avails.exists():
 
                     avails_df = pd.DataFrame.from_records(avails.values())
+                    print(avails_df)
                     start_list = avails_df['time_start'].tolist()
                     start_list.append(start)
                     end_list = avails_df['time_end'].tolist()
                     end_list.append(end)
-                    start_new = min(start_list)
-                    end_new = max(end_list)
+                    start_new = min(start_list).astimezone(EST)
+                    end_new = max(end_list).astimezone(EST)
+                    date = UDatetime.pick_date_by_two_date(start_new, end_new)
+
                     duration_new = end_new - start_new
                     ids = avails_df['id'].tolist()
 
                     WorkerAvailable.objects.filter(id__in=ids).delete()
                     WorkerAvailable.objects.update_or_create(name=worker,
-                                                             date=start_new.date(),
+                                                             date=date,
                                                              duration=duration_new,
                                                              time_start=start_new,
                                                              time_end=end_new)
@@ -291,6 +295,7 @@ class PageManager:
                     WorkerAvailable.objects.update_or_create(name=worker,
                                                              date=start.date(),
                                                              duration=duration,
+                                                             deduction=timedelta(hours=1),
                                                              time_start=start,
                                                              time_end=end)
 
