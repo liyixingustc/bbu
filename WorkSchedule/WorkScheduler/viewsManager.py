@@ -352,8 +352,9 @@ class PageManager:
                                              Q(create_on__range=[start, end], current_status__in=['completed']))
 
                 if worker_avail.exists():
-                    worker_avail_df = pd.DataFrame.from_records(worker_avail.values('duration'))
-                    avail = worker_avail_df['duration'].sum().total_seconds() / 3600
+                    worker_avail_df = pd.DataFrame.from_records(worker_avail.values('duration', 'deduction'))
+
+                    avail = (worker_avail_df['duration']-worker_avail_df['deduction']).sum().total_seconds() / 3600
                 else:
                     avail = 0
                 if worker_scheduled.exists():

@@ -333,8 +333,9 @@ define(function (require) {
 			loading: function (isLoading, view) {
 
             	if (isLoading === false){
-            		var start = view.currentRange.start.format(),
-						end = view.currentRange.end.format();
+            		var start = view.start.format(),
+						end = view.end.format();
+
 					KPI_board_update(start,end)
 				}
             }
