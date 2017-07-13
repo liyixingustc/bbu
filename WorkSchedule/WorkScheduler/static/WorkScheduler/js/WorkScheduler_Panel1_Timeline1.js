@@ -106,7 +106,7 @@ define(function (require) {
 					slotDuration:'00:30:00',
 					slotLabelFormat: [
 					'ddd M/D',
-					'Ha'
+					'ha'
 					],
 					columnFormat: 'ddd D.M'
 				},
