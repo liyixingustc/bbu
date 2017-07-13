@@ -33,6 +33,9 @@ define(function (require) {
         $FileUpload.fileinput({
             uploadUrl: 'Panel1/Form1/FileUpload/',
             maxFilePreviewSize: 10240,
+            minFileCount: 1,
+            // maxFileCount: 1,
+            uploadAsync: false,
             browseOnZoneClick: true,
             uploadExtraData: function (previewId, index){
                 return {

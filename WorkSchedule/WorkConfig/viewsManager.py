@@ -311,22 +311,23 @@ class PageManager:
 
             @classmethod
             def fileupload(cls,request, *args, **kwargs):
-                if request.method == 'POST' and request.FILES.get('FileUpload'):
-                    file = request.FILES.get('FileUpload')
+                files = request.FILES.getlist('FileUpload')
+                if request.method == 'POST' and files:
                     FileType = request.POST.get('FileType')
                     Processor = request.POST.get('Processor')
+                    if files:
+                        for file in files:
+                            try:
+                                document = Documents.objects.get(name__exact=file.name)
+                                document.document.delete(False)
+                            except Exception as e:
+                                pass
 
-                    try:
-                        document = Documents.objects.get(name__exact=file.name)
-                        document.document.delete(False)
-                    except Exception as e:
-                        pass
-
-                    Documents.objects.update_or_create(name=file.name,
-                                                       defaults={'document': file,
-                                                                 'status': 'new',
-                                                                 'file_type': FileType,
-                                                                 'processor': Processor,
-                                                                 'created_by': request.user})
+                            Documents.objects.update_or_create(name=file.name,
+                                                               defaults={'document': file,
+                                                                         'status': 'new',
+                                                                         'file_type': FileType,
+                                                                         'processor': Processor,
+                                                                         'created_by': request.user})
 
                 return JsonResponse({})
