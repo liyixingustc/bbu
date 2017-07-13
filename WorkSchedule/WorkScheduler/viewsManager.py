@@ -272,7 +272,7 @@ class PageManager:
                 if avails.exists():
 
                     avails_df = pd.DataFrame.from_records(avails.values())
-                    print(avails_df)
+
                     start_list = avails_df['time_start'].tolist()
                     start_list.append(start)
                     end_list = avails_df['time_end'].tolist()
@@ -364,8 +364,10 @@ class PageManager:
                 if tasks.exists():
                     tasks_df = pd.DataFrame.from_records(tasks.values('estimate_hour'))
                     tasks_est = tasks_df['estimate_hour'].sum().total_seconds() / 3600
+                    tasks_count = len(tasks_df)
                 else:
                     tasks_est = 0
+                    tasks_count = 0
 
                 avail_remain = avail - scheduled
                 task_remain = tasks_est - scheduled
@@ -373,7 +375,8 @@ class PageManager:
                 response = {'avail': avail,
                             'scheduled': scheduled,
                             'avail_remain': avail_remain,
-                            'task_remain': task_remain}
+                            'task_remain': task_remain,
+                            'tasks_count': tasks_count}
 
                 return JsonResponse(response)
 

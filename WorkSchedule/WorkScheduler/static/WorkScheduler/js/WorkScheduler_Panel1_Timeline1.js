@@ -428,12 +428,14 @@ define(function (require) {
 				avail = result['avail'],
 				avail_remain = result['avail_remain'],
 				task_remain = result['task_remain'],
+				tasks_count = result['tasks_count'],
 				percent1 = 0,
 				percent2 = 0,
 				$WorkSchedulerPanle3KPIBoard1Stats1 = $("#WorkSchedulerPanle3KPIBoard1Stats1"),
 				$WorkSchedulerPanle3KPIBoard1Stats2 = $("#WorkSchedulerPanle3KPIBoard1Stats2"),
-				WorkSchedulerPanle3KPIBoard2Stats1 = $("#WorkSchedulerPanle3KPIBoard2Stats1"),
-				WorkSchedulerPanle3KPIBoard2Stats2 = $("#WorkSchedulerPanle3KPIBoard2Stats2");
+				$WorkSchedulerPanle3KPIBoard2Stats1 = $("#WorkSchedulerPanle3KPIBoard2Stats1"),
+				$WorkSchedulerPanle3KPIBoard2Stats2 = $("#WorkSchedulerPanle3KPIBoard2Stats2"),
+				$WorkSchedulerPanle3KPIBoard3Stats1 = $("#WorkSchedulerPanle3KPIBoard3Stats1");
 
 
 			// KPIboard 1 setting
@@ -453,14 +455,16 @@ define(function (require) {
 			if(task_remain===0){percent2=0}
 			else if(task_remain>0){percent2=avail_remain/task_remain}
 
-			WorkSchedulerPanle3KPIBoard2Stats1.text(Math.round(avail_remain) +"/"+ Math.round(task_remain)+" hrs");
-			WorkSchedulerPanle3KPIBoard2Stats2.text(Math.round(percent2*100)+"%");
+			$WorkSchedulerPanle3KPIBoard2Stats1.text(Math.round(avail_remain) +"/"+ Math.round(task_remain)+" hrs");
+			$WorkSchedulerPanle3KPIBoard2Stats2.text(Math.round(percent2*100)+"%");
 			if(percent2>=1){
-				WorkSchedulerPanle3KPIBoard2Stats2.attr('class','green')
+				$WorkSchedulerPanle3KPIBoard2Stats2.attr('class','green')
 			}
 			else if(percent2<1){
-				WorkSchedulerPanle3KPIBoard2Stats2.attr('class','red')
+				$WorkSchedulerPanle3KPIBoard2Stats2.attr('class','red')
 			}
+
+			$WorkSchedulerPanle3KPIBoard3Stats1.text(tasks_count)
 
         });
     }
