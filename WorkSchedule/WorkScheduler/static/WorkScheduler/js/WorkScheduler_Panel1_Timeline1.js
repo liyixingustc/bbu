@@ -83,19 +83,39 @@ define(function (require) {
 			droppable: true,
 			aspectRatio: 1.8,
 			scrollTime: '00:00',
+			customButtons: {
+				date_select: {
+					text: 'custom!',
+					click: function(event) {
+						console.log(event)
+					}
+				}
+			},
 			header: {
 				left: 'today prev,next',
-				center: 'title',
-				right: 'timelineCustomDay,timelineDay,timelineWeek,month'
+				center: 'title,date_select',
+				right: 'timelineCustomDay,timelineCustomWeek,month'
 			},
-
-			defaultView: 'timelineDay',
+			defaultView: 'timelineCustomDay',
 			views: {
 				timelineCustomDay: {
 					type: 'timeline',
 					duration: { days: 1},
 					minTime: '-01:00:00',
-					maxTime: '25:00:00'
+					maxTime: '25:00:00',
+					slotDuration:'00:30:00',
+					slotLabelFormat: [
+					'ddd M/D',
+					'Ha'
+					],
+					columnFormat: 'ddd D.M'
+				},
+				timelineCustomWeek: {
+					type: 'timeline',
+					duration: { weeks: 1},
+					minTime: '-01:00:00',
+					maxTime: '25:00:00',
+					slotDuration:'00:30:00'
 				}
 			},
 			// eventOverlap: false, // will cause the event to take up entire resource height
