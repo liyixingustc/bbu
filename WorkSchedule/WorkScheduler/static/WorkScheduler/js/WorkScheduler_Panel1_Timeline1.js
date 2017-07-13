@@ -93,7 +93,7 @@ define(function (require) {
 			},
 			header: {
 				left: 'today prev,next',
-				center: 'title,date_select',
+				center: 'title',
 				right: 'timelineCustomDay,timelineCustomWeek,month'
 			},
 			defaultView: 'timelineCustomDay',
