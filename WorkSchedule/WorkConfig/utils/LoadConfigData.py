@@ -3,6 +3,7 @@ import os
 
 from ..models.models import *
 
+
 class LoadConfigData:
 
     def __init__(self, file=None, workers_sheet='workers', companies_sheet='companies'):
@@ -40,14 +41,12 @@ class LoadConfigData:
                                                  'address': row['address']
                                              })
 
-
     def load(self):
 
         self.load_worker()
         self.load_company()
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
 
     LoadConfigData().load()
-
