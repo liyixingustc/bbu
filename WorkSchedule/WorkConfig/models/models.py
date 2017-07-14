@@ -19,6 +19,15 @@ processor_choice = (('TasksLoadProcessor', 'TasksLoadProcessor'),
                     ('WorkerAvailProcessor', 'WorkerAvailProcessor'),
                     )
 
+level_choice = (('lead', 'lead'),
+                ('worker', 'worker'),
+                )
+
+shift_choice = (('1', '1'),
+                ('2', '2'),
+                ('3', '3'),
+                )
+
 
 class Company(models.Model):
     business_name = models.CharField(max_length=30,unique=True)
@@ -28,9 +37,11 @@ class Company(models.Model):
 class Workers(models.Model):
 
     name = models.CharField(max_length=30,unique=True)
-    last_name = models.CharField(max_length=30, null=True, blank=True)
-    first_name = models.CharField(max_length=30, null=True, blank=True)
-    company = models.ForeignKey(Company,to_field='business_name', null=True, blank=True)
+    last_name = models.CharField(max_length=30)
+    first_name = models.CharField(max_length=30)
+    company = models.ForeignKey(Company,to_field='business_name')
+    level = models.CharField(default='lead', max_length=30, choices=level_choice)
+    shift = models.CharField(default='1', max_length=30, choices=shift_choice)
 
 
 class Documents(models.Model):
