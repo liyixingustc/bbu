@@ -113,7 +113,7 @@ class PageManager:
                     avail_events['resourceId'] = avail_events['resourceId'].astype('str')
                     avail_events['start'] = avail_events['start'].apply(lambda x: x.astimezone(EST))
                     avail_events['end'] = avail_events['end'].apply(lambda x: x.astimezone(EST))
-
+                    print(avail_events)
                     avail_response = avail_events.to_dict(orient='records')
                 else:
                     avail_response = []
