@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 
-# from ..models.models import *
+from ..models.models import *
 
 class LoadConfigData:
 
@@ -19,10 +19,26 @@ class LoadConfigData:
 
     def load_worker(self):
         data = pd.read_excel(self.file, self.workers_sheet)
-        print(data)
+        for index, row in data.iterrows():
+            company = Company.objects.get(business_name__exact=row['company'])
+            Workers.objects.update_or_create(id=row['id'],
+                                             defaults={
+                                                'name': row['name'],
+                                                'last_name': row['last_name'],
+                                                'first_name': row['first_name'],
+                                                'company': company,
+                                                'level': row['level'],
+                                                'shift': row['shift'],
+                                             })
 
     def load_company(self):
         data = pd.read_excel(self.file, self.companies_sheet)
+        for index, row in data.iterrows():
+            Company.objects.update_or_create(id=row['id'],
+                                             defaults={
+                                                 'business_name': row['business_name'],
+                                                 'address': row['address']
+                                             })
 
 
     def load(self):

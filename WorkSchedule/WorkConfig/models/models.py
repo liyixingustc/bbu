@@ -31,7 +31,7 @@ shift_choice = (('1', '1'),
 
 class Company(models.Model):
     business_name = models.CharField(max_length=30,unique=True)
-    address = models.CharField(max_length=30,unique=True)
+    address = models.CharField(max_length=100)
 
 
 class Workers(models.Model):
@@ -39,7 +39,7 @@ class Workers(models.Model):
     name = models.CharField(max_length=30,unique=True)
     last_name = models.CharField(max_length=30)
     first_name = models.CharField(max_length=30)
-    company = models.ForeignKey(Company,to_field='business_name')
+    company = models.ForeignKey(Company,to_field='business_name', db_column='company')
     level = models.CharField(default='lead', max_length=30, choices=level_choice)
     shift = models.CharField(default='1', max_length=30, choices=shift_choice)
 
