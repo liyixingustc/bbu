@@ -18,7 +18,8 @@ define(function (require) {
 		PNotify_buttons = require('pnotify-buttons'),
 		PNotify_nonblock = require('pnotify-nonblock'),
 		PNotify_animate = require('pnotify-animate'),
-		qTip2 = require('qTip2');
+		qTip2 = require('qTip2'),
+		screenfull = require('screenfull');
 
     var fullDate = new Date();
     //convert month to 2 digits
@@ -27,13 +28,21 @@ define(function (require) {
 	var $WorkScheduler_Panel1_Timeline1 = $('#WorkScheduler_Panel1_Timeline1');
 	var WorkSchedulerPanel1Modal1Choice = false,
 		WorkSchedulerPanel1Modal2Choice = false;
-	var start_background_global, end_background_global, resource_global;
-	var event_data_global = 1;
+	var select_data_global = 1, event_data_global = 1;
 
     function run() {
 
 		init();
         event();
+
+		var $fc_icon_fullscreen = $(".fc-icon-fullscreen");
+		$fc_icon_fullscreen.parent().html(
+			'<span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>'
+		);
+		$fc_icon_fullscreen.qtip({
+			content: "full screen"
+		});
+
     }
 
     function init() {
@@ -46,12 +55,13 @@ define(function (require) {
 			$('#WorkSchedulerPanel2Table1TableId').children('tbody').children('tr').each(function() {
 				// store data so the calendar knows to render an event upon drop
 				$(this).data('event', {
-					title: $.trim($(this).children('td').eq(1).text()), // use the element's text as the event title
+					'title': $.trim($(this).children('td').eq(1).text()), // use the element's text as the event title
 					// stick: true, // maintain when user navigates (see docs on the renderEvent method)
-					constraint: 'WorkerAvail',
+					'constraint': 'WorkerAvail',
+					'duration':'05:00',
 					// color: '#257e4a',
 					// parameters
-					taskId: $.trim($(this).children('td').eq(1).text())
+					'taskId': $.trim($(this).children('td').eq(1).text())
 				});
 
 				// make the event draggable using jQuery UI
@@ -84,15 +94,18 @@ define(function (require) {
 			aspectRatio: 1.8,
 			scrollTime: '00:00',
 			customButtons: {
-				date_select: {
-					text: 'custom!',
+				fullscreen: {
+					text: 'full screen',
+					icon: 'fullscreen glyphicon glyphicon-fullscreen',
 					click: function(event) {
-						console.log(event)
+						if (screenfull.enabled) {
+							screenfull.toggle($WorkScheduler_Panel1_Timeline1[0]);
+						}
 					}
 				}
 			},
 			header: {
-				left: 'today prev,next',
+				left: 'today prev,next   fullscreen',
 				center: 'title',
 				right: 'timelineCustomDay,timelineCustomWeek,month'
 			},
@@ -231,9 +244,11 @@ define(function (require) {
 
             	$('#WorkSchedulerPanel1Modal1Create').click();
 
-            	start_background_global = start;
-            	end_background_global = end;
-            	resource_global = resource;
+            	select_data_global = {
+            		'start': start.format(),
+					'end': end.format(),
+					'resourceId': resource.id
+				};
 
 				return false;
 			},
@@ -241,9 +256,9 @@ define(function (require) {
 				console.log('eventReceive', event);
 
 				var eventData = {
-					resourceId: event.resourceId,
-					taskId: event.taskId,
-					start: event.start.format()
+					'resourceId': event.resourceId,
+					'taskId': event.taskId,
+					'start': event.start.format()
 					// end: event.end.format()
 				};
 
@@ -345,20 +360,13 @@ define(function (require) {
     function event() {
 
     	// extend worker available events
-		$('#WorkSchedulerPanel1Modal1Yes').on('click',function () {
+		$('#WorkSchedulerPanel1Modal1FormId').submit(function (e) {
 			WorkSchedulerPanel1Modal1Choice = true;
-			var eventData;
+			var form_data = $(this).serializeObject();
 			if(WorkSchedulerPanel1Modal1Choice){
-				eventData = {
-					title: 'WorkerAvail',
-					resourceId: resource_global.id,
-					start: start_background_global.format(),
-					end: end_background_global.format(),
-					rendering: 'background',
-					color: 'light green',
-					overlap: true
-				};
-                $.post('Panel1/Modal1/extend_worker_avail/',eventData,function () {
+				var eventData = $.extend({}, form_data, select_data_global);
+
+                $.get('Panel1/Modal1/select_submit/',eventData,function () {
 					$WorkScheduler_Panel1_Timeline1.fullCalendar('refetchEvents');
 					$WorkScheduler_Panel1_Timeline1.fullCalendar('refetchResources');
 
@@ -383,6 +391,7 @@ define(function (require) {
 			$WorkScheduler_Panel1_Timeline1.fullCalendar('unselect');
 
 			$('#WorkSchedulerPanel1Modal1No').click();
+			return false
 		});
 
 		$('#WorkSchedulerPanel1Modal2FormId').submit(function (e) {
@@ -418,6 +427,13 @@ define(function (require) {
 			$('#WorkSchedulerPanel1Modal2No').click();
 			return false
 		});
+
+		// full screen the timeline table
+		$("#WorkSchedulerPanel1TimeLine1Button1").click(function () {
+			if (screenfull.enabled) {
+				screenfull.toggle($WorkScheduler_Panel1_Timeline1[0]);
+			}
+        });
     }
 
 	function KPI_board_update(start, end) {

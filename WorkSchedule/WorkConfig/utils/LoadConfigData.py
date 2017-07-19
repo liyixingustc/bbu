@@ -1,7 +1,8 @@
 import pandas as pd
+import openpyxl
 import os
 
-from ..models.models import *
+# from ..models.models import *
 
 
 class LoadConfigData:
@@ -41,6 +42,14 @@ class LoadConfigData:
                                                  'address': row['address']
                                              })
 
+    def load_AOR(self):
+        self.file = os.path.join(
+                os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                'sample/AOR.xlsx')
+
+        data = pd.read_excel(self.file, 0, parse_cols="A,C")
+        print(data)
+
     def load(self):
 
         self.load_worker()
@@ -49,4 +58,4 @@ class LoadConfigData:
 
 if __name__ == "__main__":
 
-    LoadConfigData().load()
+    LoadConfigData().load_AOR()

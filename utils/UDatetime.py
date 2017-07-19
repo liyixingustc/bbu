@@ -15,9 +15,9 @@ class UDatetime:
     def __init__(self):
         pass
 
-    @property
-    def now_local(self):
-        return datetime.now(tz=self.local_tz)
+    @classmethod
+    def now_local(cls):
+        return cls.local_tz.localize(datetime.now())
 
     @classmethod
     def to_local(cls, date):

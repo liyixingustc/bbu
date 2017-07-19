@@ -27,6 +27,7 @@ require.config({
         'pnotify-buttons' : ['/static/gentelella/vendors/pnotify/dist/pnotify.buttons'],
         'pnotify-nonblock' : ['/static/gentelella/vendors/pnotify/dist/pnotify.nonblock'],
         'pnotify-animate' : ['/static/gentelella/vendors/pnotify/dist/pnotify.animate'],
+        'screenfull':['/static/screenfull/dist/screenfull.min'],
         // progressbar
         'nprogress' : ['/static/gentelella/vendors/nprogress/nprogress'],
         'bootstrap-progressbar' : [
@@ -87,6 +88,10 @@ require.config({
         },
         'bootstrap-progressbar':{
             deps:['jquery','bootstrap']
+        },
+        'screenfull':{
+            deps:['jquery','bootstrap'],
+            exports: 'screenfull'
         },
         // bootstrap table extensions
         'bootstrap-table-export':{

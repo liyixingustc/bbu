@@ -72,8 +72,15 @@ define(function (require) {
                     align: 'center'
                 },
                 {
-                    field: 'estimate_hour',
+                    field: 'balance_hour',
                     title: 'EST',
+                    sortable: true,
+                    editable: true,
+                    align: 'center'
+                },
+                {
+                    field: 'estimate_hour',
+                    title: 'EST_orig',
                     sortable: true,
                     editable: true,
                     align: 'center'
@@ -99,7 +106,36 @@ define(function (require) {
                     editable: true,
                     align: 'center'
                 }
-            ]
+            ],
+            rowStyle: function (row, index) {
+                console.log(row,index)
+                var color = null,
+                    bal = row['balance_hour'],
+                    est = row['estimate_hour'];
+
+                if(bal===0){
+                    color = 'green'
+                }
+                else if (bal<est && bal>0 ){
+                    color = '#eec700'
+                }
+                else if(bal<0){
+                    color = 'red'
+                }
+
+                if(color){
+                    return {
+                        classes: '',
+                        css: {'background-color': color, 'color':'white'}
+                    }
+                }
+                else {
+                    return {
+                        classes: '',
+                        css: {}
+                    }
+                }
+            }
         });
         // $table_container_id.show()
     }
