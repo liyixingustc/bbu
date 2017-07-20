@@ -81,3 +81,26 @@ class UDatetime:
             return delta
         else:
             return timedelta(hours=0)
+
+    @classmethod
+    def remove_overlap(cls, r1_start, r1_end, r2_start, r2_end):
+
+        r1_start = r1_start.astimezone(cls.local_tz)
+        r1_end = r1_end.astimezone(cls.local_tz)
+        r2_start = r2_start.astimezone(cls.local_tz)
+        r2_end = r2_end.astimezone(cls.local_tz)
+
+        latest_start = max(r1_start, r2_start)
+        earliest_end = min(r1_end, r2_end)
+
+        if latest_start == r1_start and earliest_end == r1_end:
+            return [[r1_start, r1_start]]
+        elif latest_start == r1_start and earliest_end < r1_end:
+            return [[earliest_end, r1_end]]
+        elif earliest_end == r1_end and latest_start > r1_start:
+            return [[r1_start, latest_start]]
+        elif latest_start > r1_start and earliest_end < r1_end:
+            return [[r1_start, latest_start], [earliest_end, r1_end]]
+        else:
+            return []
+

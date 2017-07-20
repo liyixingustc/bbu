@@ -258,9 +258,88 @@ class PageManager:
 
                 worker = Workers.objects.get(id=worker_id)
                 if command_type == 'ExtendWorkerAvailable':
-                    pass
+                    avails = WorkerAvailable.objects.filter(Q(time_start__range=[start, end]) |
+                                                            Q(time_end__range=[start, end]) |
+                                                            Q(time_start__lte=start, time_end__gte=end),
+                                                            name__exact=worker)
+
+                    if avails.exists():
+
+                        avails_df = pd.DataFrame.from_records(avails.values())
+                        if avails.count() == 1:
+                            ids = avails_df['id'].tolist()
+                        else:
+                            ids = 1
+
+                        start_list = avails_df['time_start'].tolist()
+                        start_list.append(start)
+                        end_list = avails_df['time_end'].tolist()
+                        end_list.append(end)
+                        start_new = min(start_list).astimezone(EST)
+                        end_new = max(end_list).astimezone(EST)
+                        date = UDatetime.pick_date_by_two_date(start_new, end_new)
+
+                        duration_new = end_new - start_new
+
+                        WorkerAvailable.objects.update_or_create(id__in=ids,
+                                                                 defaults={
+                                                                     'name': worker,
+                                                                     'date': date,
+                                                                     'duration': duration_new,
+                                                                     'deduction': WorkAvailSheet.DEDUCTION,
+                                                                     'time_start': start_new,
+                                                                     'time_end': end_new
+                                                                 })
+
+                    else:
+                        duration = end - start
+                        WorkerAvailable.objects.update_or_create(name=worker,
+                                                                 date=start.date(),
+                                                                 duration=duration,
+                                                                 deduction=WorkAvailSheet.DEDUCTION,
+                                                                 time_start=start,
+                                                                 time_end=end,
+                                                                 source='manual')
+
                 elif command_type == 'CutWorkerAvailable':
-                    pass
+                    avails = WorkerAvailable.objects.filter(Q(time_start__range=[start, end]) |
+                                                            Q(time_end__range=[start, end]) |
+                                                            Q(time_start__lte=start, time_end__gte=end),
+                                                            name__exact=worker)
+
+                    if avails.exists():
+                        avails_df = pd.DataFrame.from_records(avails.values())
+                        if avails.count() == 1:
+                            ids = avails_df['id'].tolist()
+
+                            start_list = avails_df['time_start'].tolist()
+                            start_list.append(start)
+                            end_list = avails_df['time_end'].tolist()
+                            end_list.append(end)
+                            range_new = UDatetime.remove_overlap(start_list[0], end_list[0], start_list[1], end_list[1])
+                            if len(range_new) == 1:
+                                start_new = range_new[0][0]
+                                end_new = range_new[0][1]
+                                if start_new == end_new:
+                                    WorkerAvailable.objects.filter(id__in=ids).delete()
+                                else:
+                                    date = UDatetime.pick_date_by_two_date(start_new, end_new)
+
+                                    duration_new = end_new - start_new
+
+                                    WorkerAvailable.objects.update_or_create(id__in=ids,
+                                                                             defaults={
+                                                                                 'name': worker,
+                                                                                 'date': date,
+                                                                                 'duration': duration_new,
+                                                                                 'deduction': WorkAvailSheet.DEDUCTION,
+                                                                                 'time_start': start_new,
+                                                                                 'time_end': end_new
+                                                                             })
+                            else:
+                                return JsonResponse({})
+
+
                 elif command_type == 'TimeOff':
                     task = Tasks.objects.get(work_order__exact='0')
 
@@ -279,40 +358,7 @@ class PageManager:
                                                                                     defaults={'duration': duration})
 
 
-                # avails = WorkerAvailable.objects.filter(Q(time_start__range=[start, end]) |
-                #                                         Q(time_end__range=[start, end]) |
-                #                                         Q(time_start__lte=start, time_end__gte=end),
-                #                                         name__exact=worker)
-                #
-                # if avails.exists():
-                #
-                #     avails_df = pd.DataFrame.from_records(avails.values())
-                #
-                #     start_list = avails_df['time_start'].tolist()
-                #     start_list.append(start)
-                #     end_list = avails_df['time_end'].tolist()
-                #     end_list.append(end)
-                #     start_new = min(start_list).astimezone(EST)
-                #     end_new = max(end_list).astimezone(EST)
-                #     date = UDatetime.pick_date_by_two_date(start_new, end_new)
-                #
-                #     duration_new = end_new - start_new
-                #     ids = avails_df['id'].tolist()
-                #
-                #     WorkerAvailable.objects.filter(id__in=ids).delete()
-                #     WorkerAvailable.objects.update_or_create(name=worker,
-                #                                              date=date,
-                #                                              duration=duration_new,
-                #                                              time_start=start_new,
-                #                                              time_end=end_new)
-                # else:
-                #     duration = end - start
-                #     WorkerAvailable.objects.update_or_create(name=worker,
-                #                                              date=start.date(),
-                #                                              duration=duration,
-                #                                              deduction=timedelta(hours=1),
-                #                                              time_start=start,
-                #                                              time_end=end)
+
 
                 return JsonResponse({})
 
@@ -344,6 +390,19 @@ class PageManager:
                     return JsonResponse(response, safe=False)
                 else:
                     return JsonResponse({})
+
+            @staticmethod
+            def edit(request, *args, **kwargs):
+
+                estimate_hour = request.GET.get('estimate_hour')
+                work_order = request.GET.get('work_order')
+
+                estimate_hour = timedelta(hours=float(estimate_hour))
+
+                Tasks.objects.filter(work_order__exact=work_order).update(estimate_hour=estimate_hour)
+
+                return JsonResponse({})
+
 
         class KPIBoardManager:
             @staticmethod

@@ -10,11 +10,15 @@ define(function (require) {
         select2 = require('select2'),
         jqueryUI = require('jquery-ui'),
         fullcalendar = require('fullcalendar'),
+        PNotify = require('pnotify'),
+		PNotify_buttons = require('pnotify-buttons'),
+		PNotify_nonblock = require('pnotify-nonblock'),
+		PNotify_animate = require('pnotify-animate'),
         // bootstrap table extensions
         bootstrap_table_export = require('bootstrap-table-export'),
         // tableExport = require('tableExport'),
-        // bootstrap_table_editable = require('bootstrap-table-editable'),
-        // x_editable = require('x-editable'),
+        bootstrap_table_editable = require('bootstrap-table-editable'),
+        x_editable = require('x-editable'),
         flat_json = require('flat-json'),
         multiple_sort = require('multiple-sort'),
         filter_control = require('filter-control');
@@ -55,7 +59,7 @@ define(function (require) {
                     title: 'Line',
                     sortable: true,
                     searchable: true,
-                    editable: true,
+                    // editable: true,
                     align: 'center'
                     // filterControl: 'select'
                 },
@@ -63,26 +67,26 @@ define(function (require) {
                     field: 'work_order',
                     title: 'WO',
                     sortable: true,
-                    editable: true,
+                    // editable: true,
                     align: 'center'
                 },
                 {
                     field: 'description',
                     title: 'description',
                     sortable: true,
-                    editable: true,
+                    // editable: true,
                     align: 'center'
                 },
                 {
                     field: 'balance_hour',
                     title: 'EST',
                     sortable: true,
-                    editable: true,
+                    // editable: true,
                     align: 'center'
                 },
                 {
                     field: 'estimate_hour',
-                    title: 'EST_orig',
+                    title: 'EST Orig',
                     sortable: true,
                     editable: true,
                     align: 'center'
@@ -91,21 +95,21 @@ define(function (require) {
                     field: 'work_type',
                     title: 'type',
                     sortable: true,
-                    editable: true,
+                    // editable: true,
                     align: 'center'
                 },
                 {
                     field: 'priority',
                     title: 'priority',
                     sortable: true,
-                    editable: true,
+                    // editable: true,
                     align: 'center'
                 },
                 {
                     field: 'OLD',
                     title: 'OLD',
                     sortable: true,
-                    editable: true,
+                    // editable: true,
                     align: 'center'
                 }
             ],
@@ -149,15 +153,29 @@ define(function (require) {
 
 
         //editable events
-        // $table_id.on('editable-save.bs.table',function (editable, field, row, oldValue, $el) {
-        //
-        //     $.post(WorkScheduler_Panel2_Table1_url_edit,{'name':row['name'],'duration':row[field],'date':field},function () {
-        //
-        //     })
-        // });
-        // $table_id.on('editable-hidden.bs.table',function (field, row, $el, reason) {
-        //
-        // });
+        $table_id.on('editable-save.bs.table',function (editable, field, row, oldValue, $el) {
+
+            $.get('Panel2/Table1/edit/',row,function () {
+
+            })
+        });
+        $table_id.on('editable-hidden.bs.table',function (field, row, $el, reason) {
+            $table_id.bootstrapTable('refresh');
+            var notice = new PNotify({
+                                title: 'Success!',
+                                text: 'You have successfully extended the worker available hours',
+                                type: 'success',
+                                sound: false,
+                                animate_speed: 'fast',
+                                styling: 'bootstrap3',
+                                nonblock: {
+                                    nonblock: true
+                                }
+                            });
+            notice.get().click(function() {
+                notice.remove();
+            });
+        });
     }
 
     return run

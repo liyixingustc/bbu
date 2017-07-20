@@ -38,7 +38,7 @@ require.config({
         'bootstrap-table-export' : ['/static/bootstrap-table/dist/extensions/export/bootstrap-table-export.min'],
         'tableExport' : ['http://rawgit.com/hhurz/tableExport.jquery.plugin/master/tableExport'],
         'bootstrap-table-editable' : ['/static/bootstrap-table/dist/extensions/editable/bootstrap-table-editable.min'],
-        'x-editable' : ['http://rawgit.com/vitalets/x-editable/master/dist/bootstrap3-editable/js/bootstrap-editable'],
+        'x-editable' : ['/static/x-editable/bootstrap3-editable/js/bootstrap-editable'],
         'filter-control' : ['/static/bootstrap-table/dist/extensions/filter-control/bootstrap-table-filter-control.min'],
         'flat-json' : ['/static/bootstrap-table/dist/extensions/flat-json/bootstrap-table-flat-json.min'],
         'multiple-sort' : ['/static/bootstrap-table/dist/extensions/multiple-sort/bootstrap-table-multiple-sort.min']
