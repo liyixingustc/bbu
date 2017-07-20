@@ -25,14 +25,15 @@ class WorkScheduleDataDAO:
     @classmethod
     def get_all_tasks_scheduled(cls):
 
-        tasks = Tasks.objects.filter(current_status__in=['new', 'pending']).values('line',
+        tasks = Tasks.objects.filter(current_status__in=['new', 'pending']).exclude(priority__in=['T'])\
+                                                                           .values('line',
                                                                                    'work_order',
                                                                                    'description',
                                                                                    'estimate_hour',
                                                                                    'work_type',
                                                                                    'priority',
-                                                                                   'create_on',
-                                                                                   'actual_hour')\
+                                                                                   'kitted_date'
+                                                                                   )\
                                                             .annotate(schedule_hour=Sum('workerscheduled__duration'))
         tasks_record = pd.DataFrame.from_records(tasks)
 
@@ -42,10 +43,8 @@ class WorkScheduleDataDAO:
         tasks_record['schedule_hour'] = tasks_record['schedule_hour'].apply(lambda x: x.total_seconds()/3600)
         tasks_record['estimate_hour'] = tasks_record['estimate_hour'].apply(lambda x: x.total_seconds()/3600)
         tasks_record['balance_hour'] = tasks_record['balance_hour'].apply(lambda x: x.total_seconds()/3600)
-        tasks_record['actual_hour'] = tasks_record['actual_hour'].apply(lambda x: x.total_seconds()/3600)
-
         now_date = UDatetime.now_local().date()
-        tasks_record['OLD'] = tasks_record['create_on'].apply(lambda x: int((now_date - x.date()).total_seconds()/(3600*24)))
-        tasks_record.drop('create_on',axis=1,inplace=True)
+        tasks_record['OLD'] = tasks_record['kitted_date'].apply(lambda x: int((now_date - x.date()).total_seconds()/(3600*24)))
+        tasks_record.drop('kitted_date',axis=1,inplace=True)
 
         return tasks_record

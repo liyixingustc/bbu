@@ -93,7 +93,7 @@ class PageManager:
                                                                              'description': row['Description'],
                                                                              'work_type': 'CM',
                                                                              'priority': row['Priority'],
-                                                                             'create_on': row['Date Kitted'],
+                                                                             'kitted_date': row['Date Kitted'],
                                                                              'requested_by': row['Requested by'],
                                                                              'estimate_hour': timedelta(hours=int(row['Man Hrs'])),
                                                                              'current_status': 'new'

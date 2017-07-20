@@ -30,17 +30,15 @@ line_choice = (('1', '1'),
 class Tasks(models.Model):
 
     # model fields
-    work_order = models.CharField(max_length=30, null=True)
-    line = models.CharField(max_length=10, null=True)
-    equipment = models.CharField(max_length=10, null=True)
-    description = models.CharField(max_length=150, null=True)
+    work_order = models.CharField(max_length=30, null=True, blank=True)
+    line = models.CharField(max_length=10, null=True, blank=True)
+    equipment = models.CharField(max_length=10, null=True, blank=True)
+    description = models.CharField(max_length=150, null=True, blank=True)
     work_type = models.CharField(max_length=10, choices=working_type_choice, null=True, blank=True)
     priority = models.CharField(max_length=10, choices=priority_choice, null=True, blank=True)
-    create_on = models.DateTimeField(null=True, blank=True) # change field name
+    kitted_date = models.DateTimeField(null=True, blank=True) # change field name
     requested_by = models.CharField(max_length=30, null=True, blank=True)
     estimate_hour = models.DurationField(default=timedelta(hours=0))
-    schedule_hour = models.DurationField(default=timedelta(hours=0))
-    actual_hour = models.DurationField(default=timedelta(hours=0))
     current_status = models.CharField(max_length=10,choices=status_choice,default='new')
 
 

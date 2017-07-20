@@ -7,7 +7,6 @@ define(function (require) {
         datepicker = require('bootstrap-datepicker'),
         gentelella = require('gentelella'),
         select2 = require('select2'),
-        // bootstrap table extensions
         moment = require('moment'),
         jqueryUI = require('jquery-ui'),
         fullcalendar = require('fullcalendar'),
@@ -30,6 +29,34 @@ define(function (require) {
 		WorkSchedulerPanel1Modal2Choice = false;
 	var select_data_global = 1, event_data_global = 1;
 
+	function external_drag_init() {
+		$('#WorkSchedulerPanel2Table1TableId').children('tbody').children('tr').each(function() {
+			// store data so the calendar knows to render an event upon drop
+			var duration = $.trim($(this).children('td').eq(3).text()),
+				duration_hours = duration.split('.')[0],
+				duration_mins = duration.split('.')[1]*6;
+				if(duration_hours<0){duration_hours=0}
+				if(!duration_mins || duration_mins<0){duration_mins=0}
+
+			$(this).data('event', {
+				'title': $.trim($(this).children('td').eq(1).text()), // use the element's text as the event title
+				// stick: true, // maintain when user navigates (see docs on the renderEvent method)
+				'constraint': 'WorkerAvail',
+				'duration': moment({hour: duration_hours,minute:duration_mins}).format("HH:mm"),
+				// color: '#257e4a',
+				// parameters
+				'taskId': $.trim($(this).children('td').eq(1).text())
+			});
+
+			// make the event draggable using jQuery UI
+			$(this).draggable({
+				zIndex: 999,
+				revert: true,      // will cause the event to go back to its
+				revertDuration: 0  //  original position after the drag
+			});
+		});
+	}
+
     function run() {
 
 		init();
@@ -42,7 +69,6 @@ define(function (require) {
 		$fc_icon_fullscreen.qtip({
 			content: "full screen"
 		});
-
     }
 
     function init() {
@@ -51,27 +77,6 @@ define(function (require) {
 
         /* initialize the external events
 		-----------------------------------------------------------------*/
-        function external_drag_init() {
-			$('#WorkSchedulerPanel2Table1TableId').children('tbody').children('tr').each(function() {
-				// store data so the calendar knows to render an event upon drop
-				$(this).data('event', {
-					'title': $.trim($(this).children('td').eq(1).text()), // use the element's text as the event title
-					// stick: true, // maintain when user navigates (see docs on the renderEvent method)
-					'constraint': 'WorkerAvail',
-					'duration':'05:00',
-					// color: '#257e4a',
-					// parameters
-					'taskId': $.trim($(this).children('td').eq(1).text())
-				});
-
-				// make the event draggable using jQuery UI
-				$(this).draggable({
-					zIndex: 999,
-					revert: true,      // will cause the event to go back to its
-					revertDuration: 0  //  original position after the drag
-				});
-			});
-        }
 
 		$("#WorkSchedulerPanel2Table1TableId").on('page-change.bs.table',function (num,size) {
             external_drag_init()
@@ -134,6 +139,7 @@ define(function (require) {
 			// eventOverlap: false, // will cause the event to take up entire resource height
 			resourceAreaWidth: '25%',
 			// resourceLabelText: 'Workers',
+			lazyFetching: false,
             refetchResourcesOnNavigate: true,
 			resourceColumns: [
 				{
@@ -202,13 +208,15 @@ define(function (require) {
 						case undefined:color = 'grey';break;
 					}
 					// <span class="fc-title" style="position: relative; top: 0px; left: 0px;">17004298</span>
+					if(event.taskId==="0"){event.title = 'Lunch'}
+					else {event.title = event.taskId}
 
 					var html_content =
 					    '<div class="progress" style="height: 36px">\
 						  <div class="progress-bar progress-bar-striped active progress-bar-'+color+'" role="progressbar"\
 						  aria-valuenow="'+event.percent*100+'" aria-valuemin="0" aria-valuemax="100" style="width:100%">\
 							<span>\
-								'+event.taskId+'</br>' +
+								'+event.title+'</br>' +
 						        'complete: '+Math.round(event.percent*100)+'%\
 						    </span>\
 						  </div>\
@@ -235,7 +243,7 @@ define(function (require) {
 				}
 			},
             drop: function(date, jsEvent, ui, resourceId) {
-				console.log('drop', date.format(), resourceId);
+				// console.log('drop', date.format(), resourceId);
 
                 // if so, remove the element from the "Draggable Events" list
                 // $(this).remove();
@@ -258,8 +266,8 @@ define(function (require) {
 				var eventData = {
 					'resourceId': event.resourceId,
 					'taskId': event.taskId,
-					'start': event.start.format()
-					// end: event.end.format()
+					'start': event.start.format(),
+					'end': event.end.format()
 				};
 
 				$.get('Panel1/TimeLine1/event_create/',eventData,function () {
@@ -294,7 +302,7 @@ define(function (require) {
             },
 			eventResize: function(event, delta, revertFunc) {
 
-				console.log(event,delta,revertFunc);
+				// console.log(event,delta,revertFunc);
 
 				var eventData = {
 					resourceId: event.resourceId,
@@ -369,6 +377,10 @@ define(function (require) {
                 $.get('Panel1/Modal1/select_submit/',eventData,function () {
 					$WorkScheduler_Panel1_Timeline1.fullCalendar('refetchEvents');
 					$WorkScheduler_Panel1_Timeline1.fullCalendar('refetchResources');
+					$("#WorkSchedulerPanel2Table1TableId").bootstrapTable('refresh');
+					setTimeout(function () {
+						external_drag_init()
+					},500)
 
 					var notice = new PNotify({
 										title: 'Success!',
@@ -403,6 +415,10 @@ define(function (require) {
                 $.get('Panel1/Modal2/tasks_submit/',eventData,function () {
 					$WorkScheduler_Panel1_Timeline1.fullCalendar('refetchEvents');
 					$WorkScheduler_Panel1_Timeline1.fullCalendar('refetchResources');
+					$("#WorkSchedulerPanel2Table1TableId").bootstrapTable('refresh');
+					setTimeout(function () {
+						external_drag_init()
+					},500)
 
 					var notice = new PNotify({
 										title: 'Success!',

@@ -8,6 +8,8 @@ define(function (require) {
         datepicker = require('bootstrap-datepicker'),
         gentelella = require('gentelella'),
         select2 = require('select2'),
+        jqueryUI = require('jquery-ui'),
+        fullcalendar = require('fullcalendar'),
         // bootstrap table extensions
         bootstrap_table_export = require('bootstrap-table-export'),
         // tableExport = require('tableExport'),
@@ -108,7 +110,6 @@ define(function (require) {
                 }
             ],
             rowStyle: function (row, index) {
-                console.log(row,index)
                 var color = null,
                     bal = row['balance_hour'],
                     est = row['estimate_hour'];
@@ -135,7 +136,11 @@ define(function (require) {
                         css: {}
                     }
                 }
+            },
+            rowAttributes:function (row, index) {
+
             }
+
         });
         // $table_container_id.show()
     }

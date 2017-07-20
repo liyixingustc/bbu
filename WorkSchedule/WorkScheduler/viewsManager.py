@@ -6,7 +6,7 @@ import pytz
 from datetime import datetime as dt
 from dateutil.parser import parse
 from dateutil.tz import tzlocal
-from django.db.models import Q
+from django.db.models import Q, Count, Min, Sum, Avg
 from bbu.settings import TIME_ZONE
 
 from ..WorkWorkers.models.models import *
@@ -40,7 +40,8 @@ class PageManager:
                     workers['id'] = workers['id'].astype('str')
 
                     worker_avail = WorkerAvailable.objects.filter(date__range=[start_date, end_date])
-                    worker_scheduled = WorkerScheduled.objects.filter(date__range=[start_date, end_date])
+                    worker_scheduled = WorkerScheduled.objects.filter(date__range=[start_date, end_date])\
+                                                              .exclude(task_id__priority__in=['T'])
 
                     for index, row in workers.iterrows():
 
@@ -100,7 +101,9 @@ class PageManager:
                 if avail_records.exists():
                     avail_events = pd.DataFrame.from_records(avail_records.values('name__id',
                                                                                   'time_start',
-                                                                                  'time_end'))
+                                                                                  'time_end',
+                                                                                  'date'
+                                                                                  ))
 
                     avail_events['id'] = 'WorkerAvail'
                     avail_events['rendering'] = 'background'
@@ -113,6 +116,7 @@ class PageManager:
                     avail_events['end'] = avail_events['end'].apply(lambda x: x.astimezone(EST))
 
                     avail_response = avail_events.to_dict(orient='records')
+
                 else:
                     avail_response = []
 
@@ -128,7 +132,8 @@ class PageManager:
                                                                                    'task_id__estimate_hour',
                                                                                    'duration',
                                                                                    'time_start',
-                                                                                   'time_end'))
+                                                                                   'time_end')
+                                                              .annotate(total_duration=Sum('task_id__workerscheduled__duration')))
                     event_records.rename_axis({'id': 'workerscheduledId',
                                                'name__id': 'resourceId',
                                                'task_id__work_order': 'taskId',
@@ -141,14 +146,14 @@ class PageManager:
                     event_records['resourceId'] = event_records['resourceId'].astype('str')
                     event_records['title'] = event_records['taskId']
                     event_records['constraint'] = 'WorkerAvail'
-                    event_records['percent'] = (event_records['duration'])/event_records['est']
+                    event_records['percent'] = event_records['total_duration']/event_records['est']
                     event_records['percent'] = event_records['percent'].apply(lambda x: np.round(x, 2))
                     event_records['remaining_hours'] = event_records['est'] - event_records['duration']
                     event_records['remaining_hours'] = event_records['remaining_hours'].apply(lambda x:round(x.total_seconds()/3600))
 
                     event_records['start'] = event_records['start'].apply(lambda x: x.astimezone(EST))
                     event_records['end'] = event_records['end'].apply(lambda x: x.astimezone(EST))
-                    event_records['duration'] = event_records['duration'].apply(lambda x: round(x.total_seconds()/3600))
+                    event_records['duration'] = event_records['duration'].apply(lambda x: np.round(x.total_seconds()/3600, 2))
 
                     event_records = event_records.to_dict(orient='records')
                 else:
@@ -248,7 +253,31 @@ class PageManager:
                 start = UDatetime.datetime_str_init(start)
                 end = UDatetime.datetime_str_init(end, start, timedelta(hours=2))
 
+                date = UDatetime.pick_date_by_two_date(start, end)
+                duration = end - start
+
                 worker = Workers.objects.get(id=worker_id)
+                if command_type == 'ExtendWorkerAvailable':
+                    pass
+                elif command_type == 'CutWorkerAvailable':
+                    pass
+                elif command_type == 'TimeOff':
+                    task = Tasks.objects.get(work_order__exact='0')
+
+                    available_ids = WorkerAvailable.objects.filter(time_start__lte=start,
+                                                                  time_end__gte=end,
+                                                                  name__exact=worker)
+                    if available_ids.count() > 0:
+                        available_id = available_ids[0]
+
+                        worker_scheduled = WorkerScheduled.objects.update_or_create(name=worker,
+                                                                                    date=date,
+                                                                                    time_start=start,
+                                                                                    time_end=end,
+                                                                                    task_id=task,
+                                                                                    available_id=available_id,
+                                                                                    defaults={'duration': duration})
+
 
                 # avails = WorkerAvailable.objects.filter(Q(time_start__range=[start, end]) |
                 #                                         Q(time_end__range=[start, end]) |
@@ -333,7 +362,7 @@ class PageManager:
                 worker_scheduled = WorkerScheduled.objects.filter(date__range=[start_date, end_date])
 
                 tasks = Tasks.objects.filter(Q(current_status__in=['new', 'pending']) |
-                                             Q(create_on__range=[start, end], current_status__in=['completed']))
+                                             Q(kitted_date__range=[start, end], current_status__in=['completed']))
 
                 if worker_avail.exists():
                     worker_avail_df = pd.DataFrame.from_records(worker_avail.values('duration', 'deduction'))
