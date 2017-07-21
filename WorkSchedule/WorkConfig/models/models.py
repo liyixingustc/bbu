@@ -28,6 +28,19 @@ shift_choice = (('1', '1'),
                 ('3', '3'),
                 )
 
+line_choice = (('1', '1'),
+               ('2', '2'),
+               ('7', '7'),
+               ('8', '8'),
+               ('9', '9'),
+               ('SPONGE', 'SPONGE'),
+               ('', ''),
+               )
+
+AOR_type_choice = (('major', 'major'),
+                   ('minor', 'minor'),
+                   )
+
 
 class Company(models.Model):
     business_name = models.CharField(max_length=30,unique=True)
@@ -55,3 +68,10 @@ class Documents(models.Model):
     created_on = models.DateTimeField(default=timezone.now)
 
 
+class AOR(models.Model):
+
+    worker = models.ForeignKey(Workers, to_field='name', db_column='name')
+    line = models.CharField(max_length=30, choices=line_choice, null=True, blank=True)
+    AOR_type = models.CharField(max_length=30, choices=AOR_type_choice, null=True, blank=True)
+    equip_name = models.CharField(max_length=100)
+    equip_code = models.CharField(max_length=100)

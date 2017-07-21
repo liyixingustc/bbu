@@ -2,15 +2,16 @@ import pandas as pd
 import openpyxl
 import os
 
-# from ..models.models import *
+from ..models.models import *
 
 
 class LoadConfigData:
 
-    def __init__(self, file=None, workers_sheet='workers', companies_sheet='companies'):
+    def __init__(self, file=None, workers_sheet='workers', companies_sheet='companies', AOR_sheet='AOR'):
 
         self.workers_sheet = workers_sheet
         self.companies_sheet = companies_sheet
+        self.AOR_sheet = AOR_sheet
 
         if file:
             self.file = file
@@ -42,20 +43,26 @@ class LoadConfigData:
                                                  'address': row['address']
                                              })
 
-    def load_AOR(self):
-        self.file = os.path.join(
-                os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                'sample/AOR.xlsx')
-
-        data = pd.read_excel(self.file, 0, parse_cols="A,C")
-        print(data)
+    def load_aor(self):
+        data = pd.read_excel(self.file, self.AOR_sheet)
+        for index, row in data.iterrows():
+            worker = Workers.objects.get(name__exact=row['worker'].upper())
+            AOR.objects.update_or_create(id=row['id'],
+                                         defaults={
+                                             'worker': worker,
+                                             'line': row['line'],
+                                             'AOR_type': row['type'],
+                                             'equip_name': row['equip name'],
+                                             'equip_code': row['equip code'],
+                                         })
 
     def load(self):
 
         self.load_worker()
         self.load_company()
+        self.load_aor()
 
 
 if __name__ == "__main__":
 
-    LoadConfigData().load_AOR()
+    LoadConfigData().load_aor()

@@ -7,7 +7,7 @@ import pandas as pd
 from utils.mapper import mapper
 from .viewsManager import PageManager
 # Create your views here.
-
+# from .utils.LoadConfigData import LoadConfigData
 
 class Page:
 
@@ -16,6 +16,7 @@ class Page:
     @csrf_protect
     def index(request, *args, **kwargs):
         template_name = 'WorkConfig/{page}.html'.format(page=kwargs['page'])
+        # LoadConfigData().load()
         return render(request, template_name)
 
     class Panel:

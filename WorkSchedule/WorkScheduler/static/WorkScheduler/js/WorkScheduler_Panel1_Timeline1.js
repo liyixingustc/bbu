@@ -93,7 +93,7 @@ define(function (require) {
 			// selectOverlap: function(event) {
 			// 	return event.rendering === 'background';
 			// },
-			firstDay:6,
+			firstDay:5,
 			editable: true,
 			droppable: true,
 			aspectRatio: 1.8,
