@@ -1,6 +1,8 @@
 from django.db import models
 from datetime import timedelta
 
+from ...WorkConfig.models.models import *
+
 # Create your models here.
 
 status_choice = (('new', 'new'),
@@ -32,7 +34,8 @@ class Tasks(models.Model):
     # model fields
     work_order = models.CharField(max_length=30, null=True, blank=True)
     line = models.CharField(max_length=10, null=True, blank=True)
-    equipment = models.CharField(max_length=10, null=True, blank=True)
+    equipment = models.CharField(max_length=100, null=True, blank=True)
+    AOR = models.ForeignKey(AOR, db_column='AOR', null=True, blank=True)
     description = models.CharField(max_length=150, null=True, blank=True)
     work_type = models.CharField(max_length=10, choices=working_type_choice, null=True, blank=True)
     priority = models.CharField(max_length=10, choices=priority_choice, null=True, blank=True)
