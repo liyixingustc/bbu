@@ -110,7 +110,7 @@ class PageManager:
                     avail_events['color'] = 'lightgreen'
                     avail_events.rename_axis({'name__id': 'resourceId',
                                               'time_start': 'start',
-                                              'time_end': 'end'},axis=1, inplace=True)
+                                              'time_end': 'end'}, axis=1, inplace=True)
                     avail_events['resourceId'] = avail_events['resourceId'].astype('str')
                     avail_events['start'] = avail_events['start'].apply(lambda x: x.astimezone(EST))
                     avail_events['end'] = avail_events['end'].apply(lambda x: x.astimezone(EST))
@@ -128,6 +128,7 @@ class PageManager:
                                                                                    'name__id',
                                                                                    'task_id__work_order',
                                                                                    'task_id__description',
+                                                                                   'task_id__AOR__equip_code',
                                                                                    'task_id__priority',
                                                                                    'task_id__estimate_hour',
                                                                                    'duration',
@@ -138,6 +139,7 @@ class PageManager:
                                                'name__id': 'resourceId',
                                                'task_id__work_order': 'taskId',
                                                'task_id__description': 'description',
+                                               'task_id__AOR__equip_code': 'equip_code',
                                                'task_id__priority': 'priority',
                                                'task_id__estimate_hour': 'est',
                                                'duration': 'duration',
@@ -339,9 +341,13 @@ class PageManager:
                             else:
                                 return JsonResponse({})
 
-
-                elif command_type == 'TimeOff':
-                    task = Tasks.objects.get(work_order__exact='0')
+                elif command_type in ['Lunch', 'Breaks']:
+                    if command_type == 'Lunch':
+                        task = Tasks.objects.get(work_order__exact='0')
+                    elif command_type == 'Breaks':
+                        task = Tasks.objects.get(work_order__exact='1')
+                    else:
+                        task = Tasks.objects.get(work_order__exact='0')
 
                     available_ids = WorkerAvailable.objects.filter(time_start__lte=start,
                                                                   time_end__gte=end,

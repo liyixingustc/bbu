@@ -33,12 +33,15 @@ class WorkerAvailLoadProcessor:
 
                     # data init
                     shift1 = data.iloc[0:11]
+                    print('shift1',shift1)
                     cls.worker_avail_shift_processor(shift1, 'shift1', file)
 
                     shift2 = data.iloc[12:23]
+                    print('shift2',shift2)
                     cls.worker_avail_shift_processor(shift2, 'shift2', file)
 
                     shift3 = data.iloc[35:46]
+                    print('shift3',shift3)
                     cls.worker_avail_shift_processor(shift3, 'shift3', file)
 
                     # update documents

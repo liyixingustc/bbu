@@ -39,13 +39,13 @@ define(function (require) {
 				if(!duration_mins || duration_mins<0){duration_mins=0}
 
 			$(this).data('event', {
-				'title': $.trim($(this).children('td').eq(1).text()), // use the element's text as the event title
+				'title': $.trim($(this).children('td').eq(0).text()), // use the element's text as the event title
 				// stick: true, // maintain when user navigates (see docs on the renderEvent method)
 				'constraint': 'WorkerAvail',
 				'duration': moment({hour: duration_hours,minute:duration_mins}).format("HH:mm"),
 				// color: '#257e4a',
 				// parameters
-				'taskId': $.trim($(this).children('td').eq(1).text())
+				'taskId': $.trim($(this).children('td').eq(0).text())
 			});
 
 			// make the event draggable using jQuery UI
@@ -121,7 +121,8 @@ define(function (require) {
 					duration: { days: 1},
 					minTime: '-01:00:00',
 					maxTime: '25:00:00',
-					slotDuration:'00:30:00',
+					slotWidth:'15',
+					slotDuration:'00:15:00',
 					slotLabelFormat: [
 					'ddd M/D',
 					'ha'
@@ -133,7 +134,8 @@ define(function (require) {
 					duration: { weeks: 1},
 					minTime: '-01:00:00',
 					maxTime: '25:00:00',
-					slotDuration:'00:30:00'
+					slotWidth:'20',
+					slotDuration:'00:15:00'
 				}
 			},
 			// eventOverlap: false, // will cause the event to take up entire resource height
@@ -208,7 +210,8 @@ define(function (require) {
 						case undefined:color = 'grey';break;
 					}
 					// <span class="fc-title" style="position: relative; top: 0px; left: 0px;">17004298</span>
-					if(event.taskId==="0"){event.title = 'Lunch'}
+					if(event.taskId==="0"){event.title = 'L'}
+					else if(event.taskId==="1"){event.title = 'B'}
 					else {event.title = event.taskId}
 
 					var html_content =
@@ -216,8 +219,8 @@ define(function (require) {
 						  <div class="progress-bar progress-bar-striped active progress-bar-'+color+'" role="progressbar"\
 						  aria-valuenow="'+event.percent*100+'" aria-valuemin="0" aria-valuemax="100" style="width:100%">\
 							<span>\
-								'+event.title+'</br>' +
-						        'complete: '+Math.round(event.percent*100)+'%\
+								'+event.title+'</br>'
+						         +event.equip_code + '\
 						    </span>\
 						  </div>\
 						 </div>';
@@ -234,8 +237,11 @@ define(function (require) {
 				if(event.rendering !== 'background'){
 					// element.find('.progress .progress-bar').progressbar({display_text: 'center', use_percentage: false});
 					var qtip_html =
-						'Complete: ' + Math.round(event.percent*100)+ '%<br/>\
-						Task description:' + event.description
+						// 'Complete: ' + Math.round(event.percent*100)+ '%<br/>\
+						// Task description:' + event.description
+						'Complete: ' + Math.round(event.percent*100) + '%<br/>'
+						+ 'Equip Code:' + event.equip_code + '<br/>'
+						+ 'Task description:' + event.description
 						;
 					element.qtip({
 						content: qtip_html

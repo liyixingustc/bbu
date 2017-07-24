@@ -54,15 +54,15 @@ define(function (require) {
             // filterControl:true,
             url:"Panel2/Table1/create/",
             columns:[
-                {
-                    field: 'line',
-                    title: 'Line',
-                    sortable: true,
-                    searchable: true,
-                    // editable: true,
-                    align: 'center'
-                    // filterControl: 'select'
-                },
+                // {
+                //     field: 'line',
+                //     title: 'Line',
+                //     sortable: true,
+                //     searchable: true,
+                //     // editable: true,
+                //     align: 'center'
+                //     // filterControl: 'select'
+                // },
                 {
                     field: 'work_order',
                     title: 'WO',
@@ -89,6 +89,13 @@ define(function (require) {
                     title: 'EST Orig',
                     sortable: true,
                     editable: true,
+                    align: 'center'
+                },
+                {
+                    field: 'AOR',
+                    title: 'AOR',
+                    sortable: true,
+                    // editable: true,
                     align: 'center'
                 },
                 {
