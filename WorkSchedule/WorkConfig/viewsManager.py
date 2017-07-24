@@ -41,6 +41,7 @@ class PageManager:
 
             @classmethod
             def tasks_load(cls, as_of_date):
+                Tasks.objects.all().delete()
 
                 files = Documents.objects.filter(status__exact='new', file_type__exact='Tasks')
                 if files.exists():
@@ -48,6 +49,7 @@ class PageManager:
                         path = BASE_DIR + file.document.url
                         if os.path.exists(path):
                             data = pd.read_excel(path)
+                            data.dropna(inplace=True, how='all')
 
                             tasks_obj = Tasks.objects.filter(current_status__in=['new', 'pending']).values()
                             tasks = pd.DataFrame.from_records(tasks_obj)
@@ -75,21 +77,42 @@ class PageManager:
 
                             # add new tasks
                             tasks_new_to_add = data[~data['Work Order'].isin(common_list)]
+                            tasks_new_to_add['Work Order'] = tasks_new_to_add['Work Order'].apply(lambda x: str(int(x)))
                             tasks_new_to_add['Priority'] = tasks_new_to_add['Priority'].apply(lambda x:
                                                                                               str(x).upper()if x
                                                                                               else None
                                                                                               )
+                            # print(tasks_new_to_add)
                             tasks_new_to_add['Date Kitted'] = tasks_new_to_add['Date Kitted'].apply(lambda x:
-                                                                                                    EST.localize(x) if x
+                                                                                                    UDatetime.local_tz
+                                                                                                    .localize(x)
+                                                                                                    if x
                                                                                                     else UDatetime.now_local)
                             tasks_new_to_add['line'] = tasks_new_to_add['Date Kitted'].apply(lambda x:
                                                                                                     x if x else '1')
 
                             if not tasks_new_to_add.empty:
                                 for index, row in tasks_new_to_add.iterrows():
+
+                                    regex = re.compile(
+                                        r'.*'
+                                        r'\s+'
+                                        r'(?P<code>[A-Z][0-9a-zA-Z\_\-]+)\s*(\(.*\))*?$')
+                                    parts = regex.match(row['Charge To Name'])
+                                    aor = AOR.objects.get(equip_code__exact='NONE')
+
+                                    if parts:
+                                        parts = parts.groupdict()
+                                        code = parts['code'].upper()
+                                        aor_records = AOR.objects.filter(equip_code__exact=code)
+
+                                        if aor_records.count() >= 1:
+                                            aor = aor_records[0]
+
                                     Tasks.objects.update_or_create(work_order=row['Work Order'],
                                                                    defaults={'line': '1',
                                                                              'equipment': row['Charge To Name'],
+                                                                             'AOR': aor,
                                                                              'description': row['Description'],
                                                                              'work_type': 'CM',
                                                                              'priority': row['Priority'],

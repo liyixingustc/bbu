@@ -32,7 +32,7 @@ line_choice = (('1', '1'),
 class Tasks(models.Model):
 
     # model fields
-    work_order = models.CharField(max_length=30, null=True, blank=True)
+    work_order = models.CharField(max_length=30)
     line = models.CharField(max_length=10, null=True, blank=True)
     equipment = models.CharField(max_length=100, null=True, blank=True)
     AOR = models.ForeignKey(AOR, db_column='AOR', null=True, blank=True)
