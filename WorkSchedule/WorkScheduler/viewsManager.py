@@ -32,7 +32,7 @@ class PageManager:
                 start_date = UDatetime.pick_date_by_one_date(start)
                 end_date = UDatetime.pick_date_by_one_date(end)
 
-                workers = Workers.objects.all()
+                workers = Workers.objects.exclude(name__exact='NONE')
                 response = []
 
                 if workers.exists():

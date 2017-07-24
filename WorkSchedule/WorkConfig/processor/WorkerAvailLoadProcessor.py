@@ -31,17 +31,33 @@ class WorkerAvailLoadProcessor:
                     data = pd.read_excel(path, header=0, skiprows=[0, 1, 2, 4], skip_footer=4, parse_cols='A:H')
                     data.rename(columns={data.columns[0]: "worker"}, inplace=True)
 
+                    # find the range for each shift
+
+                    worker_range = data['worker'].str.contains('^[a-zA-Z\'\-]+\s*,\s*[a-zA-Z\'\-]+$', regex=True, na=False)
+                    worker_range_df = pd.DataFrame(worker_range)
+                    worker_range_df['worker'] = worker_range_df['worker'].astype(int)
+                    worker_range_df['part'] = 0
+
+                    part = 1
+                    last = 1
+                    for index, row in worker_range_df.iterrows():
+                        if row['worker'] == 1 and last == 1:
+                            worker_range_df.set_value(index, 'part', part)
+                        elif row['worker'] == 1 and last == 0:
+                            part += 1
+                            worker_range_df.set_value(index, 'part', part)
+
+                        last = row['worker']
+
                     # data init
-                    shift1 = data.iloc[0:11]
-                    print('shift1',shift1)
+                    shift1 = data[worker_range_df['part'] == 1]
+
                     cls.worker_avail_shift_processor(shift1, 'shift1', file)
 
-                    shift2 = data.iloc[12:23]
-                    print('shift2',shift2)
+                    shift2 = data[worker_range_df['part'] == 2]
                     cls.worker_avail_shift_processor(shift2, 'shift2', file)
 
-                    shift3 = data.iloc[35:46]
-                    print('shift3',shift3)
+                    shift3 = data[worker_range_df['part'] == 5]
                     cls.worker_avail_shift_processor(shift3, 'shift3', file)
 
                     # update documents
@@ -61,6 +77,8 @@ class WorkerAvailLoadProcessor:
 
         result = data_melt[~data_melt['time'].isin(WorkAvailSheet.TIME_OFF)]
         result = result.assign(duration=timedelta(hours=0))
+
+        # result = result[result['worker'].str.contains('^[a-zA-Z\'\-]+\s*,\s*[a-zA-Z\'\-]+$', regex=True, na=False)]
 
         result['worker'] = result['worker'].str.replace(', ', ',')
         result['worker'] = result['worker'].str.split(',').apply(lambda x: '{0} {1}'.format(x[1], x[0]))

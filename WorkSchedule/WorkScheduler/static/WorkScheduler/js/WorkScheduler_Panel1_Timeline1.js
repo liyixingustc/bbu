@@ -28,6 +28,7 @@ define(function (require) {
 	var WorkSchedulerPanel1Modal1Choice = false,
 		WorkSchedulerPanel1Modal2Choice = false;
 	var select_data_global = 1, event_data_global = 1;
+	var is_fullscreen = false;
 
 	function external_drag_init() {
 		$('#WorkSchedulerPanel2Table1TableId').children('tbody').children('tr').each(function() {
@@ -88,6 +89,7 @@ define(function (require) {
 		$WorkScheduler_Panel1_Timeline1.fullCalendar({
             schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
 			now: currentDate,
+			height: 700,
 			selectable: true,
 			selectHelper: true,
 			// selectOverlap: function(event) {
@@ -134,12 +136,12 @@ define(function (require) {
 					duration: { weeks: 1},
 					minTime: '-01:00:00',
 					maxTime: '25:00:00',
-					slotWidth:'20',
+					slotWidth:'15',
 					slotDuration:'00:15:00'
 				}
 			},
 			// eventOverlap: false, // will cause the event to take up entire resource height
-			resourceAreaWidth: '25%',
+			resourceAreaWidth: 150,
 			// resourceLabelText: 'Workers',
 			lazyFetching: false,
             refetchResourcesOnNavigate: true,
@@ -210,8 +212,8 @@ define(function (require) {
 						case undefined:color = 'grey';break;
 					}
 					// <span class="fc-title" style="position: relative; top: 0px; left: 0px;">17004298</span>
-					if(event.taskId==="0"){event.title = 'L'}
-					else if(event.taskId==="1"){event.title = 'B'}
+					if(event.taskId==="0"){event.title = 'L';event.equip_code = ''}
+					else if(event.taskId==="1"){event.title = 'B';event.equip_code = ''}
 					else {event.title = event.taskId}
 
 					var html_content =
@@ -386,7 +388,7 @@ define(function (require) {
 					$("#WorkSchedulerPanel2Table1TableId").bootstrapTable('refresh');
 					setTimeout(function () {
 						external_drag_init()
-					},500)
+					},500);
 
 					var notice = new PNotify({
 										title: 'Success!',
@@ -424,7 +426,7 @@ define(function (require) {
 					$("#WorkSchedulerPanel2Table1TableId").bootstrapTable('refresh');
 					setTimeout(function () {
 						external_drag_init()
-					},500)
+					},500);
 
 					var notice = new PNotify({
 										title: 'Success!',
@@ -451,11 +453,20 @@ define(function (require) {
 		});
 
 		// full screen the timeline table
-		$("#WorkSchedulerPanel1TimeLine1Button1").click(function () {
-			if (screenfull.enabled) {
-				screenfull.toggle($WorkScheduler_Panel1_Timeline1[0]);
+		
+		screenfull.onchange(function () {
+			is_fullscreen = !is_fullscreen;
+			if(is_fullscreen){
+				var screen_height = screen.availHeight;
+				$WorkScheduler_Panel1_Timeline1.css({'padding':'10px 20px'});
+				$WorkScheduler_Panel1_Timeline1.fullCalendar('option', 'height', screen_height);
+
 			}
-        });
+			else{
+				$WorkScheduler_Panel1_Timeline1.css({'padding':'0px'});
+				$WorkScheduler_Panel1_Timeline1.fullCalendar('option', 'height', 700)
+			}
+        })
     }
 
 	function KPI_board_update(start, end) {

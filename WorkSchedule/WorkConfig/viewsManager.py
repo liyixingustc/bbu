@@ -41,7 +41,6 @@ class PageManager:
 
             @classmethod
             def tasks_load(cls, as_of_date):
-                Tasks.objects.all().delete()
 
                 files = Documents.objects.filter(status__exact='new', file_type__exact='Tasks')
                 if files.exists():
