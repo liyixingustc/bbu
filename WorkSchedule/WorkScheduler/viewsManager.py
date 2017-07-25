@@ -202,7 +202,6 @@ class PageManager:
                                                                                 available_id=available_id,
                                                                                 defaults={'duration': duration})
 
-
                 response = []
 
                 return JsonResponse(response, safe=False)
@@ -409,7 +408,6 @@ class PageManager:
 
                 return JsonResponse({})
 
-
         class KPIBoardManager:
             @staticmethod
             def update(request, *args, **kwargs):
@@ -422,12 +420,16 @@ class PageManager:
 
                 start_date = UDatetime.pick_date_by_one_date(start)
                 end_date = UDatetime.pick_date_by_one_date(end)
+                print(start_date,end_date)
 
                 worker_avail = WorkerAvailable.objects.filter(date__range=[start_date, end_date])
                 worker_scheduled = WorkerScheduled.objects.filter(date__range=[start_date, end_date])
 
-                tasks = Tasks.objects.filter(Q(current_status__in=['new', 'pending']) |
-                                             Q(kitted_date__range=[start, end], current_status__in=['completed']))
+                tasks_all = Tasks.objects.filter(Q(current_status__in=['new', 'pending']) |
+                                                 Q(kitted_date__range=[start, end], current_status__in=['completed']))
+
+                tasks = Tasks.objects.filter(Q(current_status__in=['new', 'pending']))\
+                                     .annotate(scheduled_hour=Sum('workerscheduled__duration'))
 
                 if worker_avail.exists():
                     worker_avail_df = pd.DataFrame.from_records(worker_avail.values('duration', 'deduction'))
@@ -441,21 +443,26 @@ class PageManager:
                 else:
                     scheduled = 0
                 if tasks.exists():
-                    tasks_df = pd.DataFrame.from_records(tasks.values('estimate_hour'))
+                    tasks_df = pd.DataFrame.from_records(tasks.values('estimate_hour', 'scheduled_hour'))
                     tasks_est = tasks_df['estimate_hour'].sum().total_seconds() / 3600
                     tasks_count = len(tasks_df)
+                    tasks_scheduled_count = len(tasks_df[~tasks_df['scheduled_hour'].isnull()])
                 else:
                     tasks_est = 0
                     tasks_count = 0
 
                 avail_remain = avail - scheduled
-                task_remain = tasks_est - scheduled
+                task_est_remain = tasks_est - scheduled
 
-                response = {'avail': avail,
+                response = {
                             'scheduled': scheduled,
+                            'avail': avail,
                             'avail_remain': avail_remain,
-                            'task_remain': task_remain,
-                            'tasks_count': tasks_count}
+                            'tasks_est': tasks_est,
+                            'task_est_remain': task_est_remain,
+                            'tasks_count': tasks_count,
+                            'tasks_scheduled_count': tasks_scheduled_count
+                }
 
                 return JsonResponse(response)
 

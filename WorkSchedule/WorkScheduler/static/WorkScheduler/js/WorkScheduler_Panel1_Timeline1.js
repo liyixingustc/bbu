@@ -63,11 +63,20 @@ define(function (require) {
 		init();
         event();
 
+        // custom icons
 		var $fc_icon_fullscreen = $(".fc-icon-fullscreen");
 		$fc_icon_fullscreen.parent().html(
 			'<span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>'
 		);
 		$fc_icon_fullscreen.qtip({
+			content: "full screen"
+		});
+
+		var $fc_icon_print = $(".fc-icon-print");
+		$fc_icon_print.parent().html(
+			'<span class="glyphicon glyphicon-print" aria-hidden="true"></span>'
+		);
+		$fc_icon_print.qtip({
 			content: "full screen"
 		});
     }
@@ -109,10 +118,17 @@ define(function (require) {
 							screenfull.toggle($WorkScheduler_Panel1_Timeline1[0]);
 						}
 					}
+				},
+				print: {
+					text: 'print',
+					icon: 'print glyphicon glyphicon-print',
+					click: function(event) {
+
+					}
 				}
 			},
 			header: {
-				left: 'today prev,next   fullscreen',
+				left: 'today prev,next fullscreen print',
 				center: 'title',
 				right: 'timelineCustomDay,timelineCustomWeek,month'
 			},
@@ -477,35 +493,39 @@ define(function (require) {
 			var scheduled = result['scheduled'],
 				avail = result['avail'],
 				avail_remain = result['avail_remain'],
-				task_remain = result['task_remain'],
+				tasks_est = result['tasks_est'],
+				task_est_remain = result['task_est_remain'],
 				tasks_count = result['tasks_count'],
+				tasks_scheduled_count = result['tasks_scheduled_count'],
 				percent1 = 0,
 				percent2 = 0,
+				percent3 = 0,
 				$WorkSchedulerPanle3KPIBoard1Stats1 = $("#WorkSchedulerPanle3KPIBoard1Stats1"),
 				$WorkSchedulerPanle3KPIBoard1Stats2 = $("#WorkSchedulerPanle3KPIBoard1Stats2"),
 				$WorkSchedulerPanle3KPIBoard2Stats1 = $("#WorkSchedulerPanle3KPIBoard2Stats1"),
 				$WorkSchedulerPanle3KPIBoard2Stats2 = $("#WorkSchedulerPanle3KPIBoard2Stats2"),
-				$WorkSchedulerPanle3KPIBoard3Stats1 = $("#WorkSchedulerPanle3KPIBoard3Stats1");
+				$WorkSchedulerPanle3KPIBoard3Stats1 = $("#WorkSchedulerPanle3KPIBoard3Stats1"),
+				$WorkSchedulerPanle3KPIBoard3Stats2 = $("#WorkSchedulerPanle3KPIBoard3Stats2");
 
 
 			// KPIboard 1 setting
-			if(avail===0){percent1=0}
-			else if(avail>0){percent1=scheduled/avail}
+			if(tasks_est===0){tasks_est=0}
+			else if(tasks_est>0){percent1=avail/tasks_est}
 
-			$WorkSchedulerPanle3KPIBoard1Stats1.text(Math.round(scheduled)+"/"+ Math.round(avail)+" hrs");
+			$WorkSchedulerPanle3KPIBoard1Stats1.text(Math.round(avail)+"/"+ Math.round(tasks_est)+" hrs");
 			$WorkSchedulerPanle3KPIBoard1Stats2.text(Math.round(percent1*100)+"%");
-			if(percent1<1){
+			if(percent1>=1){
 				$WorkSchedulerPanle3KPIBoard1Stats2.attr('class','green')
 			}
-			else if(percent1>=1){
+			else if(percent1<1){
 				$WorkSchedulerPanle3KPIBoard1Stats2.attr('class','red')
 			}
 
 			// KPIboard 2 setting
-			if(task_remain===0){percent2=0}
-			else if(task_remain>0){percent2=avail_remain/task_remain}
+			if(task_est_remain===0){percent2=0}
+			else if(task_est_remain>0){percent2=avail_remain/task_est_remain}
 
-			$WorkSchedulerPanle3KPIBoard2Stats1.text(Math.round(avail_remain) +"/"+ Math.round(task_remain)+" hrs");
+			$WorkSchedulerPanle3KPIBoard2Stats1.text(Math.round(avail_remain) +"/"+ Math.round(task_est_remain)+" hrs");
 			$WorkSchedulerPanle3KPIBoard2Stats2.text(Math.round(percent2*100)+"%");
 			if(percent2>=1){
 				$WorkSchedulerPanle3KPIBoard2Stats2.attr('class','green')
@@ -514,8 +534,18 @@ define(function (require) {
 				$WorkSchedulerPanle3KPIBoard2Stats2.attr('class','red')
 			}
 
-			$WorkSchedulerPanle3KPIBoard3Stats1.text(tasks_count)
+			// KPIboard 3 setting
+			if(tasks_count===0){percent3=1}
+			else if(tasks_count>0){percent3=tasks_scheduled_count/tasks_count}
 
+			$WorkSchedulerPanle3KPIBoard3Stats1.text(Math.round(tasks_scheduled_count) +"/"+ Math.round(tasks_count)+" hrs");
+			$WorkSchedulerPanle3KPIBoard3Stats2.text(Math.round(percent3*100)+"%");
+			if(percent3>=1){
+				$WorkSchedulerPanle3KPIBoard3Stats2.attr('class','green')
+			}
+			else if(percent3<1){
+				$WorkSchedulerPanle3KPIBoard3Stats2.attr('class','red')
+			}
         });
     }
 
