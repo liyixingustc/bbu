@@ -58,8 +58,8 @@ class LoadConfigData:
 
     def load(self):
 
-        self.load_worker()
         self.load_company()
+        self.load_worker()
         self.load_aor()
 
 
