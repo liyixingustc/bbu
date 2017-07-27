@@ -124,12 +124,20 @@ define(function (require) {
 					text: 'print',
 					icon: 'print glyphicon glyphicon-print',
 					click: function(event) {
-						html2canvas($WorkScheduler_Panel1_Timeline1, {
-							background:'white',
+
+						var $WorkSchedulerPanel1Timeline1SnapShot = $("#WorkSchedulerPanel1Timeline1SnapShot");
+						$WorkSchedulerPanel1Timeline1SnapShot.show();
+						$WorkSchedulerPanel1Timeline1SnapShot.width(10215);
+						$WorkSchedulerPanel1Timeline1SnapShot.height(1350);
+						$WorkSchedulerPanel1Timeline1SnapShot.html($WorkScheduler_Panel1_Timeline1.clone())
+
+
+						html2canvas($WorkSchedulerPanel1Timeline1SnapShot, {
+							background:'white'
 						}).then(function (canvas) {
-							console.log(canvas)
 							var w = window.open();
 							$(w.document.body).html(canvas);
+							$WorkSchedulerPanel1Timeline1SnapShot.hide()
                         })
 					}
 				}
