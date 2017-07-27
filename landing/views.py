@@ -62,4 +62,4 @@ def signup(request):
 
 def logout(request):
     auth.logout(request)
-    return redirect('/login/')
+    return redirect('/')
