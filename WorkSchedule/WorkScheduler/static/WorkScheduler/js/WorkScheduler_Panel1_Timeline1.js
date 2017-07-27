@@ -99,7 +99,7 @@ define(function (require) {
 		$WorkScheduler_Panel1_Timeline1.fullCalendar({
             schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
 			now: currentDate,
-			// height: 700,
+			height: 700,
 			selectable: true,
 			selectHelper: true,
 			// selectOverlap: function(event) {
