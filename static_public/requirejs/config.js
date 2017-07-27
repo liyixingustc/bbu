@@ -28,6 +28,7 @@ require.config({
         'pnotify-nonblock' : ['/static/gentelella/vendors/pnotify/dist/pnotify.nonblock'],
         'pnotify-animate' : ['/static/gentelella/vendors/pnotify/dist/pnotify.animate'],
         'screenfull':['/static/screenfull/dist/screenfull.min'],
+        'html2canvas': ['/static/html2canvas/dist/html2canvas'],
         // progressbar
         'nprogress' : ['/static/gentelella/vendors/nprogress/nprogress'],
         'bootstrap-progressbar' : [
@@ -92,6 +93,10 @@ require.config({
         'screenfull':{
             deps:['jquery','bootstrap'],
             exports: 'screenfull'
+        },
+        'html2canvas':{
+            deps:['jquery','bootstrap'],
+            exports: 'html2canvas'
         },
         // bootstrap table extensions
         'bootstrap-table-export':{

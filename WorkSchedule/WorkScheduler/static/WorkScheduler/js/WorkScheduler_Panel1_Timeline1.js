@@ -18,7 +18,8 @@ define(function (require) {
 		PNotify_nonblock = require('pnotify-nonblock'),
 		PNotify_animate = require('pnotify-animate'),
 		qTip2 = require('qTip2'),
-		screenfull = require('screenfull');
+		screenfull = require('screenfull'),
+		html2canvas = require('html2canvas');
 
     var fullDate = new Date();
     //convert month to 2 digits
@@ -98,7 +99,7 @@ define(function (require) {
 		$WorkScheduler_Panel1_Timeline1.fullCalendar({
             schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
 			now: currentDate,
-			height: 700,
+			// height: 700,
 			selectable: true,
 			selectHelper: true,
 			// selectOverlap: function(event) {
@@ -123,7 +124,13 @@ define(function (require) {
 					text: 'print',
 					icon: 'print glyphicon glyphicon-print',
 					click: function(event) {
-
+						html2canvas($WorkScheduler_Panel1_Timeline1, {
+							background:'white',
+						}).then(function (canvas) {
+							console.log(canvas)
+							var w = window.open();
+							$(w.document.body).html(canvas);
+                        })
 					}
 				}
 			},
@@ -384,6 +391,7 @@ define(function (require) {
 						end = view.end.format();
 
 					KPI_board_update(start,end)
+
 				}
             }
 		});
@@ -430,6 +438,7 @@ define(function (require) {
 			return false
 		});
 
+		// events click
 		$('#WorkSchedulerPanel1Modal2FormId').submit(function (e) {
 			WorkSchedulerPanel1Modal2Choice = true;
 			var form_data = $(this).serializeObject();
@@ -469,7 +478,6 @@ define(function (require) {
 		});
 
 		// full screen the timeline table
-		
 		screenfull.onchange(function () {
 			is_fullscreen = !is_fullscreen;
 			if(is_fullscreen){
