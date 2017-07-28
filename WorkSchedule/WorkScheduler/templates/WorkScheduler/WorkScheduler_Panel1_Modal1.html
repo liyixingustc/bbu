@@ -13,10 +13,17 @@
           </label>
           <div class="col-md-6 col-sm-6 col-xs-12">
             <select id="CommandType" name="CommandType" class="select2_single form-control col-md-7 col-xs-12" style="width:80% " required>
-              <option value="ExtendWorkerAvailable">Extend Worker Available Time</option>
-              <option value="CutWorkerAvailable">Cut Worker Available Time</option>
-              <option value="Lunch">Lunch</option>
-              <option value="Breaks">Breaks</option>
+              <optgroup label="Worker Available">
+                <option value="ExtendWorkerAvailable">Extend Worker Available Time</option>
+                <option value="CutWorkerAvailable">Cut Worker Available Time</option>
+              </optgroup>
+              <optgroup label="Time Off">
+                <option value="Lunch">Lunch</option>
+                <option value="Breaks">Breaks</option>
+              </optgroup>
+              <optgroup label="Special Tasks">
+                <option value="UnionBus">Union Business</option>
+              </optgroup>
             </select>
           </div>
         </div>

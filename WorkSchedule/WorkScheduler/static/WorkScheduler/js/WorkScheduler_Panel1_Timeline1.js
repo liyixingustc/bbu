@@ -140,10 +140,16 @@ define(function (require) {
 							$WorkSchedulerPanel1Timeline1SnapShot.hide()
                         })
 					}
+				},
+				add: {
+					text: '+ worker',
+					click: function(event) {
+
+					}
 				}
 			},
 			header: {
-				left: 'today prev,next fullscreen print',
+				left: 'add today prev,next fullscreen print',
 				center: 'title',
 				right: 'timelineCustomDay,timelineCustomWeek,month'
 			},
@@ -172,7 +178,7 @@ define(function (require) {
 				}
 			},
 			// eventOverlap: false, // will cause the event to take up entire resource height
-			resourceAreaWidth: 150,
+			resourceAreaWidth: 165,
 			// resourceLabelText: 'Workers',
 			lazyFetching: false,
             refetchResourcesOnNavigate: true,
@@ -220,6 +226,14 @@ define(function (require) {
 				error: function() {
 					$('#script-warning').show();
 				}
+			},
+			// resource callback
+			resourceRender: function(resource, cellEls) {
+				cellEls.on('click', function() {
+					if (confirm('Are you sure you want to delete ' + resource.title + '?')) {
+						// $('#calendar').fullCalendar('removeResource', resource);
+					}
+				});
 			},
 
 			// events callback
