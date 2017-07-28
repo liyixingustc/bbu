@@ -235,7 +235,6 @@ define(function (require) {
 					}
 				});
 			},
-
 			// events callback
 			eventRender: function(event, element) {
 				// if(event.rendering !== 'background'){
