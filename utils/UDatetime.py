@@ -27,6 +27,7 @@ class UDatetime:
     def datetime_str_init(cls, timestamp,
                           default_base=dt.datetime.now(),
                           default_delta=timedelta(days=0)):
+
         if timestamp:
             timestamp = parse(timestamp)
             if not timestamp.tzinfo:
@@ -38,9 +39,8 @@ class UDatetime:
 
     @classmethod
     def pick_date_by_one_date(cls, date):
-
         ahead = date - cls.local_tz.localize(datetime(date.year, date.month, date.day))
-        behind = cls.local_tz.localize(datetime(date.year, date.month, date.day+1)) - date
+        behind = cls.local_tz.localize(datetime(date.year, date.month, date.day) + timedelta(days=1)) - date
         if ahead.total_seconds() >= behind.total_seconds() and behind.total_seconds() <= (3600*6):
             picked_date = (date + timedelta(days=1)).date()
         elif ahead.total_seconds() < behind.total_seconds() and ahead.total_seconds() <= (3600*6):
