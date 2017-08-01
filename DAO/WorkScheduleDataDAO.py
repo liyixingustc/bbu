@@ -54,7 +54,7 @@ class WorkScheduleDataDAO:
     @classmethod
     def get_all_workers_by_date_range(cls, start, end):
 
-        # init employee
+        # query pipline
         workers = Workers.objects\
             .exclude(name__exact='NONE') \
             .filter(status__exact='active') \
@@ -87,6 +87,8 @@ class WorkScheduleDataDAO:
                     )
                 ),
             )
+
+        # to df
         workers_df = pd.DataFrame.from_records(workers.values('id',
                                                               'name',
                                                               'available_hour',
@@ -97,6 +99,7 @@ class WorkScheduleDataDAO:
                                                               )
                                                )
 
+        # process data
         workers_df = workers_df[~((workers_df['type'] == 'contractor') &
                                 (workers_df['available_hour'] == timedelta()))]
 
