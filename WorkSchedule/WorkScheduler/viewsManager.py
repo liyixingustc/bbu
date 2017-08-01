@@ -9,11 +9,14 @@ from dateutil.tz import tzlocal
 from django.db.models import Q, Count, Min, Sum, Avg
 from bbu.settings import TIME_ZONE
 
+from django.db import models
 from ..WorkWorkers.models.models import *
 from ..WorkTasks.models.models import *
 from .tables.tables import *
 from .tables.tablesManager import *
 from utils.UDatetime import UDatetime
+
+from DAO.WorkScheduleDataDAO import WorkScheduleDataDAO
 
 EST = pytz.timezone(TIME_ZONE)
 
@@ -32,55 +35,17 @@ class PageManager:
                 start_date = UDatetime.pick_date_by_one_date(start)
                 end_date = UDatetime.pick_date_by_one_date(end)
 
-                workers = Workers.objects.exclude(name__exact='NONE')
+
+                # workers_contractor_df = workers_contractor_df[workers_contractor_df['scheduled_hour'] > timedelta()]
+                # print(workers_contractor_df)
+
+                workers_df = WorkScheduleDataDAO.get_all_workers_by_date_range(start_date, end_date)
+
                 response = []
 
-                if workers.exists():
-                    workers = pd.DataFrame.from_records(workers.values('id','name'))
-                    workers['id'] = workers['id'].astype('str')
-
-                    worker_avail = WorkerAvailable.objects.filter(date__range=[start_date, end_date])
-                    worker_scheduled = WorkerScheduled.objects.filter(date__range=[start_date, end_date])\
-                                                              .exclude(task_id__priority__in=['T'])
-
-                    for index, row in workers.iterrows():
-
-                        avail = timedelta(hours=0)
-                        avail_deduct = timedelta(hours=0)
-                        if worker_avail.exists():
-                            worker_avail_df = pd.DataFrame.from_records(worker_avail.values('name',
-                                                                                            'duration',
-                                                                                            'deduction',
-                                                                                            'time_start',
-                                                                                            'time_end'))
-                            avail_df = worker_avail_df[worker_avail_df['name'] == row['name']]
-
-                            for index_avail, row_avail in avail_df.iterrows():
-                                avail += UDatetime.get_overlap(start, end,
-                                                               row_avail['time_start'],
-                                                               row_avail['time_end'])
-                                avail_deduct += row_avail['deduction']
-
-                        scheduled = timedelta(hours=0)
-                        scheduled_deduct = timedelta(hours=0)
-                        if worker_scheduled.exists():
-                            worker_scheduled_df = pd.DataFrame.from_records(worker_scheduled.values('name',
-                                                                                                    'duration',
-                                                                                                    'time_start',
-                                                                                                    'time_end'))
-                            scheduled_df = worker_scheduled_df[worker_scheduled_df['name'] == row['name']]
-
-                            for index_scheduled, row_scheduled in scheduled_df.iterrows():
-                                scheduled += UDatetime.get_overlap(start, end,
-                                                                   row_scheduled['time_start'],
-                                                                   row_scheduled['time_end'])
-
-                        balance = avail - scheduled - avail_deduct
-
-                        workers.set_value(index, 'Avail', np.round((balance.total_seconds()/3600), 1))
-
-                    workers.rename_axis({'name': 'title'}, axis=1, inplace=True)
-                    response = workers.to_dict(orient='records')
+                if not workers_df.empty:
+                    workers_df.rename_axis({'name': 'title', 'balance': 'Avail'}, axis=1, inplace=True)
+                    response = workers_df.to_dict(orient='records')
                     return JsonResponse(response, safe=False)
                 else:
                     return JsonResponse(response, safe=False)
@@ -340,11 +305,13 @@ class PageManager:
                             else:
                                 return JsonResponse({})
 
-                elif command_type in ['Lunch', 'Breaks']:
+                elif command_type in ['Lunch', 'Breaks', 'UnionBus']:
                     if command_type == 'Lunch':
                         task = Tasks.objects.get(work_order__exact='0')
                     elif command_type == 'Breaks':
                         task = Tasks.objects.get(work_order__exact='1')
+                    elif command_type == 'UnionBus':
+                        task = Tasks.objects.get(work_order__exact='10')
                     else:
                         task = Tasks.objects.get(work_order__exact='0')
 
@@ -384,6 +351,21 @@ class PageManager:
                 response = []
 
                 return JsonResponse(response, safe=False)
+
+            @staticmethod
+            def add_worker_submit(request, *args, **kwargs):
+                print(request)
+                response = []
+
+                return JsonResponse(response, safe=False)
+
+            @staticmethod
+            def worker_submit(request, *args, **kwargs):
+
+                response = []
+
+                return JsonResponse(response, safe=False)
+
 
         class TableManager:
             @staticmethod
@@ -429,6 +411,7 @@ class PageManager:
                                                  Q(kitted_date__range=[start, end], current_status__in=['completed']))
 
                 tasks = Tasks.objects.filter(Q(current_status__in=['new', 'pending']))\
+                                     .exclude(priority__in=['T', 'O'])\
                                      .annotate(scheduled_hour=Sum('workerscheduled__duration'))
 
                 if worker_avail.exists():
@@ -450,6 +433,7 @@ class PageManager:
                 else:
                     tasks_est = 0
                     tasks_count = 0
+                    tasks_scheduled_count = 0
 
                 avail_remain = avail - scheduled
                 task_est_remain = tasks_est - scheduled

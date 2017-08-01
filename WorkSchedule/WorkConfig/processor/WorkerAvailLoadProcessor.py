@@ -84,23 +84,49 @@ class WorkerAvailLoadProcessor:
         result['worker'] = result['worker'].str.split(',').apply(lambda x: '{0} {1}'.format(x[1], x[0]))
 
         for index, row in result.iterrows():
+            is_union_bus = False
+            if row['time'] == 'Union Bus.':
+                row['time'] = None
+                is_union_bus = True
             date = row['date']
             deduction = timedelta(hours=1)
             worker = Workers.objects.get(name=row['worker'])
-
             parsed_time = cls.time_parser(row['time'], row['worker'], date, shift)
 
             # update db
-            WorkerAvailable.objects.update_or_create(name=worker,
-                                                     date=date,
+            available = WorkerAvailable.objects.update_or_create(name=worker,
+                                                                 date=date,
+                                                                 defaults={
+                                                                     'duration': parsed_time['duration'],
+                                                                     'time_start': parsed_time['start_datetime'],
+                                                                     'time_end': parsed_time['end_datetime'],
+                                                                     'deduction': deduction,
+                                                                     'source': 'file',
+                                                                     'document': file
+                                                                 })
+            if is_union_bus:
+                cls.union_bus_parser(row, parsed_time, deduction, file, available[0])
+
+    @classmethod
+    def union_bus_parser(cls, row, parsed_time, deduction, file, available_id):
+        print(row)
+        worker = Workers.objects.filter(name__exact=row['worker'])
+        task = Tasks.objects.filter(work_order='10')
+        if worker.exists() and task.exists():
+            WorkerScheduled.objects.update_or_create(name=worker[0],
+                                                     date=row['date'],
                                                      defaults={
                                                          'duration': parsed_time['duration'],
                                                          'time_start': parsed_time['start_datetime'],
-                                                         'time_end': parsed_time['end_datetime'],
-                                                         'deduction': deduction,
+                                                         'time_end': parsed_time['end_datetime'] - deduction,
+                                                         'task_id': task[0],
+                                                         'available_id': available_id,
                                                          'source': 'file',
                                                          'document': file
-                                                     })
+                                                     }
+                                                     )
+
+        return row
 
     @classmethod
     def time_parser(cls, time_str, worker, date, shift):

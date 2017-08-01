@@ -1,0 +1,47 @@
+{% extends 'bbu/modal.html' %}
+
+{% block modal_id %}WorkSchedulerPanel1Modal4{% endblock %}
+
+{% block form_title %}Edit your range{% endblock form_title %}
+
+{% block modal-body_footer %}
+  <form method="get" id="WorkSchedulerPanel1Modal4FormId" class="form-horizontal form-label-left">
+    {% csrf_token %}
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="control-label col-md-3 col-sm-3 col-xs-12" for="CommandType">Command Type<span class="required">*</span>
+          </label>
+          <div class="col-md-6 col-sm-6 col-xs-12">
+            <select id="CommandType" name="CommandType" class="select2_single form-control col-md-7 col-xs-12" style="width:100% " required>
+              <optgroup label="Worker Available">
+                <option value="ExtendWorkerAvailable">Extend Worker Available Time</option>
+                <option value="CutWorkerAvailable">Cut Worker Available Time</option>
+              </optgroup>
+              <optgroup label="Time Off">
+                <option value="Lunch">Lunch</option>
+                <option value="Breaks">Breaks</option>
+              </optgroup>
+              <optgroup label="Special Tasks">
+                <option value="UnionBus">Union Business</option>
+              </optgroup>
+            </select>
+          </div>
+        </div>
+{#        <div class="form-group">#}
+{#          <label class="control-label col-md-3 col-sm-3 col-xs-12" for="Deduction"> Deduction#}
+{#          </label>#}
+{#          <div class="col-md-6 col-sm-6 col-xs-12">#}
+{#            <input type="text" id="Deduction" name="Deduction" class="form-control col-md-7 col-xs-12" style="width:80% ">#}
+{#          </div>#}
+{#        </div>#}
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary" id="WorkSchedulerPanel1Modal4Yes">
+            <span class="glyphicon glyphicon-ok"></span>
+        </button>
+        <button id="WorkSchedulerPanel1Modal4No" type="button" class="btn btn-danger" data-dismiss="modal">
+            <span class="glyphicon glyphicon-remove"></span>
+        </button>
+      </div>
+  </form>
+{% endblock modal-body_footer %}

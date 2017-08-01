@@ -25,9 +25,13 @@ define(function (require) {
     //convert month to 2 digits
     var twoDigitMonth = ((fullDate.getMonth().length+1) === 1)? (fullDate.getMonth()+1) : '0' + (fullDate.getMonth()+1);
     var currentDate = fullDate.getFullYear() + "-" + twoDigitMonth + "-" + fullDate.getDate();
-	var $WorkScheduler_Panel1_Timeline1 = $('#WorkScheduler_Panel1_Timeline1');
+	var $WorkScheduler_Panel1_Timeline1 = $('#WorkScheduler_Panel1_Timeline1'),
+		$WorkSchedulerPanel1Timeline1SnapShot = $("#WorkSchedulerPanel1Timeline1SnapShot");
 	var WorkSchedulerPanel1Modal1Choice = false,
-		WorkSchedulerPanel1Modal2Choice = false;
+		WorkSchedulerPanel1Modal2Choice = false,
+		WorkSchedulerPanel1Modal3Choice = false,
+		WorkSchedulerPanel1Modal4Choice = false;
+
 	var select_data_global = 1, event_data_global = 1;
 	var is_fullscreen = false;
 
@@ -116,7 +120,27 @@ define(function (require) {
 					icon: 'fullscreen glyphicon glyphicon-fullscreen',
 					click: function(event) {
 						if (screenfull.enabled) {
+							// var $WorkSchedulerPanel1Timeline1SnapShotSize = $WorkScheduler_Panel1_Timeline1.find(
+							// 		'div.fc-view-container table tbody.fc-body td.fc-time-area div.fc-scroller-canvas'
+							// 	);
+							// var height = $WorkSchedulerPanel1Timeline1SnapShotSize.height() + 127,
+							// 	width = $WorkSchedulerPanel1Timeline1SnapShotSize.width() + 182;
+                            //
+							// $WorkSchedulerPanel1Timeline1SnapShot.show();
+							// $WorkSchedulerPanel1Timeline1SnapShot.html($WorkScheduler_Panel1_Timeline1.clone());
+							// $WorkSchedulerPanel1Timeline1SnapShot.width(width);
+							// $WorkSchedulerPanel1Timeline1SnapShot.height(height);
+							// $WorkSchedulerPanel1Timeline1SnapShot.css({'padding':'15px'});
+							// var $WorkSchedulerPanel1Timeline1SnapShotHeightResource = $WorkSchedulerPanel1Timeline1SnapShot.find(
+							// 		'div.fc-view-container table tbody.fc-body td.fc-resource-area div.fc-scroller'
+							// 	),
+							// 	$WorkSchedulerPanel1Timeline1SnapShotHeightEvent = $WorkSchedulerPanel1Timeline1SnapShot.find(
+							// 		'div.fc-view-container table tbody.fc-body td.fc-time-area div.fc-scroller'
+							// 	);
+							// $WorkSchedulerPanel1Timeline1SnapShotHeightResource.height(height);
+							// $WorkSchedulerPanel1Timeline1SnapShotHeightEvent.height(height);
 							screenfull.toggle($WorkScheduler_Panel1_Timeline1[0]);
+
 						}
 					}
 				},
@@ -125,11 +149,25 @@ define(function (require) {
 					icon: 'print glyphicon glyphicon-print',
 					click: function(event) {
 
-						var $WorkSchedulerPanel1Timeline1SnapShot = $("#WorkSchedulerPanel1Timeline1SnapShot");
+						var $WorkSchedulerPanel1Timeline1SnapShotSize = $WorkScheduler_Panel1_Timeline1.find(
+								'div.fc-view-container table tbody.fc-body td.fc-time-area div.fc-scroller-canvas'
+							);
+						var height = $WorkSchedulerPanel1Timeline1SnapShotSize.height() + 127,
+							width = $WorkSchedulerPanel1Timeline1SnapShotSize.width() + 182;
+
 						$WorkSchedulerPanel1Timeline1SnapShot.show();
-						$WorkSchedulerPanel1Timeline1SnapShot.width(10215);
-						$WorkSchedulerPanel1Timeline1SnapShot.height(1350);
-						$WorkSchedulerPanel1Timeline1SnapShot.html($WorkScheduler_Panel1_Timeline1.clone())
+						$WorkSchedulerPanel1Timeline1SnapShot.html($WorkScheduler_Panel1_Timeline1.clone());
+						$WorkSchedulerPanel1Timeline1SnapShot.width(width);
+						$WorkSchedulerPanel1Timeline1SnapShot.height(height);
+						$WorkSchedulerPanel1Timeline1SnapShot.css({'padding':'15px'});
+						var $WorkSchedulerPanel1Timeline1SnapShotHeightResource = $WorkSchedulerPanel1Timeline1SnapShot.find(
+								'div.fc-view-container table tbody.fc-body td.fc-resource-area div.fc-scroller'
+							),
+							$WorkSchedulerPanel1Timeline1SnapShotHeightEvent = $WorkSchedulerPanel1Timeline1SnapShot.find(
+								'div.fc-view-container table tbody.fc-body td.fc-time-area div.fc-scroller'
+							);
+						$WorkSchedulerPanel1Timeline1SnapShotHeightResource.height(height);
+						$WorkSchedulerPanel1Timeline1SnapShotHeightEvent.height(height);
 
 
 						html2canvas($WorkSchedulerPanel1Timeline1SnapShot, {
@@ -137,14 +175,17 @@ define(function (require) {
 						}).then(function (canvas) {
 							var w = window.open();
 							$(w.document.body).html(canvas);
-							$WorkSchedulerPanel1Timeline1SnapShot.hide()
+							$WorkSchedulerPanel1Timeline1SnapShot.hide();
+							$WorkSchedulerPanel1Timeline1SnapShot.empty()
                         })
 					}
 				},
 				add: {
 					text: '+ worker',
 					click: function(event) {
+						$('#WorkSchedulerPanel1Modal3Create').click();
 
+						return false;
 					}
 				}
 			},
@@ -230,9 +271,12 @@ define(function (require) {
 			// resource callback
 			resourceRender: function(resource, cellEls) {
 				cellEls.on('click', function() {
-					if (confirm('Are you sure you want to delete ' + resource.title + '?')) {
-						// $('#calendar').fullCalendar('removeResource', resource);
-					}
+					// if (confirm('Are you sure you want to delete ' + resource.title + '?')) {
+					// 	// $('#calendar').fullCalendar('removeResource', resource);
+					// }
+					$('#WorkSchedulerPanel1Modal4Create').click();
+
+					return false;
 				});
 			},
 			// events callback
@@ -258,6 +302,7 @@ define(function (require) {
 					// <span class="fc-title" style="position: relative; top: 0px; left: 0px;">17004298</span>
 					if(event.taskId==="0"){event.title = 'L';event.equip_code = ''}
 					else if(event.taskId==="1"){event.title = 'B';event.equip_code = ''}
+					else if(event.taskId==="10"){event.title = 'Union Bus';event.equip_code = ''}
 					else {event.title = event.taskId}
 
 					var html_content =
@@ -498,6 +543,82 @@ define(function (require) {
 			return false
 		});
 
+		$('#WorkSchedulerPanel1Modal3FormId').submit(function (e) {
+			WorkSchedulerPanel1Modal3Choice = true;
+			var form_data = $(this).serializeObject();
+			if(WorkSchedulerPanel1Modal3Choice){
+				var eventData = $.extend({}, form_data, select_data_global);
+
+                $.get('Panel1/Modal3/select_submit/',eventData,function () {
+					$WorkScheduler_Panel1_Timeline1.fullCalendar('refetchEvents');
+					$WorkScheduler_Panel1_Timeline1.fullCalendar('refetchResources');
+					$("#WorkSchedulerPanel2Table1TableId").bootstrapTable('refresh');
+					setTimeout(function () {
+						external_drag_init()
+					},500);
+
+					var notice = new PNotify({
+										title: 'Success!',
+										text: 'You have successfully extended the worker available hours',
+										type: 'success',
+										sound: false,
+										animate_speed: 'fast',
+										styling: 'bootstrap3',
+										nonblock: {
+											nonblock: true
+										}
+									});
+					notice.get().click(function() {
+						notice.remove();
+					});
+                });
+
+				WorkSchedulerPanel1Modal3Choice = false
+			}
+			$WorkScheduler_Panel1_Timeline1.fullCalendar('unselect');
+
+			$('#WorkSchedulerPanel1Modal3No').click();
+			return false
+		});
+
+		$('#WorkSchedulerPanel1Modal4FormId').submit(function (e) {
+			WorkSchedulerPanel1Modal4Choice = true;
+			var form_data = $(this).serializeObject();
+			if(WorkSchedulerPanel1Modal4Choice){
+				var eventData = $.extend({}, form_data, select_data_global);
+
+                $.get('Panel1/Modal4/select_submit/',eventData,function () {
+					$WorkScheduler_Panel1_Timeline1.fullCalendar('refetchEvents');
+					$WorkScheduler_Panel1_Timeline1.fullCalendar('refetchResources');
+					$("#WorkSchedulerPanel2Table1TableId").bootstrapTable('refresh');
+					setTimeout(function () {
+						external_drag_init()
+					},500);
+
+					var notice = new PNotify({
+										title: 'Success!',
+										text: 'You have successfully extended the worker available hours',
+										type: 'success',
+										sound: false,
+										animate_speed: 'fast',
+										styling: 'bootstrap3',
+										nonblock: {
+											nonblock: true
+										}
+									});
+					notice.get().click(function() {
+						notice.remove();
+					});
+                });
+
+				WorkSchedulerPanel1Modal4Choice = false
+			}
+			$WorkScheduler_Panel1_Timeline1.fullCalendar('unselect');
+
+			$('#WorkSchedulerPanel1Modal4No').click();
+			return false
+		});
+
 		// full screen the timeline table
 		screenfull.onchange(function () {
 			is_fullscreen = !is_fullscreen;
@@ -510,6 +631,9 @@ define(function (require) {
 			else{
 				$WorkScheduler_Panel1_Timeline1.css({'padding':'0px'});
 				$WorkScheduler_Panel1_Timeline1.fullCalendar('option', 'height', 700)
+
+				// $WorkSchedulerPanel1Timeline1SnapShot.hide();
+				// $WorkSchedulerPanel1Timeline1SnapShot.empty()
 			}
         })
     }
@@ -567,7 +691,7 @@ define(function (require) {
 			if(tasks_count===0){percent3=1}
 			else if(tasks_count>0){percent3=tasks_scheduled_count/tasks_count}
 
-			$WorkSchedulerPanle3KPIBoard3Stats1.text(Math.round(tasks_scheduled_count) +"/"+ Math.round(tasks_count)+" hrs");
+			$WorkSchedulerPanle3KPIBoard3Stats1.text(Math.round(tasks_scheduled_count) +"/"+ Math.round(tasks_count)+" W/Os");
 			$WorkSchedulerPanle3KPIBoard3Stats2.text(Math.round(percent3*100)+"%");
 			if(percent3>=1){
 				$WorkSchedulerPanle3KPIBoard3Stats2.attr('class','green')

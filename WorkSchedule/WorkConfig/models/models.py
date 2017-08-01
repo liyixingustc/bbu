@@ -26,6 +26,7 @@ level_choice = (('lead', 'lead'),
 shift_choice = (('1', '1'),
                 ('2', '2'),
                 ('3', '3'),
+                ('N', 'N'),
                 )
 
 line_choice = (('1', '1'),
@@ -37,24 +38,35 @@ line_choice = (('1', '1'),
                ('', ''),
                )
 
+worker_status_choice = (('active', 'active'),
+                        ('inactive', 'inactive'),
+                        )
+
+worker_type_choice = (('employee', 'employee'),
+                      ('contractor', 'contractor'),
+                      ('none', 'none'),
+                      )
+
 AOR_type_choice = (('major', 'major'),
                    ('minor', 'minor'),
                    )
 
 
 class Company(models.Model):
-    business_name = models.CharField(max_length=30,unique=True)
+    business_name = models.CharField(max_length=30, unique=True)
     address = models.CharField(max_length=100)
 
 
 class Workers(models.Model):
 
-    name = models.CharField(max_length=30,unique=True)
+    name = models.CharField(max_length=30, unique=True)
     last_name = models.CharField(max_length=30)
     first_name = models.CharField(max_length=30)
     company = models.ForeignKey(Company,to_field='business_name', db_column='company')
     level = models.CharField(default='lead', max_length=30, choices=level_choice)
     shift = models.CharField(default='1', max_length=30, choices=shift_choice)
+    status = models.CharField(default='active', max_length=30, choices=worker_status_choice)
+    type = models.CharField(default='employee', max_length=30, choices=worker_type_choice)
 
 
 class Documents(models.Model):

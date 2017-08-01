@@ -25,7 +25,7 @@ class WorkScheduleDataDAO:
     @classmethod
     def get_all_tasks_scheduled(cls):
 
-        tasks = Tasks.objects.filter(current_status__in=['new', 'pending']).exclude(priority__in=['T'])\
+        tasks = Tasks.objects.filter(current_status__in=['new', 'pending']).exclude(priority__in=['T', 'O'])\
                                                                            .values('line',
                                                                                    'work_order',
                                                                                    'description',
@@ -50,3 +50,64 @@ class WorkScheduleDataDAO:
         tasks_record.drop('kitted_date',axis=1,inplace=True)
 
         return tasks_record
+
+    @classmethod
+    def get_all_workers_by_date_range(cls, start, end):
+
+        # init employee
+        workers = Workers.objects\
+            .exclude(name__exact='NONE') \
+            .filter(status__exact='active') \
+            .annotate(
+                available_hour=Sum(
+                    models.Case(
+                        models.When(workeravailable__date__range=[start,
+                                                                  end],
+                                    then='workeravailable__duration'),
+                        default=0,
+                        output_field=models.DurationField(),
+                    )
+                ),
+                deduction=Sum(
+                    models.Case(
+                        models.When(workeravailable__date__range=[start,
+                                                                  end],
+                                    then='workeravailable__deduction'),
+                        default=0,
+                        output_field=models.DurationField(),
+                    )
+                ),
+                scheduled_hour=Sum(
+                    models.Case(
+                        models.When(workerscheduled__date__range=[start,
+                                                                  end],
+                                    then='workerscheduled__duration'),
+                        default=0,
+                        output_field=models.DurationField(),
+                    )
+                ),
+            )
+        workers_df = pd.DataFrame.from_records(workers.values('id',
+                                                              'name',
+                                                              'available_hour',
+                                                              'deduction',
+                                                              'scheduled_hour',
+                                                              'company',
+                                                              'type'
+                                                              )
+                                               )
+
+        workers_df = workers_df[~((workers_df['type'] == 'contractor') &
+                                (workers_df['available_hour'] == timedelta()))]
+
+        for index, row in workers_df.iterrows():
+            if row['type'] == 'contractor':
+                workers_df.set_value(index, 'name', row['company'])
+        workers_df['id'] = workers_df['id'].astype('str')
+
+        workers_df['balance'] = workers_df['available_hour'] - workers_df['deduction'] - workers_df['scheduled_hour']
+        workers_df['balance'] = workers_df['balance'].apply(lambda x: np.round(x.total_seconds()/3600, 2))
+
+        workers_df.sort_values('name', inplace=True)
+
+        return workers_df

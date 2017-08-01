@@ -32,6 +32,7 @@ class LoadConfigData:
                                                 'company': company,
                                                 'level': row['level'],
                                                 'shift': row['shift'],
+                                                'type': row['type']
                                              })
 
     def load_company(self):
