@@ -31,7 +31,7 @@ class PageManager:
 
                 start = UDatetime.datetime_str_init(start)
                 end = UDatetime.datetime_str_init(end, start, timedelta(days=1))
-                print(start,end)
+
                 start_date = UDatetime.pick_date_by_one_date(start)
                 end_date = UDatetime.pick_date_by_one_date(end)
 
