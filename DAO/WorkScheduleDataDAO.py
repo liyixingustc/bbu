@@ -55,14 +55,27 @@ class WorkScheduleDataDAO:
     def get_all_workers_by_date_range(cls, start, end):
 
         # query pipline
-        workers = Workers.objects\
+        workers_available_hour = Workers.objects\
             .exclude(name__exact='NONE') \
             .filter(status__exact='active') \
             .annotate(
                 available_hour=Sum(
                     models.Case(
-                        models.When(workeravailable__date__range=[start,
-                                                                  end],
+                        models.When(workeravailable__date__range=[start, end],
+                                    then='workeravailable__duration'),
+                        default=0,
+                        output_field=models.DurationField(),
+                    )
+                ),
+            )
+
+        workers_deduction = Workers.objects\
+            .exclude(name__exact='NONE') \
+            .filter(status__exact='active') \
+            .annotate(
+                available_hour=Sum(
+                    models.Case(
+                        models.When(workeravailable__date__range=[start, end],
                                     then='workeravailable__duration'),
                         default=0,
                         output_field=models.DurationField(),
@@ -70,17 +83,21 @@ class WorkScheduleDataDAO:
                 ),
                 deduction=Sum(
                     models.Case(
-                        models.When(workeravailable__date__range=[start,
-                                                                  end],
+                        models.When(workeravailable__date__range=[start, end],
                                     then='workeravailable__deduction'),
                         default=0,
                         output_field=models.DurationField(),
                     )
                 ),
+            )
+
+        workers_scheduled_hour = Workers.objects\
+            .exclude(name__exact='NONE') \
+            .filter(status__exact='active') \
+            .annotate(
                 scheduled_hour=Sum(
                     models.Case(
-                        models.When(workerscheduled__date__range=[start,
-                                                                  end],
+                        models.When(workerscheduled__date__range=[start, end],
                                     then='workerscheduled__duration'),
                         default=0,
                         output_field=models.DurationField(),
@@ -89,15 +106,24 @@ class WorkScheduleDataDAO:
             )
 
         # to df
-        workers_df = pd.DataFrame.from_records(workers.values('id',
-                                                              'name',
-                                                              'available_hour',
-                                                              'deduction',
-                                                              'scheduled_hour',
-                                                              'company',
-                                                              'type'
-                                                              )
-                                               )
+        workers_available_hour_df = pd.DataFrame.from_records(workers_available_hour.values('id',
+                                                                                            'name',
+                                                                                            'available_hour',
+                                                                                            'company',
+                                                                                            'type'
+                                                                                            ))
+        workers_deduction_df = pd.DataFrame.from_records(workers_deduction.values('id',
+                                                                                  'deduction',
+                                                                                  ))
+        workers_scheduled_hour_df = pd.DataFrame.from_records(workers_scheduled_hour.values('id',
+                                                                                            'scheduled_hour',
+                                                                                            ))
+
+        # join df
+        workers_df = pd.merge(
+                        pd.merge(workers_available_hour_df, workers_deduction_df, on='id'),
+                        workers_scheduled_hour_df,
+                        on='id')
 
         # process data
         workers_df = workers_df[~((workers_df['type'] == 'contractor') &
