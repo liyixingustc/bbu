@@ -33,6 +33,7 @@ define(function (require) {
 		WorkSchedulerPanel1Modal4Choice = false;
 
 	var select_data_global = 1, event_data_global = 1;
+	var start_global, end_global;
 	var is_fullscreen = false;
 
 	function external_drag_init() {
@@ -184,6 +185,22 @@ define(function (require) {
 					text: '+ worker',
 					click: function(event) {
 						$('#WorkSchedulerPanel1Modal3Create').click();
+						$('#WorkSchedulerPanel1Modal3WorkerSelect').select2({
+							ajax:{
+								url:'Panel1/Modal3/add_worker_workers/',
+								data: function (params) {
+								  return {
+									'start': start_global,
+									'end': end_global
+								  };
+								},
+								processResults: function (data, params) {
+								  return {
+									results: data
+								  };
+								}
+							}
+						});
 
 						return false;
 					}
@@ -453,10 +470,10 @@ define(function (require) {
 			loading: function (isLoading, view) {
 
             	if (isLoading === false){
-            		var start = view.start.format(),
-						end = view.end.format();
+					    start_global = view.start.format();
+						end_global = view.end.format();
 
-					KPI_board_update(start,end)
+					KPI_board_update(start_global,end_global)
 
 				}
             }
@@ -549,13 +566,22 @@ define(function (require) {
 			if(WorkSchedulerPanel1Modal3Choice){
 				var eventData = $.extend({}, form_data, select_data_global);
 
-                $.get('Panel1/Modal3/select_submit/',eventData,function () {
-					$WorkScheduler_Panel1_Timeline1.fullCalendar('refetchEvents');
-					$WorkScheduler_Panel1_Timeline1.fullCalendar('refetchResources');
-					$("#WorkSchedulerPanel2Table1TableId").bootstrapTable('refresh');
-					setTimeout(function () {
-						external_drag_init()
-					},500);
+                $.get('Panel1/Modal3/add_worker_submit/',eventData,function (data) {
+
+                	$.each(data, function (index, value) {
+						$WorkScheduler_Panel1_Timeline1.fullCalendar(
+							'addResource',
+							value,
+							true
+						);
+                    });
+
+					// $WorkScheduler_Panel1_Timeline1.fullCalendar('refetchEvents');
+					// $WorkScheduler_Panel1_Timeline1.fullCalendar('refetchResources');
+					// $("#WorkSchedulerPanel2Table1TableId").bootstrapTable('refresh');
+					// setTimeout(function () {
+					// 	external_drag_init()
+					// },500);
 
 					var notice = new PNotify({
 										title: 'Success!',
@@ -587,7 +613,7 @@ define(function (require) {
 			if(WorkSchedulerPanel1Modal4Choice){
 				var eventData = $.extend({}, form_data, select_data_global);
 
-                $.get('Panel1/Modal4/select_submit/',eventData,function () {
+                $.get('Panel1/Modal4/worker_submit/',eventData,function () {
 					$WorkScheduler_Panel1_Timeline1.fullCalendar('refetchEvents');
 					$WorkScheduler_Panel1_Timeline1.fullCalendar('refetchResources');
 					$("#WorkSchedulerPanel2Table1TableId").bootstrapTable('refresh');

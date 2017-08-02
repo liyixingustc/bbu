@@ -57,6 +57,11 @@ class Page:
                 return response
 
             @staticmethod
+            def add_worker_workers(request, *args, **kwargs):
+                response = PageManager.PanelManager.ModalManager.add_worker_workers(request, *args, **kwargs)
+                return response
+
+            @staticmethod
             def worker_submit(request, *args, **kwargs):
                 response = PageManager.PanelManager.ModalManager.worker_submit(request, *args, **kwargs)
                 return response
@@ -93,6 +98,7 @@ mapping = pd.DataFrame([
     {'page': 'WorkScheduler', 'panel': 'Panel1', 'widget': 'Modal1', 'func': 'select_submit', 'register': Page.Panel.Modal.select_submit},
     {'page': 'WorkScheduler', 'panel': 'Panel1', 'widget': 'Modal2', 'func': 'tasks_submit', 'register': Page.Panel.Modal.tasks_submit},
     {'page': 'WorkScheduler', 'panel': 'Panel1', 'widget': 'Modal3', 'func': 'add_worker_submit', 'register': Page.Panel.Modal.add_worker_submit},
+    {'page': 'WorkScheduler', 'panel': 'Panel1', 'widget': 'Modal3', 'func': 'add_worker_workers', 'register': Page.Panel.Modal.add_worker_workers},
     {'page': 'WorkScheduler', 'panel': 'Panel1', 'widget': 'Modal4', 'func': 'worker_submit', 'register': Page.Panel.Modal.worker_submit},
 
     {'page': 'WorkScheduler', 'panel': 'Panel3', 'widget': 'KPIBoard', 'func': 'update','register': Page.Panel.KPIBoard.update},

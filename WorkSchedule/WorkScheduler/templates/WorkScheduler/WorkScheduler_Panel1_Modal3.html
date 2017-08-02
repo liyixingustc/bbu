@@ -9,20 +9,13 @@
     {% csrf_token %}
       <div class="modal-body">
         <div class="form-group">
-          <label class="control-label col-md-3 col-sm-3 col-xs-12" for="CommandType">Command Type<span class="required">*</span>
+          <label class="control-label col-md-3 col-sm-3 col-xs-12" for="Worker">Worker<span class="required">*</span>
           </label>
           <div class="col-md-6 col-sm-6 col-xs-12">
-            <select id="CommandType" name="CommandType" class="select2_single form-control col-md-7 col-xs-12" style="width:100% " required>
-              <optgroup label="Worker Available">
-                <option value="ExtendWorkerAvailable">Extend Worker Available Time</option>
-                <option value="CutWorkerAvailable">Cut Worker Available Time</option>
+            <select id="WorkSchedulerPanel1Modal3WorkerSelect" name="Worker" class="select2_multiple form-control col-md-7 col-xs-12" multiple="multiple" style="width:100% " required>
+              <optgroup label="Contractor">
               </optgroup>
-              <optgroup label="Time Off">
-                <option value="Lunch">Lunch</option>
-                <option value="Breaks">Breaks</option>
-              </optgroup>
-              <optgroup label="Special Tasks">
-                <option value="UnionBus">Union Business</option>
+              <optgroup label="Employee">
               </optgroup>
             </select>
           </div>

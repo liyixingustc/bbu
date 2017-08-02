@@ -35,7 +35,7 @@ class PageManager:
                 start_date = UDatetime.pick_date_by_one_date(start)
                 end_date = UDatetime.pick_date_by_one_date(end)
 
-                workers_df = WorkScheduleDataDAO.get_all_workers_by_date_range(start_date, end_date)
+                workers_df = WorkScheduleDataDAO.get_all_include_workers_by_date_range(start_date, end_date)
 
                 response = []
 
@@ -350,13 +350,72 @@ class PageManager:
 
             @staticmethod
             def add_worker_submit(request, *args, **kwargs):
-                print(request)
-                response = []
+                worker = request.GET.get('Worker')
+                if worker:
+                    worker = [worker]
+                if not worker:
+                    worker = request.GET.getlist('Worker[]')
+
+                if worker:
+                    worker_df = pd.DataFrame(columns=['id', 'title'])
+                    worker_df['id'] = worker
+                    worker_df['Avail'] = 0
+                    for index, row in worker_df.iterrows():
+                        name = Workers.objects.get(id=row['id']).name
+                        worker_df.set_value(index, 'title', name)
+                    response = worker_df.to_dict(orient='records')
+                else:
+                    response = []
+
+                return JsonResponse(response, safe=False)
+
+            @staticmethod
+            def add_worker_workers(request, *args, **kwargs):
+
+                start = request.GET.get('start')
+                end = request.GET.get('end')
+
+                start = UDatetime.datetime_str_init(start)
+                end = UDatetime.datetime_str_init(end, start, timedelta(days=1))
+
+                start_date = UDatetime.pick_date_by_one_date(start)
+                end_date = UDatetime.pick_date_by_one_date(end)
+
+                workers_df = WorkScheduleDataDAO.get_all_exclude_workers_by_date_range(start_date, end_date)
+
+                workers_df_contractor = pd.DataFrame(columns=['id', 'text'])
+                workers_df_contractor['id'] = workers_df[workers_df['type'] == 'contractor']['id']
+                workers_df_contractor['text'] = workers_df[workers_df['type'] == 'contractor']['name']
+                if not workers_df_contractor.empty:
+                    workers_dict_contractor = workers_df_contractor.to_dict(orient='records')
+                else:
+                    workers_dict_contractor = []
+
+                workers_df_employee = pd.DataFrame(columns=['id', 'text'])
+                workers_df_employee['id'] = workers_df[workers_df['type'] == 'employee']['id']
+                workers_df_employee['text'] = workers_df[workers_df['type'] == 'employee']['name']
+                if not workers_df_employee.empty:
+                    workers_dict_employee = workers_df_employee.to_dict(orient='records')
+                else:
+                    workers_dict_employee = []
+
+                response = [
+                            {
+                                'text': 'Contractor',
+                                'children': workers_dict_contractor
+                            },
+                            {
+                                'text': 'Employee',
+                                'children': workers_dict_employee
+                            },
+                            ]
 
                 return JsonResponse(response, safe=False)
 
             @staticmethod
             def worker_submit(request, *args, **kwargs):
+
+
 
                 response = []
 
