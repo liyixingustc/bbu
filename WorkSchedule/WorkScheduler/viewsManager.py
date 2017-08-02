@@ -414,12 +414,31 @@ class PageManager:
             @staticmethod
             def worker_submit(request, *args, **kwargs):
 
+                command_type = request.GET.get('CommandType')
+                start = request.GET.get('start')
+                end = request.GET.get('end')
+                worker_id = request.GET.get('resourceId')
 
+                start = UDatetime.datetime_str_init(start)
+                end = UDatetime.datetime_str_init(end, start, timedelta(hours=2))
+
+                start_date = UDatetime.pick_date_by_one_date(start)
+                end_date = UDatetime.pick_date_by_one_date(end)
+
+                worker = Workers.objects.get(id=worker_id)
 
                 response = []
 
-                return JsonResponse(response, safe=False)
+                if command_type == 'ClearTasks':
+                    WorkerScheduled.objects.filter(date__range=[start_date, end_date],
+                                                   name__exact=worker).delete()
+                elif command_type == 'ClearAll':
+                    WorkerAvailable.objects.filter(date__range=[start_date, end_date],
+                                                   name__exact=worker).delete()
+                    WorkerScheduled.objects.filter(date__range=[start_date, end_date],
+                                                   name__exact=worker).delete()
 
+                return JsonResponse(response, safe=False)
 
         class TableManager:
             @staticmethod

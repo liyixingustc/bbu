@@ -33,7 +33,7 @@ define(function (require) {
 		WorkSchedulerPanel1Modal4Choice = false;
 
 	var select_data_global = 1, event_data_global = 1;
-	var start_global, end_global;
+	var start_global, end_global, resourceId_global;
 	var is_fullscreen = false;
 
 	function external_drag_init() {
@@ -288,9 +288,7 @@ define(function (require) {
 			// resource callback
 			resourceRender: function(resource, cellEls) {
 				cellEls.on('click', function() {
-					// if (confirm('Are you sure you want to delete ' + resource.title + '?')) {
-					// 	// $('#calendar').fullCalendar('removeResource', resource);
-					// }
+					resourceId_global = resource.id;
 					$('#WorkSchedulerPanel1Modal4Create').click();
 
 					return false;
@@ -611,7 +609,7 @@ define(function (require) {
 			WorkSchedulerPanel1Modal4Choice = true;
 			var form_data = $(this).serializeObject();
 			if(WorkSchedulerPanel1Modal4Choice){
-				var eventData = $.extend({}, form_data, select_data_global);
+				var eventData = $.extend({}, form_data, {'start':start_global,'end':end_global,'resourceId':resourceId_global});
 
                 $.get('Panel1/Modal4/worker_submit/',eventData,function () {
 					$WorkScheduler_Panel1_Timeline1.fullCalendar('refetchEvents');
