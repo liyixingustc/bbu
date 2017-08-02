@@ -44,7 +44,7 @@ class Page:
             @staticmethod
             def select_submit(request, *args, **kwargs):
                 response = PageManager.PanelManager.ModalManager.select_submit(request, *args, **kwargs)
-                return
+                return response
 
             @staticmethod
             def tasks_submit(request, *args, **kwargs):

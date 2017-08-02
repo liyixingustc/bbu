@@ -218,6 +218,8 @@ class PageManager:
                 date = UDatetime.pick_date_by_two_date(start, end)
                 duration = end - start
 
+                response = {}
+
                 worker = Workers.objects.get(id=worker_id)
                 if command_type == 'ExtendWorkerAvailable':
                     avails = WorkerAvailable.objects.filter(Q(time_start__range=[start, end]) |
@@ -299,7 +301,7 @@ class PageManager:
                                                                                  'time_end': end_new
                                                                              })
                             else:
-                                return JsonResponse({})
+                                response = {}
 
                 elif command_type in ['Lunch', 'Breaks', 'UnionBus']:
                     if command_type == 'Lunch':
@@ -325,10 +327,7 @@ class PageManager:
                                                                                     available_id=available_id,
                                                                                     defaults={'duration': duration})
 
-
-
-
-                return JsonResponse({})
+                return JsonResponse(response)
 
             @staticmethod
             def tasks_submit(request, *args, **kwargs):
@@ -400,15 +399,15 @@ class PageManager:
                     workers_dict_employee = []
 
                 response = [
-                            {
-                                'text': 'Contractor',
-                                'children': workers_dict_contractor
-                            },
-                            {
-                                'text': 'Employee',
-                                'children': workers_dict_employee
-                            },
-                            ]
+                              {
+                                  'text': 'Contractor',
+                                  'children': workers_dict_contractor
+                              },
+                              {
+                                  'text': 'Employee',
+                                  'children': workers_dict_employee
+                              },
+                           ]
 
                 return JsonResponse(response, safe=False)
 
