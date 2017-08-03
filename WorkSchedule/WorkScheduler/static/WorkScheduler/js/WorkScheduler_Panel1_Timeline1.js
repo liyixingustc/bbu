@@ -34,7 +34,7 @@ define(function (require) {
 
 	var select_data_global = 1, event_data_global = 1;
 	var start_global, end_global, resourceId_global;
-	var is_fullscreen = false;
+	var is_fullscreen = false, is_zoom = false;
 
 	function external_drag_init() {
 		$('#WorkSchedulerPanel2Table1TableId').children('tbody').children('tr').each(function() {
@@ -70,6 +70,15 @@ define(function (require) {
         event();
 
         // custom icons
+		var $fc_icon_zoom = $(".fc-icon-zoom");
+		$fc_icon_zoom.parent().html(
+			'<span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span>'+' | '+
+			'<span class="glyphicon glyphicon-zoom-out" aria-hidden="true"></span>'
+		);
+		$fc_icon_zoom.qtip({
+			content: "zoom in/ zoom out"
+		});
+
 		var $fc_icon_fullscreen = $(".fc-icon-fullscreen");
 		$fc_icon_fullscreen.parent().html(
 			'<span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>'
@@ -83,7 +92,7 @@ define(function (require) {
 			'<span class="glyphicon glyphicon-print" aria-hidden="true"></span>'
 		);
 		$fc_icon_print.qtip({
-			content: "full screen"
+			content: "print"
 		});
     }
 
@@ -113,36 +122,73 @@ define(function (require) {
 			firstDay:5,
 			editable: true,
 			droppable: true,
-			aspectRatio: 1.8,
+			aspectRatio: 1,
 			scrollTime: '00:00',
 			customButtons: {
+            	zoom:{
+            		text:'zoom',
+					icon: 'zoom glyphicon glyphicon-zoom',
+					click:function () {
+
+						// expand the timeline view width
+						function expand_width() {
+							var current_view = $WorkScheduler_Panel1_Timeline1.fullCalendar( 'getView' ).name,
+							to_view;
+
+							switch (current_view){
+								// case 'timelineCustomDay':to_view = 'timelineFullScreenDay';break;
+								// case 'timelineCustomWeek':to_view = 'timelineFullScreenWeek';break;
+								case 'timelineFullScreenDay':to_view = 'timelineCustomDay';break;
+								case 'timelineFullScreenWeek':to_view = 'timelineCustomWeek';break;
+								case undefined:to_view = 'timelineFullScreenDay';break;
+							}
+							$WorkScheduler_Panel1_Timeline1.fullCalendar('changeView', to_view);
+                        }
+
+						// shrink the timeline view width
+						function shrink_width() {
+							var current_view = $WorkScheduler_Panel1_Timeline1.fullCalendar( 'getView' ).name,
+							to_view;
+
+							switch (current_view){
+								case 'timelineCustomDay':to_view = 'timelineFullScreenDay';break;
+								case 'timelineCustomWeek':to_view = 'timelineFullScreenWeek';break;
+								// case 'timelineFullScreenDay':to_view = 'timelineCustomDay';break;
+								// case 'timelineFullScreenWeek':to_view = 'timelineCustomWeek';break;
+								// case undefined:to_view = 'timelineFullScreenDay';break;
+							}
+							$WorkScheduler_Panel1_Timeline1.fullCalendar('changeView', to_view);
+                        }
+
+						// shrink the timeline view height
+						function shrink_height() {
+							var $WorkSchedulerPanel1Timeline1Resource = $WorkScheduler_Panel1_Timeline1.find(
+								'div.fc-view-container table tbody.fc-body td.fc-resource-area div.fc-cell-content'
+							),
+								$WorkSchedulerPanel1Timeline1Event = $WorkScheduler_Panel1_Timeline1.find(
+								'div.fc-view-container table tbody.fc-body td.fc-time-area td.fc-widget-content div'
+							);
+							$WorkSchedulerPanel1Timeline1Resource.css({'padding-top':'0px','padding-bottom':'0px'});
+							$WorkSchedulerPanel1Timeline1Resource.parent('div').css({'height':'28px'});
+							$WorkSchedulerPanel1Timeline1Event.css({'height':'28px'});
+                        }
+
+						if(is_zoom){
+            				expand_width();
+            				is_zoom = false
+						}
+						else if(!is_zoom){
+							shrink_width();
+							setTimeout(shrink_height,100);
+            				is_zoom = true
+						}
+					}
+				},
 				fullscreen: {
 					text: 'full screen',
 					icon: 'fullscreen glyphicon glyphicon-fullscreen',
 					click: function(event) {
-						if (screenfull.enabled) {
-							// var $WorkSchedulerPanel1Timeline1SnapShotSize = $WorkScheduler_Panel1_Timeline1.find(
-							// 		'div.fc-view-container table tbody.fc-body td.fc-time-area div.fc-scroller-canvas'
-							// 	);
-							// var height = $WorkSchedulerPanel1Timeline1SnapShotSize.height() + 127,
-							// 	width = $WorkSchedulerPanel1Timeline1SnapShotSize.width() + 182;
-                            //
-							// $WorkSchedulerPanel1Timeline1SnapShot.show();
-							// $WorkSchedulerPanel1Timeline1SnapShot.html($WorkScheduler_Panel1_Timeline1.clone());
-							// $WorkSchedulerPanel1Timeline1SnapShot.width(width);
-							// $WorkSchedulerPanel1Timeline1SnapShot.height(height);
-							// $WorkSchedulerPanel1Timeline1SnapShot.css({'padding':'15px'});
-							// var $WorkSchedulerPanel1Timeline1SnapShotHeightResource = $WorkSchedulerPanel1Timeline1SnapShot.find(
-							// 		'div.fc-view-container table tbody.fc-body td.fc-resource-area div.fc-scroller'
-							// 	),
-							// 	$WorkSchedulerPanel1Timeline1SnapShotHeightEvent = $WorkSchedulerPanel1Timeline1SnapShot.find(
-							// 		'div.fc-view-container table tbody.fc-body td.fc-time-area div.fc-scroller'
-							// 	);
-							// $WorkSchedulerPanel1Timeline1SnapShotHeightResource.height(height);
-							// $WorkSchedulerPanel1Timeline1SnapShotHeightEvent.height(height);
-							screenfull.toggle($WorkScheduler_Panel1_Timeline1[0]);
-
-						}
+						screenfull.toggle($WorkScheduler_Panel1_Timeline1[0]);
 					}
 				},
 				print: {
@@ -207,7 +253,7 @@ define(function (require) {
 				}
 			},
 			header: {
-				left: 'add today prev,next fullscreen print',
+				left: 'add today prev,next zoom fullscreen print',
 				center: 'title',
 				right: 'timelineCustomDay,timelineCustomWeek,month'
 			},
@@ -233,6 +279,28 @@ define(function (require) {
 					maxTime: '25:00:00',
 					slotWidth:'15',
 					slotDuration:'00:15:00'
+				},
+				timelineFullScreenDay: {
+					type: 'timeline',
+					duration: { days: 1},
+					minTime: '-01:00:00',
+					maxTime: '25:00:00',
+					slotWidth:'abc',
+					slotDuration:'00:15:00',
+					slotLabelFormat: [
+					'ddd M/D',
+					'ha'
+					],
+					columnFormat: 'ddd D.M'
+				},
+				timelineFullScreenWeek: {
+					type: 'timeline',
+					duration: { weeks: 1},
+					minTime: '-01:00:00',
+					maxTime: '25:00:00',
+					slotWidth:'abc',
+					slotDuration:'00:15:00',
+					slotLabelInterval:'03:00'
 				}
 			},
 			// eventOverlap: false, // will cause the event to take up entire resource height
@@ -646,8 +714,11 @@ define(function (require) {
 		// full screen the timeline table
 		screenfull.onchange(function () {
 			is_fullscreen = !is_fullscreen;
+
 			if(is_fullscreen){
 				var screen_height = screen.availHeight;
+
+				// change timeline view, height and padding
 				$WorkScheduler_Panel1_Timeline1.css({'padding':'10px 20px'});
 				$WorkScheduler_Panel1_Timeline1.fullCalendar('option', 'height', screen_height);
 
@@ -656,8 +727,6 @@ define(function (require) {
 				$WorkScheduler_Panel1_Timeline1.css({'padding':'0px'});
 				$WorkScheduler_Panel1_Timeline1.fullCalendar('option', 'height', 700)
 
-				// $WorkSchedulerPanel1Timeline1SnapShot.hide();
-				// $WorkSchedulerPanel1Timeline1SnapShot.empty()
 			}
         })
     }
