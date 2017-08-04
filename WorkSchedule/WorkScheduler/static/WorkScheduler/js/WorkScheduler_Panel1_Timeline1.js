@@ -178,9 +178,24 @@ define(function (require) {
             				is_zoom = false
 						}
 						else if(!is_zoom){
-							shrink_width();
-							setTimeout(shrink_height,100);
+                            shrink_width();
+                            setTimeout(shrink_height,100);
             				is_zoom = true
+
+							// function runAsync(){
+							// 	return new Promise(function(resolve, reject){
+							// 		shrink_width();
+							// 		resolve('OK');
+                            //
+							// 	});
+							// }
+							// function runAsync1(){
+							// 	return new Promise(function(resolve, reject){
+							// 		shrink_height();
+							// 		is_zoom = true;
+							// 	});
+							// }
+							// runAsync().then()
 						}
 					}
 				},

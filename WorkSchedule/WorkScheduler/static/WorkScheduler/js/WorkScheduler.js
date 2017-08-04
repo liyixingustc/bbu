@@ -22,6 +22,13 @@ define(function (require) {
         // $tables_data.load('Panel2/Table1/create/',function () {
         //
         // });
+        // new Promise(function (resolve, reject) {
+        //     WorkSchedulerPanel2Table1();
+        //     resolve('OK')
+        // }).then(function (r) {
+        //     WorkSchedulerPanel1Timeline1();
+        //     console.log(r)
+        // });
         WorkSchedulerPanel2Table1(function () {
             setTimeout(function () {
                 WorkSchedulerPanel1Timeline1()
