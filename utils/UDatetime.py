@@ -104,3 +104,26 @@ class UDatetime:
         else:
             return []
 
+    mapping = {'3': 1, '1': 2, '2': 3}
+    reverse_mapping = {1: '3', 2: '1', 3: '2'}
+
+    @classmethod
+    def pick_shift_by_start_shift(cls, start_shift):
+        shift_range = range(cls.mapping[start_shift], 3 + 1)
+        return shift_range
+
+    @classmethod
+    def pick_shift_by_end_shift(cls, end_shift):
+        shift_range = range(1, cls.mapping[end_shift] + 1)
+        return shift_range
+
+    @classmethod
+    def pick_shift_by_two_shift(cls, start_shift, end_shift):
+
+        if cls.mapping[end_shift] > cls.mapping[start_shift]:
+            shift_range = range(cls.mapping[start_shift], cls.mapping[end_shift] + 1)
+            shift_range = list(map(lambda x: cls.reverse_mapping[x], shift_range))
+        else:
+            shift_range = [start_shift]
+        return shift_range
+

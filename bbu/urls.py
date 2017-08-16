@@ -29,4 +29,7 @@ urlpatterns += [
     url(r'^WorkSchedule/3/', include('WorkSchedule.WorkTasks.urls')),
     url(r'^WorkSchedule/4/', include('WorkSchedule.WorkScheduler.urls')),
     url(r'^WorkSchedule/5/', include('WorkSchedule.WorkReports.urls')),
+
+    url(r'^Reports/1/', include('Reports.ReportConfig.urls')),
+    url(r'^Reports/2/', include('Reports.ReportTimeDetail.urls')),
 ]

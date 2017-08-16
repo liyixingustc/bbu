@@ -42,8 +42,11 @@ require.config({
         'x-editable' : ['/static/x-editable/bootstrap3-editable/js/bootstrap-editable'],
         'filter-control' : ['/static/bootstrap-table/dist/extensions/filter-control/bootstrap-table-filter-control.min'],
         'flat-json' : ['/static/bootstrap-table/dist/extensions/flat-json/bootstrap-table-flat-json.min'],
-        'multiple-sort' : ['/static/bootstrap-table/dist/extensions/multiple-sort/bootstrap-table-multiple-sort.min']
-
+        'multiple-sort' : ['/static/bootstrap-table/dist/extensions/multiple-sort/bootstrap-table-multiple-sort.min'],
+        // Highcharts
+        'Highcharts': ['/static/Highcharts/code/js/highcharts'],
+        'Highcharts-more': ['/static/Highcharts/code/js/highcharts-more'],
+        'Highcharts-exporting': ['/static/Highcharts/code/js/modules/exporting'],
     },
     shim:{
 
@@ -119,7 +122,20 @@ require.config({
         },
         'multiple-sort':{
             deps:['jquery','bootstrap','bootstrap-table']
-        }
+        },
+        // Highcharts
+        'Highcharts':{
+            deps:['jquery','bootstrap'],
+            exports: 'Highcharts'
+        },
+        'Highcharts-more':{
+            deps:['jquery','bootstrap','Highcharts'],
+            exports: 'Highcharts-more'
+        },
+        'Highcharts-exporting':{
+            deps:['jquery','bootstrap','Highcharts'],
+            exports: 'Highcharts-exporting'
+        },
     }
 });
 

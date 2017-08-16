@@ -1,0 +1,18 @@
+{% extends 'bbu/dashboard_base.html' %}
+{% load static %}
+
+{% block content_dashboard %}
+<div class="row">
+  {% include 'ReportConfig/ReportConfig_Panel1.html' %}
+</div>
+
+{% endblock content_dashboard %}
+
+{% block foot_js_dashboard %}
+    <script type="text/javascript">
+      require(["{% static 'requirejs/config.js' %}"], function (config) {
+        require(["{% static 'ReportConfig/js/ReportConfig.js' %}"],function(){
+        })
+      });
+    </script>
+{% endblock foot_js_dashboard %}

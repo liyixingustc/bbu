@@ -1,0 +1,58 @@
+  <form method="get" id="ReportTimeDetailPanel1Form1FormId" class="form-horizontal form-label-left">
+  {% csrf_token %}
+    <div class="form-group">
+      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="StartDate">Start Date<span class="required">*</span>
+      </label>
+      <div class="col-md-3 col-sm-3 col-xs-12">
+        <input type="text" id="StartDate" name="StartDate" class="form-control col-md-7 col-xs-12 datepicker" placeholder="YYYY-MM-DD" data-inputmask="'mask': '99/99/9999'" style="width:80% " required>
+      </div>
+      <label class="control-label col-md-1 col-sm-1 col-xs-12" for="StartShift">Start Shift<span class="required">*</span>
+      </label>
+      <div class="col-md-3 col-sm-3 col-xs-12">
+        <select id="StartShift" name="StartShift" class="select2_single form-control col-md-7 col-xs-12" style="width:80% " required>
+          <option value="3">Shift 3 (12am - 8pm)</option>
+          <option value="1">Shift 1 (8am - 4pm)</option>
+          <option value="2">Shift 2 (4am - 12am)</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="EndDate">End Date<span class="required">*</span>
+      </label>
+      <div class="col-md-3 col-sm-3 col-xs-12">
+        <input type="text" id="EndDate" name="EndDate" class="form-control col-md-7 col-xs-12 datepicker" placeholder="YYYY-MM-DD" data-inputmask="'mask': '99/99/9999'" style="width:80% " required>
+      </div>
+      <label class="control-label col-md-1 col-sm-1 col-xs-12" for="EndShift">End Shift<span class="required">*</span>
+      </label>
+      <div class="col-md-3 col-sm-3 col-xs-12">
+        <select id="EndShift" name="EndShift" class="select2_single form-control col-md-7 col-xs-12" style="width:80% " required>
+          <option value="3">Shift 3 (12am - 8pm)</option>
+          <option value="1">Shift 1 (8am - 4pm)</option>
+          <option value="2">Shift 2 (4am - 12am)</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="Line">Line<span class="required">*</span>
+      </label>
+      <div class="col-md-3 col-sm-3 col-xs-12">
+        <select id="Line" name="Line" class="select2_single form-control col-md-7 col-xs-12" style="width:80% " required>
+          <optgroup label="Bread">
+            <option value="1">Line 1</option>
+            <option value="2">Line 2</option>
+          </optgroup>
+          <optgroup label="English Muffin">
+            <option value="7">Line 7</option>
+            <option value="8">Line 8</option>
+            <option value="9">Line 9</option>
+          </optgroup>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="control-label col-md-3 col-sm-3 col-xs-12"></label>
+      <div class="col-md-6 col-sm-6 col-xs-12">
+        <button type="submit" class="btn btn-primary " id="ReportTimeDetailPanel1Form1Submit">Run</button>
+      </div>
+    </div>
+  </form>

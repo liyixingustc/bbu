@@ -76,7 +76,7 @@ class Documents(models.Model):
     file_type = models.CharField(max_length=30, choices=file_type_choice, null=True, blank=True)
     processor = models.CharField(max_length=50, choices=processor_choice, null=True, blank=True)
     status = models.CharField(default='new', max_length=30, choices=document_status_choice)
-    created_by = models.ForeignKey(User, db_column='created_by', default=1)
+    created_by = models.ForeignKey(User, db_column='created_by', default=1, related_name='WorkConfig')
     created_on = models.DateTimeField(default=timezone.now)
 
 

@@ -18,6 +18,7 @@
     <link href="{% static 'gentelella/vendors/pnotify/dist/pnotify.nonblock.css'%}" rel="stylesheet">
     <link href="{% static 'gentelella/vendors/nprogress/nprogress.css'%}" rel="stylesheet">
     <link href="{% static 'gentelella/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css'%}" rel="stylesheet">
+    <link href="{% static 'Highcharts/code/css/highcharts.css' %}" rel="stylesheet" />
 
     {# Custom Theme Style #}
     <link href="{% static 'gentelella/build/css/custom.min.css'%}" rel="stylesheet">
@@ -95,6 +96,14 @@
                   <li><a href="{% url 'WorkWorkers_Page' page='WorkWorkers' func='index'%}" id="WorkWorkers">Workers</a></li>
                   <li><a href="{% url 'WorkTasks_Page' page='WorkTasks' func='index'%}" id="WorkTasks">Tasks</a></li>
                   <li><a href="{% url 'WorkReports_Page' page='WorkReports' func='index'%}" id="WorkReport">Reports</a></li>
+                </ul>
+              </li>
+              {% endif %}
+              {% if request.user.is_staff %}
+              <li><a><i class="fa fa-edit"></i>Reports<span class="fa fa-chevron-down"></span></a>
+                <ul class="nav child_menu">
+                  <li><a href="{% url 'ReportConfig_Page' page='ReportConfig' func='index'%}" id="ReportConfig">Configuration</a></li>
+                  <li><a href="{% url 'ReportTimeDetail_Page' page='ReportTimeDetail' func='index'%}" id="ReportTimeDetail">Time Detail Report (Waterfall)</a></li>
                 </ul>
               </li>
               {% endif %}
