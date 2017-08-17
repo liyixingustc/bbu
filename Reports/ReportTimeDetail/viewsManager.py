@@ -35,7 +35,6 @@ class PageManager:
                 response = []
 
                 if EndDate > StartDate + timedelta(days=1):
-                    print(1)
                     start_shift_range = UDatetime.pick_shift_by_start_shift(start_shift)
                     end_shift_range = UDatetime.pick_shift_by_end_shift(end_shift)
                     records = ReportTimeDetail.objects\
