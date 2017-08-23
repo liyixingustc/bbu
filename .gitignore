@@ -1,2 +1,3 @@
 # Created by .ignore support plugin (hsz.mobi)
 /db.sqlite3
+/Reports/ReportConfig/migrations/0001_initial.py
