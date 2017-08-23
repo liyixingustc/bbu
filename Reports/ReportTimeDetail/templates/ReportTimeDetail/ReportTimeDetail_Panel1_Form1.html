@@ -10,9 +10,9 @@
       </label>
       <div class="col-md-3 col-sm-3 col-xs-12">
         <select id="StartShift" name="StartShift" class="select2_single form-control col-md-7 col-xs-12" style="width:80% " required>
-          <option value="3">Shift 3 (12am - 8pm)</option>
-          <option value="1">Shift 1 (8am - 4pm)</option>
-          <option value="2">Shift 2 (4am - 12am)</option>
+          <option value="3">Shift 3 (12am - 8am)</option>
+          <option value="1" selected="selected">Shift 1 (8am - 4pm)</option>
+          <option value="2">Shift 2 (4pm - 12am)</option>
         </select>
       </div>
     </div>
@@ -26,9 +26,9 @@
       </label>
       <div class="col-md-3 col-sm-3 col-xs-12">
         <select id="EndShift" name="EndShift" class="select2_single form-control col-md-7 col-xs-12" style="width:80% " required>
-          <option value="3">Shift 3 (12am - 8pm)</option>
+          <option value="3" selected="selected">Shift 3 (12am - 8am)</option>
           <option value="1">Shift 1 (8am - 4pm)</option>
-          <option value="2">Shift 2 (4am - 12am)</option>
+          <option value="2">Shift 2 (4pm - 12am)</option>
         </select>
       </div>
     </div>
@@ -38,7 +38,7 @@
       <div class="col-md-3 col-sm-3 col-xs-12">
         <select id="Line" name="Line" class="select2_single form-control col-md-7 col-xs-12" style="width:80% " required>
           <optgroup label="Bread">
-            <option value="1">Line 1</option>
+            <option value="1" selected="selected">Line 1</option>
             <option value="2">Line 2</option>
           </optgroup>
           <optgroup label="English Muffin">
@@ -46,6 +46,15 @@
             <option value="8">Line 8</option>
             <option value="9">Line 9</option>
           </optgroup>
+        </select>
+      </div>
+      <label class="control-label col-md-1 col-sm-1 col-xs-12" for="GroupBy">Group By<span class="required">*</span>
+      </label>
+      <div class="col-md-3 col-sm-3 col-xs-12">
+        <select id="GroupBy" name="GroupBy" class="select2_single form-control col-md-7 col-xs-12" style="width:80% " required>
+            <option value="Product" selected="selected">Product</option>
+            <option value="Cause">Cause</option>
+            <option value="Comments">Comments</option>
         </select>
       </div>
     </div>

@@ -15,6 +15,8 @@ from configuration.WorkScheduleConstants import WorkAvailSheet
 from utils.UDatetime import UDatetime
 
 from .processor.ReportTimeDetailProcessor import ReportTimeDetailProcessor
+from .processor.ReportLostTimeDetailProcessor import ReportLostTimeDetailProcessor
+
 
 EST = pytz.timezone(TIME_ZONE)
 
@@ -26,8 +28,9 @@ class PageManager:
             @classmethod
             def submit(cls, request, *args, **kwargs):
                 file_type = request.GET.get('FileType')
-
-                if file_type == 'ReportTimeDetail':
+                if file_type == 'ReportLostTimeDetail':
+                    ReportLostTimeDetailProcessor.report_lost_time_detail_processor()
+                elif file_type == 'ReportTimeDetail':
                     ReportTimeDetailProcessor.report_time_detail_processor()
 
                 return JsonResponse({})

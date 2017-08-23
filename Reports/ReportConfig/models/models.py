@@ -12,9 +12,11 @@ document_status_choice = (('new', 'new'),
                           )
 
 file_type_choice = (('ReportTimeDetail', 'ReportTimeDetail'),
+                    ('ReportLostTimeDetail', 'ReportLostTimeDetail'),
                     )
 
 processor_choice = (('ReportTimeDetailProcessor', 'ReportTimeDetailProcessor'),
+                    ('ReportLostTimeDetailProcessor', 'ReportLostTimeDetailProcessor'),
                     )
 
 

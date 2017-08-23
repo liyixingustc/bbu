@@ -25,6 +25,7 @@ define(function (require) {
     function init() {
 
         switch (FileType){
+            case 'ReportLostTimeDetail': Processor = 'ReportLostTimeDetailProcessor';break;
             case 'ReportTimeDetail': Processor = 'ReportTimeDetailProcessor';break;
 
         }
@@ -52,6 +53,7 @@ define(function (require) {
             FileType = $(this).val();
 
             switch (FileType){
+                case 'ReportLostTimeDetail': Processor = 'ReportLostTimeDetailProcessor';break;
                 case 'ReportTimeDetail': Processor = 'ReportTimeDetailProcessor';break;
 
             }

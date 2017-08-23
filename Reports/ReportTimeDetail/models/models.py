@@ -10,6 +10,24 @@ from configuration.ModelChoiceConstants import BaseConstants
 # Create your models here.
 
 
+class ReportLostTimeDetail(models.Model):
+    SalesDate = models.DateTimeField(default=timezone.now)
+    Line = models.CharField(max_length=100, null=True, blank=True, choices=BaseConstants.line_choice)
+    Shift = models.CharField(max_length=100, null=True, blank=True, choices=BaseConstants.shift_choice)
+    OracleType = models.CharField(max_length=100, null=True, blank=True)
+    MIPS_Description = models.CharField(max_length=100, null=True, blank=True)
+    LostTimeMinutes = models.FloatField(null=True, blank=True)
+    LostTimeValue = models.FloatField(null=True, blank=True)
+    Occ = models.FloatField(null=True, blank=True)
+    OracleCategory = models.CharField(max_length=100, null=True, blank=True)
+    Category = models.CharField(max_length=100, null=True, blank=True)
+    Area = models.CharField(max_length=100, null=True, blank=True)
+    Cause = models.CharField(max_length=100, null=True, blank=True)
+    Comments = models.CharField(max_length=100, null=True, blank=True)
+    LineStop = models.CharField(max_length=100, null=True, blank=True)
+    Init = models.CharField(max_length=100, null=True, blank=True)
+
+
 class ReportTimeDetail(models.Model):
     SalesDate = models.DateTimeField(default=timezone.now)
     Line = models.CharField(max_length=100, null=True, blank=True, choices=BaseConstants.line_choice)

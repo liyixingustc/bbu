@@ -8,9 +8,12 @@ define(function (require) {
         fileinput = require('bootstrap-fileinput'),
         gentelella = require('gentelella'),
         select2 = require('select2'),
+        moment = require('moment'),
         Highcharts = require('Highcharts'),
         HighchartsMore = require('Highcharts-more'),
         HighchartsExporting = require('Highcharts-exporting');
+
+    var product_name_global, cause_name_global;
 
 
     $(function () {
@@ -19,7 +22,8 @@ define(function (require) {
     });
 
     function init() {
-
+        $("#StartDate").datepicker("update", moment().subtract(1, 'days').format('YYYY-MM-DD'));
+        $("#EndDate").datepicker("update", new Date());
     }
 
     function event() {
@@ -28,8 +32,21 @@ define(function (require) {
 
             var data = $(this).serialize();
             $("#ReportTimeDetailPanel1Form1Submit").html("Running...");
-            $.get('Panel1/Form1/Submit/',data,function (data) {
-                create_waterfall(data);
+            $.get('Panel1/Form1/Submit/',data,function (bar_data) {
+                var GroupBy = $('#GroupBy').val(),
+                    target_id = 'ReportTimeDetailPanel2Chart1';
+
+                switch (GroupBy){
+                    case 'Product':target_id = 'ReportTimeDetailPanel2Chart1';break;
+                    case 'Cause':target_id = 'ReportTimeDetailPanel2Chart2';break;
+                    case 'Comments':target_id = 'ReportTimeDetailPanel2Chart3';break;
+                }
+
+                $('#ReportTimeDetailPanel2Chart1').html('');
+                $('#ReportTimeDetailPanel2Chart2').html('');
+                $('#ReportTimeDetailPanel2Chart3').html('');
+
+                create_waterfall(target_id, bar_data);
                 $("#ReportTimeDetailPanel1Form1Submit").html("Finished");
             });
 
@@ -37,8 +54,8 @@ define(function (require) {
         });
     }
 
-    function create_waterfall(data) {
-        Highcharts.chart('ReportTimeDetailPanel2Chart1', {
+    function create_waterfall(id,data) {
+        Highcharts.chart(id, {
             chart: {
                 type: 'waterfall'
             },
@@ -68,30 +85,8 @@ define(function (require) {
                            '<b>Occ: '+ this.count +'</b>'
                 }
             },
-
             series: [{
                 data: data,
-                // data: [ {
-                //     name: 'Product Revenue',
-                //     y: 569000,
-                //     colorIndex: 8
-                // }, {
-                //     name: 'Service Revenue',
-                //     y: 231000,
-                //     colorIndex: 11
-                // }, {
-                //     name: 'Fixed Costs',
-                //     y: -2000,
-                //     colorIndex: 8
-                // }, {
-                //     name: 'Variable Costs',
-                //     y: -233000,
-                //     colorIndex: 9
-                // }, {
-                //     name: 'Total',
-                //     isSum: true,
-                //     colorIndex: 10
-                // }],
                 dataLabels: {
                     enabled: true,
                     formatter: function () {
@@ -102,7 +97,46 @@ define(function (require) {
                     }
                 },
                 pointPadding: 0
-            }]
+            }],
+            plotOptions: {
+                series: {
+                    cursor: 'pointer',
+                    point: {
+                        events: {
+                            click: function (event) {
+                                var id = this.series.chart.renderTo.id,
+                                    target_id = this.series.chart.renderTo.id;
+
+                                switch (id){
+                                    case 'ReportTimeDetailPanel2Chart1':target_id = 'ReportTimeDetailPanel2Chart2';product_name_global=this.name;break;
+                                    case 'ReportTimeDetailPanel2Chart2':target_id = 'ReportTimeDetailPanel2Chart3';cause_name_global=this.name;break;
+                                    case 'ReportTimeDetailPanel2Chart3':target_id = 'ReportTimeDetailPanel2Chart3';break;
+                                }
+
+                                var data = {
+                                        'StartDate':$("#StartDate").val(),
+                                        'EndDate':$("#EndDate").val(),
+                                        'StartShift':$("#StartShift").val(),
+                                        'EndShift':$("#EndShift").val(),
+                                        'Line':$("#Line").val(),
+                                        'GroupBy':$("#GroupBy").val(),
+                                        'product_name': product_name_global,
+                                        'cause_name': cause_name_global,
+                                        'div_id': id
+                                    };
+
+                                if (id !== 'ReportTimeDetailPanel2Chart3' &&
+                                    product_name_global!== 'Total' &&
+                                    cause_name_global!== 'Total'){
+                                    $.get('Panel1/Form1/Submit/',data,function (data) {
+                                        create_waterfall(target_id, data);
+                                    });
+                                }
+                            }
+                        }
+                    }
+                }
+            },
         });
     }
 });
