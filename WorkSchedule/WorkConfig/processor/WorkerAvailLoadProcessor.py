@@ -28,7 +28,10 @@ class WorkerAvailLoadProcessor:
             for file in files:
                 path = BASE_DIR + file.document.url
                 if os.path.exists(path):
-                    data = pd.read_excel(path, header=0, skiprows=[0, 1, 2, 4], skip_footer=4, parse_cols='A:H')
+                    data = pd.read_excel(path, header=None, parse_cols='A:H')
+                    data = cls.header_processor(data)
+                    if data.empty:
+                        break
                     data.rename(columns={data.columns[0]: "worker"}, inplace=True)
 
                     # find the range for each shift
@@ -109,7 +112,6 @@ class WorkerAvailLoadProcessor:
 
     @classmethod
     def union_bus_parser(cls, row, parsed_time, deduction, file, available_id):
-        print(row)
         worker = Workers.objects.filter(name__exact=row['worker'])
         task = Tasks.objects.filter(work_order='10')
         if worker.exists() and task.exists():
@@ -235,6 +237,21 @@ class WorkerAvailLoadProcessor:
             'end_datetime': end_datetime,
             'duration': duration
         }
+
+    @classmethod
+    def header_processor(cls, data):
+
+        header_range = data[1].str.contains('^\s*SAT[\.]?\s*$', regex=True, na=False)
+        header_range_len = len(header_range[header_range])
+        if header_range_len == 1:
+            header_index = header_range[header_range].index.tolist()[0]
+            data.columns = data.iloc[header_index-1].values
+            data = data[(header_index + 1):]
+            data.reset_index(inplace=True, drop=True)
+        else:
+            data = pd.DataFrame()
+
+        return data
 
     @staticmethod
     def str_to_int(string):
