@@ -20,6 +20,10 @@ class UDatetime:
         return cls.local_tz.localize(datetime.now())
 
     @classmethod
+    def localize(cls, date):
+        return cls.local_tz.localize(date)
+
+    @classmethod
     def to_local(cls, date):
         return date.astimezone(tz=cls.local_tz)
 

@@ -86,7 +86,8 @@ class ReportLostTimeDetailProcessor:
                         data['LostTimeValue'] = data['LostTimeValue'].str.replace(',', '')
                         data['LostTimeValue'] = data['LostTimeValue'].astype('float64')
 
-                        data['SalesDate'] = pd.to_datetime(data['SalesDate'], format='%m/%d/%y', utc=True)
+                        data['SalesDate'] = pd.to_datetime(data['SalesDate'], format='%m/%d/%y')
+                        data['SalesDate'] = data['SalesDate'].apply(lambda x: UDatetime.localize(x))
 
                         for index, row in data.iterrows():
                             ReportLostTimeDetail.objects \
@@ -108,7 +109,7 @@ class ReportLostTimeDetailProcessor:
                                                         })
 
                     # update documents
-                    Documents.objects.filter(id=file.id).update(status='loaded')
+                    # Documents.objects.filter(id=file.id).update(status='loaded')
 
                     return JsonResponse({})
         else:
