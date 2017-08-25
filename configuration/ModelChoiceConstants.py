@@ -8,7 +8,7 @@ class BaseConstants:
                    ('8', '8'),
                    ('9', '9'),
                    ('SPONGE', 'SPONGE'),
-                   ('', ''),
+                   ('N', 'N'),
                    )
 
     shift_choice = (('1', '1'),

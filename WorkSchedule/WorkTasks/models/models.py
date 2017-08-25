@@ -3,12 +3,17 @@ from datetime import timedelta
 
 from ...WorkConfig.models.models import *
 
+from configuration.ModelChoiceConstants import BaseConstants
+
 # Create your models here.
 
-status_choice = (('new', 'new'),
-                 ('pending', 'pending'),
-                 ('completed', 'completed'),
-                 ('cancelled', 'cancelled'),)
+status_choice = (('Approved', 'Approved'),
+                 ('Canceled', 'Canceled'),
+                 ('Complete', 'Complete'),
+                 ('Denied', 'Denied'),
+                 ('Scheduled', 'Scheduled'),
+                 ('Work Request', 'Work Request'),
+                 )
 
 working_type_choice = (('CM', 'CM'),
                        ('PM', 'PM'),
@@ -25,45 +30,36 @@ priority_choice = (('s', 's'),
                    ('O', 'O'),
                    )
 
-line_choice = (('1', '1'),
-               ('2', '2'),
-               ('3', '3'),
-               ('7', '7'),
-               ('8', '8'),
-               ('9', '9'),
-               ('N', 'N'),
-               )
-
 
 class Tasks(models.Model):
 
     # model fields
     work_order = models.CharField(max_length=30)
-    line = models.CharField(max_length=10, null=True, blank=True)
-    equipment = models.CharField(max_length=100, null=True, blank=True)
-    AOR = models.ForeignKey(AOR, db_column='AOR', null=True, blank=True)
     description = models.CharField(max_length=150, null=True, blank=True)
     work_type = models.CharField(max_length=10, choices=working_type_choice, null=True, blank=True)
+    current_status = models.CharField(max_length=10, choices=status_choice, default='Work Request')
+    line = models.CharField(max_length=10, choices=BaseConstants.line_choice, null=True, blank=True)
+    shift = models.CharField(max_length=10, choices=BaseConstants.shift_choice, null=True, blank=True)
     priority = models.CharField(max_length=10, choices=priority_choice, null=True, blank=True)
-    kitted_date = models.DateTimeField(null=True, blank=True) # change field name
-    requested_by = models.CharField(max_length=30, null=True, blank=True)
+    create_date = models.DateTimeField(null=True, blank=True)
+
+    schedule_date = models.DateTimeField(null=True, blank=True)
+    actual_date = models.DateTimeField(null=True, blank=True)
     estimate_hour = models.DurationField(default=timedelta(hours=0))
-    current_status = models.CharField(max_length=10,choices=status_choice,default='new')
+
+    fail_code = models.CharField(max_length=50, null=True, blank=True)
+    completion_comments = models.CharField(max_length=150, null=True, blank=True)
+
+    equipment = models.ForeignKey(Equipment, )
+    AOR = models.ForeignKey(AOR, db_column='AOR', null=True, blank=True)
+    creator = models.ForeignKey(SomaxAccount, db_column='creator', related_name='Tasks_creator', null=True, blank=True)
+    assigned = models.ForeignKey(SomaxAccount, db_column='assigned', related_name='Tasks_assigned', null=True, blank=True)
 
 
-class TasksStatusDetail(models.Model):
+class PMs(models.Model):
 
-    task_id = models.ForeignKey(Tasks, db_column='task_id')
-    as_of_date = models.DateField()
-    status = models.CharField(max_length=10,choices=status_choice)
-    status_time = models.DateTimeField(auto_now_add=True)
-    line = models.CharField(max_length=10, null=True)
-    equipment = models.CharField(max_length=10, null=True)
-    description = models.CharField(max_length=150, null=True)
-    work_type = models.CharField(max_length=10, choices=working_type_choice, null=True)
-    priority = models.CharField(max_length=10, choices=priority_choice, null=True)
-    create_on = models.DateTimeField(null=True)
-    requested_by = models.CharField(max_length=30, null=True)
-    estimate_hour = models.DurationField(default=timedelta(hours=0))
-    schedule_hour = models.DurationField(default=timedelta(hours=0))
-    actual_hour = models.DurationField(default=timedelta(hours=0))
+    masterjob_id = models.CharField(max_length=100, null=True, blank=True)
+    description = models.CharField(max_length=100, null=True, blank=True)
+    schedule_type = models.CharField(max_length=100, null=True, blank=True)
+    duration = models.DurationField(default=timedelta(hours=0))
+    PMs_type = models.CharField(max_length=100, null=True, blank=True)
