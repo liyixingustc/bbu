@@ -23,7 +23,7 @@ define(function (require) {
 
     function init() {
         $("#StartDate").datepicker("update", moment().subtract(1, 'days').format('YYYY-MM-DD'));
-        $("#EndDate").datepicker("update", new Date());
+        $("#EndDate").datepicker("update", moment().add(30, 'days').format('YYYY-MM-DD'));
     }
 
     function event() {
@@ -82,6 +82,7 @@ define(function (require) {
             tooltip: {
                 pointFormatter: function () {
                     return '<b>Mins: '+ Math.abs(this.y).toFixed(1) +'</b><br/>' +
+                           '<b>Hrs: '+ Math.abs(this.y/60).toFixed(1) +'</b><br/>'+
                            '<b>Occ: '+ this.count +'</b>'
                 }
             },
@@ -90,7 +91,8 @@ define(function (require) {
                 dataLabels: {
                     enabled: true,
                     formatter: function () {
-                        return Math.abs(this.y).toFixed(1) + ' (' + this.point.count + ')';
+                        return Math.abs(this.y).toFixed(1) + ' (' + this.point.count + ')'+
+                               '<br/>'+ Math.abs(this.y/60).toFixed(1) +'Hrs<br/>';
                     },
                     style: {
                         fontWeight: 'bold'
