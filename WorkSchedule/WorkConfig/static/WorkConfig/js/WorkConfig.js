@@ -27,7 +27,12 @@ define(function (require) {
         switch (FileType){
             case 'Tasks': Processor = 'TasksLoadProcessor';break;
             case 'WorkerAvail':Processor = 'WorkerAvailProcessor';break;
-
+            case 'Equipment': Processor = 'EquipmentLoadProcessor';break;
+            case 'PMs': Processor = 'PMsLoadProcessor';break;
+            case 'SomaxAccount': Processor = 'SomaxAccountLoadProcessor';break;
+            case 'Worker': Processor = 'WorkerLoadProcessor';break;
+            case 'Company': Processor = 'CompanyLoadProcessor';break;
+            case 'AOR': Processor = 'AORLoadProcessor';break;
         }
 
         $FileUpload.fileinput({
@@ -53,11 +58,15 @@ define(function (require) {
             FileType = $(this).val();
 
             switch (FileType){
-            case 'Tasks': Processor = 'TasksLoadProcessor';break;
-            case 'WorkerAvail':Processor = 'WorkerAvailProcessor';break;
-
-        }
-
+                case 'Tasks': Processor = 'TasksLoadProcessor';break;
+                case 'WorkerAvail':Processor = 'WorkerAvailProcessor';break;
+                case 'Equipment': Processor = 'EquipmentLoadProcessor';break;
+                case 'PMs': Processor = 'PMsLoadProcessor';break;
+                case 'SomaxAccount': Processor = 'SomaxAccountLoadProcessor';break;
+                case 'Worker': Processor = 'WorkerLoadProcessor';break;
+                case 'Company': Processor = 'CompanyLoadProcessor';break;
+                case 'AOR': Processor = 'AORLoadProcessor';break;
+            }
         });
 
         $Processor.change(function () {

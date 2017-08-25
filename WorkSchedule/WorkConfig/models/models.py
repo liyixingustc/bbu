@@ -15,10 +15,22 @@ document_status_choice = (('new', 'new'),
 
 file_type_choice = (('Tasks', 'Tasks'),
                     ('WorkerAvail', 'WorkerAvail'),
+                    ('AOR', 'AOR'),
+                    ('Company', 'Company'),
+                    ('Equipment', 'Equipment'),
+                    ('PMs', 'WorkerAvail'),
+                    ('SomaxAccount', 'SomaxAccount'),
+                    ('Worker', 'Worker'),
                     )
 
 processor_choice = (('TasksLoadProcessor', 'TasksLoadProcessor'),
-                    ('WorkerAvailProcessor', 'WorkerAvailProcessor'),
+                    ('WorkerAvailLoadProcessor', 'WorkerAvailLoadProcessor'),
+                    ('AORLoadProcessor', 'AORLoadProcessor'),
+                    ('CompanyLoadProcessor', 'CompanyLoadProcessor'),
+                    ('EquipmentLoadProcessor', 'EquipmentLoadProcessor'),
+                    ('PMsLoadProcessor', 'PMsLoadProcessor'),
+                    ('SomaxAccountLoadProcessor', 'SomaxAccountLoadProcessor'),
+                    ('WorkerLoadProcessor', 'WorkerLoadProcessor'),
                     )
 
 level_choice = (('lead', 'lead'),
