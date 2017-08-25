@@ -50,7 +50,7 @@ class Tasks(models.Model):
     fail_code = models.CharField(max_length=50, null=True, blank=True)
     completion_comments = models.CharField(max_length=150, null=True, blank=True)
 
-    equipment = models.ForeignKey(Equipment, )
+    equipment = models.ForeignKey(Equipment, db_column='equipment', null=True, blank=True)
     AOR = models.ForeignKey(AOR, db_column='AOR', null=True, blank=True)
     creator = models.ForeignKey(SomaxAccount, db_column='creator', related_name='Tasks_creator', null=True, blank=True)
     assigned = models.ForeignKey(SomaxAccount, db_column='assigned', related_name='Tasks_assigned', null=True, blank=True)
