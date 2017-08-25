@@ -29,7 +29,15 @@ class SomaxAccountLoadProcessor:
                 path = BASE_DIR + file.document.url
                 if os.path.exists(path):
                     data = pd.read_excel(path)
-
+                    for index, row in data.iterrows():
+                        SomaxAccount.objects.update_or_create(user_name=row['User Name'],
+                                                     defaults={
+                                                         'full_name': row['Full Name'],
+                                                         'first_name': row['First Name'],
+                                                         'last_name': row['Last Name'],
+                                                         'security_profile': row['Security Profile'],
+                                                         'user_type': row['User Type'],
+                                                     })
                     # update documents
                     Documents.objects.filter(id=file.id).update(status='loaded')
 
