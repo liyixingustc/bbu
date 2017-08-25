@@ -21,7 +21,7 @@ EST = pytz.timezone(TIME_ZONE)
 
 class WorkerAvailLoadProcessor:
     @classmethod
-    def worker_avail_processor(cls):
+    def worker_avail_load_processor(cls):
 
         files = Documents.objects.filter(status__exact='new', file_type__exact='WorkerAvail')
         if files.exists():

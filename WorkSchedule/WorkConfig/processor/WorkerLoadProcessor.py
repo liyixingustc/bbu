@@ -19,4 +19,31 @@ EST = pytz.timezone(TIME_ZONE)
 
 
 class WorkerLoadProcessor:
-    pass
+
+    @classmethod
+    def worker_load_processor(cls):
+
+        files = Documents.objects.filter(status__exact='new', file_type__exact='Worker')
+        if files.exists():
+            for file in files:
+                path = BASE_DIR + file.document.url
+                if os.path.exists(path):
+                    data = pd.read_excel(path)
+                    for index, row in data.iterrows():
+                        company = Company.objects.get(business_name__exact=row['company'])
+                        Workers.objects.update_or_create(id=row['id'],
+                                                         defaults={
+                                                             'name': row['name'],
+                                                             'last_name': row['last_name'],
+                                                             'first_name': row['first_name'],
+                                                             'company': company,
+                                                             'level': row['level'],
+                                                             'shift': row['shift'],
+                                                             'type': row['type']
+                                                         })
+                    # update documents
+                    Documents.objects.filter(id=file.id).update(status='loaded')
+
+                    return JsonResponse({})
+        else:
+            return JsonResponse({})

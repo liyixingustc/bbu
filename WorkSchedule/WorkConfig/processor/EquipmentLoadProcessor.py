@@ -19,4 +19,20 @@ EST = pytz.timezone(TIME_ZONE)
 
 
 class EquipmentLoadProcessor:
-    pass
+
+    @classmethod
+    def equipment_load_processor(cls):
+
+        files = Documents.objects.filter(status__exact='new', file_type__exact='Equipment')
+        if files.exists():
+            for file in files:
+                path = BASE_DIR + file.document.url
+                if os.path.exists(path):
+                    data = pd.read_excel(path)
+
+                    # update documents
+                    Documents.objects.filter(id=file.id).update(status='loaded')
+
+                    return JsonResponse({})
+        else:
+            return JsonResponse({})

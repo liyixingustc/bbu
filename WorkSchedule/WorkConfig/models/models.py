@@ -53,7 +53,7 @@ AOR_type_choice = (('major', 'major'),
 
 class SomaxAccount(models.Model):
 
-    user_name = models.CharField(max_length=100, null=True, blank=True)
+    user_name = models.CharField(max_length=100, null=True, blank=True, unique=True)
     full_name = models.CharField(max_length=100, null=True, blank=True)
     first_name = models.CharField(max_length=100, null=True, blank=True)
     last_name = models.CharField(max_length=100, null=True, blank=True)
@@ -85,11 +85,12 @@ class Workers(models.Model):
     name = models.CharField(max_length=30, unique=True)
     last_name = models.CharField(max_length=30)
     first_name = models.CharField(max_length=30)
-    company = models.ForeignKey(Company,to_field='business_name', db_column='company')
+    company = models.ForeignKey(Company, to_field='business_name', db_column='company')
     level = models.CharField(default='lead', max_length=30, choices=level_choice)
     shift = models.CharField(default='1', max_length=30, choices=BaseConstants.shift_choice)
     status = models.CharField(default='active', max_length=30, choices=worker_status_choice)
     type = models.CharField(default='employee', max_length=30, choices=worker_type_choice)
+    somax_account = models.ForeignKey(SomaxAccount, to_field='user_name', db_column='somax_account', null=True, blank=True)
 
 
 class Documents(models.Model):
