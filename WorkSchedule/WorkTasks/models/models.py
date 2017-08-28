@@ -18,7 +18,9 @@ status_choice = (('Approved', 'Approved'),
 working_type_choice = (('CM', 'CM'),
                        ('PM', 'PM'),
                        ('EV', 'EV'),
-                       ('EM', 'EM'),)
+                       ('EM', 'EM'),
+                       (None, None),
+                       )
 
 priority_choice = (('s', 's'),
                    ('u', 'u'),
@@ -28,6 +30,7 @@ priority_choice = (('s', 's'),
                    ('4', '4'),
                    ('T', 'T'),
                    ('O', 'O'),
+                   (None, None),
                    )
 
 

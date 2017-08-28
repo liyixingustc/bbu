@@ -8,13 +8,13 @@ class BaseConstants:
                    ('8', '8'),
                    ('9', '9'),
                    ('SPONGE', 'SPONGE'),
-                   ('N', 'N'),
+                   (None, None),
                    )
 
     shift_choice = (('1', '1'),
                     ('2', '2'),
                     ('3', '3'),
-                    ('N', 'N'),
+                    (None, None),
                     )
 
     working_type_choice = (('CM', 'CM'),
