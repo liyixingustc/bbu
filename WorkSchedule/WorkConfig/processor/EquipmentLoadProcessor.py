@@ -29,7 +29,23 @@ class EquipmentLoadProcessor:
                 path = BASE_DIR + file.document.url
                 if os.path.exists(path):
                     data = pd.read_excel(path)
-
+                    for index, row in data.iterrows():
+                        equipment_name_clean = ''.join(row['Name'].split()).upper()
+                        Equipment.objects.update_or_create(equipment_id=row['Equipment ID'],
+                                                           defaults={
+                                                             'equipment_name': row['Name'],
+                                                             'location': row['Location'],
+                                                             'serial_no': row['Serial No'],
+                                                             'equipment_type': row['Type'],
+                                                             'make': row['Make'],
+                                                             'model_no': row['Model No'],
+                                                             'account': row['Account'],
+                                                             'asset_number': row['Asset Number'],
+                                                             'area': row['Area'],
+                                                             'department': row['Department'],
+                                                             'line': row['Line'],
+                                                             'equipment_name_clean': equipment_name_clean
+                                                            })
                     # update documents
                     Documents.objects.filter(id=file.id).update(status='loaded')
 

@@ -68,6 +68,7 @@ class Company(models.Model):
 
 class Equipment(models.Model):
     equipment_id = models.CharField(max_length=100, null=True, blank=True, unique=True)
+    equipment_name = models.CharField(max_length=100, null=True, blank=True)
     location = models.CharField(max_length=100, null=True, blank=True)
     serial_no = models.CharField(max_length=100, null=True, blank=True)
     equipment_type = models.CharField(max_length=100, null=True, blank=True)
@@ -78,6 +79,7 @@ class Equipment(models.Model):
     area = models.CharField(max_length=100, null=True, blank=True)
     department = models.CharField(max_length=100, null=True, blank=True)
     line = models.CharField(max_length=100, null=True, blank=True)
+    equipment_name_clean = models.CharField(max_length=100, null=True, blank=True)
 
 
 class Workers(models.Model):
