@@ -46,9 +46,12 @@ class Tasks(models.Model):
     priority = models.CharField(max_length=10, choices=priority_choice, null=True, blank=True)
     create_date = models.DateTimeField(null=True, blank=True)
 
-    schedule_date = models.DateTimeField(null=True, blank=True)
-    actual_date = models.DateTimeField(null=True, blank=True)
+    current_status_somax = models.CharField(max_length=10, choices=status_choice, default='Work Request')
+    schedule_date_somax = models.DateTimeField(null=True, blank=True)
+    actual_date_somax = models.DateTimeField(null=True, blank=True)
     estimate_hour = models.DurationField(default=timedelta(hours=0))
+    scheduled_hour = models.DurationField(default=timedelta(hours=0))
+    actual_hour = models.DurationField(default=timedelta(hours=0))
 
     fail_code = models.CharField(max_length=50, null=True, blank=True)
     completion_comments = models.CharField(max_length=150, null=True, blank=True)
