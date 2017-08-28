@@ -31,6 +31,11 @@ class WorkerLoadProcessor:
                     data = pd.read_excel(path)
                     for index, row in data.iterrows():
                         company = Company.objects.get(business_name__exact=row['company'])
+                        somax_account = SomaxAccount.objects.filter(full_name__exact=row['name'])
+                        if somax_account:
+                            somax_account = somax_account[0]
+                        else:
+                            somax_account = None
                         Workers.objects.update_or_create(id=row['id'],
                                                          defaults={
                                                              'name': row['name'],
@@ -39,10 +44,11 @@ class WorkerLoadProcessor:
                                                              'company': company,
                                                              'level': row['level'],
                                                              'shift': row['shift'],
-                                                             'type': row['type']
+                                                             'type': row['type'],
+                                                             'somax_account': somax_account
                                                          })
                     # update documents
-                    Documents.objects.filter(id=file.id).update(status='loaded')
+                    # Documents.objects.filter(id=file.id).update(status='loaded')
 
                     return JsonResponse({})
         else:

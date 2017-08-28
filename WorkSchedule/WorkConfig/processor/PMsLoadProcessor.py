@@ -30,6 +30,16 @@ class PMsLoadProcessor:
                 if os.path.exists(path):
                     data = pd.read_excel(path)
 
+                    for index, row in data.iterrows():
+                        duration = timedelta(hours=row['Duration'])
+                        PMs.objects.update_or_create(masterjob_id=row['Master Job ID'],
+                                                     defaults={
+                                                         'description': row['Description'],
+                                                         'schedule_type': row['Schedule Type'],
+                                                         'duration': duration,
+                                                         'PMs_type': row['Type'],
+                                                     })
+
                     # update documents
                     Documents.objects.filter(id=file.id).update(status='loaded')
 
