@@ -48,7 +48,7 @@ class WorkerLoadProcessor:
                                                              'somax_account': somax_account
                                                          })
                     # update documents
-                    # Documents.objects.filter(id=file.id).update(status='loaded')
+                    Documents.objects.filter(id=file.id).update(status='loaded')
 
                     return JsonResponse({})
         else:
