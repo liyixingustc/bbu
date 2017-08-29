@@ -3,11 +3,11 @@
 
 {% block content_dashboard %}
 <div class="row">
-  {% include 'ReportTimeDetail/ReportTimeDetail_Panel1.html' %}
+  {% include 'ReportLostTimeDetail/ReportLostTimeDetail_Panel1.html' %}
 </div>
 
 <div class="row">
-  {% include 'ReportTimeDetail/ReportTimeDetail_Panel2.html' %}
+  {% include 'ReportLostTimeDetail/ReportLostTimeDetail_Panel2.html' %}
 </div>
 
 {% endblock content_dashboard %}
@@ -15,7 +15,7 @@
 {% block foot_js_dashboard %}
     <script type="text/javascript">
       require(["{% static 'requirejs/config.js' %}"], function (config) {
-        require(["{% static 'ReportTimeDetail/js/ReportTimeDetail.js' %}"],function(){
+        require(["{% static 'ReportLostTimeDetail/js/ReportLostTimeDetail.js' %}"],function(){
         })
       });
     </script>

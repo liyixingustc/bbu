@@ -28,26 +28,26 @@ define(function (require) {
 
     function event() {
 
-        $("#ReportTimeDetailPanel1Form1FormId").submit(function (e) {
+        $("#ReportLostTimeDetailPanel1Form1FormId").submit(function (e) {
 
             var data = $(this).serialize();
-            $("#ReportTimeDetailPanel1Form1Submit").html("Running...");
+            $("#LostReportTimeDetailPanel1Form1Submit").html("Running...");
             $.get('Panel1/Form1/Submit/',data,function (bar_data) {
                 var GroupBy = $('#GroupBy').val(),
-                    target_id = 'ReportTimeDetailPanel2Chart1';
+                    target_id = 'LostReportTimeDetailPanel2Chart1';
 
                 switch (GroupBy){
-                    case 'Product':target_id = 'ReportTimeDetailPanel2Chart1';break;
-                    case 'Cause':target_id = 'ReportTimeDetailPanel2Chart2';break;
-                    case 'Comments':target_id = 'ReportTimeDetailPanel2Chart3';break;
+                    case 'Product':target_id = 'ReportLostTimeDetailPanel2Chart1';break;
+                    case 'Cause':target_id = 'ReportLostTimeDetailPanel2Chart2';break;
+                    case 'Comments':target_id = 'ReportLostTimeDetailPanel2Chart3';break;
                 }
 
-                $('#ReportTimeDetailPanel2Chart1').html('');
-                $('#ReportTimeDetailPanel2Chart2').html('');
-                $('#ReportTimeDetailPanel2Chart3').html('');
+                $('#ReportLostTimeDetailPanel2Chart1').html('');
+                $('#ReportLostTimeDetailPanel2Chart2').html('');
+                $('#ReportLostTimeDetailPanel2Chart3').html('');
 
                 create_waterfall(target_id, bar_data);
-                $("#ReportTimeDetailPanel1Form1Submit").html("Finished");
+                $("#ReportLostTimeDetailPanel1Form1Submit").html("Finished");
             });
 
             return false
@@ -110,9 +110,9 @@ define(function (require) {
                                     target_id = this.series.chart.renderTo.id;
 
                                 switch (id){
-                                    case 'ReportTimeDetailPanel2Chart1':target_id = 'ReportTimeDetailPanel2Chart2';product_name_global=this.name;break;
-                                    case 'ReportTimeDetailPanel2Chart2':target_id = 'ReportTimeDetailPanel2Chart3';cause_name_global=this.name;break;
-                                    case 'ReportTimeDetailPanel2Chart3':target_id = 'ReportTimeDetailPanel2Chart3';break;
+                                    case 'ReportLostTimeDetailPanel2Chart1':target_id = 'ReportLostTimeDetailPanel2Chart2';product_name_global=this.name;break;
+                                    case 'ReportLostTimeDetailPanel2Chart2':target_id = 'ReportLostTimeDetailPanel2Chart3';cause_name_global=this.name;break;
+                                    case 'ReportLostTimeDetailPanel2Chart3':target_id = 'ReportLostTimeDetailPanel2Chart3';break;
                                 }
 
                                 var data = {
@@ -127,7 +127,7 @@ define(function (require) {
                                         'div_id': id
                                     };
 
-                                if (id !== 'ReportTimeDetailPanel2Chart3' &&
+                                if (id !== 'ReportLostTimeDetailPanel2Chart3' &&
                                     product_name_global!== 'Total' &&
                                     cause_name_global!== 'Total'){
                                     $.get('Panel1/Form1/Submit/',data,function (data) {
