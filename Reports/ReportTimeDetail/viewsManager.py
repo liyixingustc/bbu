@@ -75,14 +75,14 @@ class PageManager:
                     data = data[data['LostTimeMinutes'] != 0]
                     # get the for lower leven when click on the bar
                     if groupby == 'Product':
-                        if div_id == 'ReportTimeDetailPanel2Chart1' and product_name and product_name != 'Total':
+                        if div_id == 'ReportLostTimeDetailPanel2Chart1' and product_name and product_name != 'Total':
                             groupby = 'Cause'
                             data = data[data['MIPS_Description'] == product_name]
-                        elif div_id == 'ReportTimeDetailPanel2Chart2' and cause_name and cause_name != 'Total':
+                        elif div_id == 'ReportLostTimeDetailPanel2Chart2' and cause_name and cause_name != 'Total':
                             groupby = 'Comments'
                             data = data[(data['MIPS_Description'] == product_name) & (data['Cause'] == cause_name)]
                     elif groupby == 'Cause':
-                        if div_id == 'ReportTimeDetailPanel2Chart2' and cause_name and cause_name != 'Total':
+                        if div_id == 'ReportLostTimeDetailPanel2Chart2' and cause_name and cause_name != 'Total':
                             groupby = 'Comments'
                             data = data[data['Cause'] == cause_name]
 

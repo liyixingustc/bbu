@@ -15,7 +15,7 @@ class Page:
     @staff_member_required(login_url='/login/')
     @csrf_protect
     def index(request, *args, **kwargs):
-        template_name = 'ReportTimeDetail/{page}.html'.format(page=kwargs['page'])
+        template_name = 'ReportLostTimeDetail/{page}.html'.format(page=kwargs['page'])
         # LoadConfigData().load()
         return render(request, template_name)
 
@@ -29,8 +29,8 @@ class Page:
 
 
 mapping = pd.DataFrame([
-    {'page': 'ReportTimeDetail', 'panel': 'None', 'widget': 'None', 'func': 'index', 'register': Page.index},
-    {'page': 'ReportTimeDetail', 'panel': 'Panel1', 'widget': 'Form1', 'func': 'Submit', 'register': Page.Panel.Form.submit},
+    {'page': 'ReportLostTimeDetail', 'panel': 'None', 'widget': 'None', 'func': 'index', 'register': Page.index},
+    {'page': 'ReportLostTimeDetail', 'panel': 'Panel1', 'widget': 'Form1', 'func': 'Submit', 'register': Page.Panel.Form.submit},
 ])
 
 

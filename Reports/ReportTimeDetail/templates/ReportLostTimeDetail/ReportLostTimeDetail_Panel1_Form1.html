@@ -1,7 +1,7 @@
-  <form method="get" id="ReportTimeDetailPanel1Form1FormId" class="form-horizontal form-label-left">
+  <form method="get" id="ReportLostTimeDetailPanel1Form1FormId" class="form-horizontal form-label-left">
   {% csrf_token %}
     <div class="form-group">
-      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="StartDate">Start Date<span class="required">*</span>
+      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="StartDate">Start Sales Date<span class="required">*</span>
       </label>
       <div class="col-md-3 col-sm-3 col-xs-12">
         <input type="text" id="StartDate" name="StartDate" class="form-control col-md-7 col-xs-12 datepicker" placeholder="YYYY-MM-DD" data-inputmask="'mask': '99/99/9999'" style="width:80% " required>
@@ -17,7 +17,7 @@
       </div>
     </div>
     <div class="form-group">
-      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="EndDate">End Date<span class="required">*</span>
+      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="EndDate">End Sales Date<span class="required">*</span>
       </label>
       <div class="col-md-3 col-sm-3 col-xs-12">
         <input type="text" id="EndDate" name="EndDate" class="form-control col-md-7 col-xs-12 datepicker" placeholder="YYYY-MM-DD" data-inputmask="'mask': '99/99/9999'" style="width:80% " required>
@@ -61,7 +61,7 @@
     <div class="form-group">
       <label class="control-label col-md-3 col-sm-3 col-xs-12"></label>
       <div class="col-md-6 col-sm-6 col-xs-12">
-        <button type="submit" class="btn btn-primary " id="ReportTimeDetailPanel1Form1Submit">Run</button>
+        <button type="submit" class="btn btn-primary " id="LostReportTimeDetailPanel1Form1Submit">Run</button>
       </div>
     </div>
   </form>
