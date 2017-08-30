@@ -2,14 +2,16 @@
 {% block panel_title %}Waterfall Report{% endblock panel_title %}
 
 {% block panel_content %}
-    <div>
-      {% include 'ReportLostTimeDetail/ReportLostTimeDetail_Panel2_Chart1.html' %}
-    </div>
-    <div>
-      {% include 'ReportLostTimeDetail/ReportLostTimeDetail_Panel2_Chart2.html' %}
-    </div>
-    <div>
-      {% include 'ReportLostTimeDetail/ReportLostTimeDetail_Panel2_Chart3.html' %}
+    <div id="ReportLostTimeDetailPanel2ChartContainer" style='overflow:auto'>
+        <div>
+          {% include 'ReportLostTimeDetail/ReportLostTimeDetail_Panel2_Chart1.html' %}
+        </div>
+        <div>
+          {% include 'ReportLostTimeDetail/ReportLostTimeDetail_Panel2_Chart2.html' %}
+        </div>
+        <div>
+          {% include 'ReportLostTimeDetail/ReportLostTimeDetail_Panel2_Chart3.html' %}
+        </div>
     </div>
     <div class="clearfix"></div>
     <br/>

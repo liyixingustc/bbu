@@ -11,9 +11,14 @@ define(function (require) {
         moment = require('moment'),
         Highcharts = require('Highcharts'),
         HighchartsMore = require('Highcharts-more'),
-        HighchartsExporting = require('Highcharts-exporting');
+        HighchartsExporting = require('Highcharts-exporting'),
+        screenfull = require('screenfull');
 
     var product_name_global, cause_name_global;
+    var is_fullscreen = false;
+    var div_chart_height_originial, div_chart_width_originial;
+
+    var $ReportLostTimeDetailPanel2ChartContainer = $('#ReportLostTimeDetailPanel2ChartContainer');
 
 
     $(function () {
@@ -28,13 +33,34 @@ define(function (require) {
 
     function event() {
 
+        screenfull.onchange(function () {
+			is_fullscreen = !is_fullscreen;
+
+			if(is_fullscreen){
+				var screen_height = screen.availHeight,
+                    screen_width = screen.availWidth;
+
+				div_chart_height_originial = $ReportLostTimeDetailPanel2ChartContainer.height();
+				div_chart_width_originial = $ReportLostTimeDetailPanel2ChartContainer.width();
+
+				$ReportLostTimeDetailPanel2ChartContainer.height(screen_height);
+                $ReportLostTimeDetailPanel2ChartContainer.width(screen_width);
+
+			}
+			else{
+                $ReportLostTimeDetailPanel2ChartContainer.height(div_chart_height_originial);
+                $ReportLostTimeDetailPanel2ChartContainer.width(div_chart_width_originial);
+
+			}
+        });
+
         $("#ReportLostTimeDetailPanel1Form1FormId").submit(function (e) {
 
             var data = $(this).serialize();
-            $("#LostReportTimeDetailPanel1Form1Submit").html("Running...");
+            $("#ReportLostTimeDetailPanel1Form1Submit").html("Running...");
             $.get('Panel1/Form1/Submit/',data,function (bar_data) {
                 var GroupBy = $('#GroupBy').val(),
-                    target_id = 'LostReportTimeDetailPanel2Chart1';
+                    target_id = 'ReportLostTimeDetailPanel2Chart1';
 
                 switch (GroupBy){
                     case 'Product':target_id = 'ReportLostTimeDetailPanel2Chart1';break;
@@ -134,11 +160,31 @@ define(function (require) {
                                         create_waterfall(target_id, data);
                                     });
                                 }
+
+                                if(!is_fullscreen){
+                                    div_chart_height_originial = $ReportLostTimeDetailPanel2ChartContainer.height();
+                                    div_chart_width_originial = $ReportLostTimeDetailPanel2ChartContainer.width();
+                                }
+                                else {
+                                }
+
                             }
                         }
                     }
                 }
             },
+
+            exporting: {
+                buttons: {
+                    FullScreenButton: {
+                        _titleKey: 'Full Screen',
+                        text:'Full Screen',
+                        onclick: function () {
+                            screenfull.toggle($ReportLostTimeDetailPanel2ChartContainer[0]);
+                        }
+                    }
+                }
+            }
         });
     }
 });
