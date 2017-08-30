@@ -15,6 +15,12 @@ source_choice = (('manual', 'manual'),
                  ('somax', 'somax'),
                 )
 
+current_status_choice = (('Working', 'Working'),
+                         ('Canceled', 'Canceled'),
+                         ('Complete', 'Complete'),
+                         ('Uncomplete', 'Uncomplete'),
+                         )
+
 
 class WorkerAvailable(models.Model):
 
@@ -43,20 +49,20 @@ class WorkerScheduled(models.Model):
     created_on = models.DateTimeField(default=timezone.now)
     source = models.CharField(max_length=10, choices=source_choice, default='manual')
     document = models.ForeignKey(Documents, db_column='document', to_field='name', null=True, blank=True)
+    current_status = models.CharField(max_length=10, choices=source_choice, default='manual')
 
-
-class WorkerActual(models.Model):
-
-    name = models.ForeignKey(Workers, db_column='name', to_field='name')
-    date = models.DateField()
-    duration = models.DurationField(default=timedelta(hours=0))
-    time_start = models.DateTimeField(default=timezone.now)
-    time_end = models.DateTimeField(default=timezone.now)
-    task_id = models.ForeignKey(Tasks, db_column='task_id')
-    created_by = models.ForeignKey(User, db_column='created_by', default=1)
-    created_on = models.DateTimeField(default=timezone.now)
-    source = models.CharField(max_length=10, choices=source_choice, default='manual')
-    document = models.ForeignKey(Documents, db_column='document', to_field='name', null=True, blank=True)
+# class WorkerActual(models.Model):
+#
+#     name = models.ForeignKey(Workers, db_column='name', to_field='name')
+#     date = models.DateField()
+#     duration = models.DurationField(default=timedelta(hours=0))
+#     time_start = models.DateTimeField(default=timezone.now)
+#     time_end = models.DateTimeField(default=timezone.now)
+#     task_id = models.ForeignKey(Tasks, db_column='task_id')
+#     created_by = models.ForeignKey(User, db_column='created_by', default=1)
+#     created_on = models.DateTimeField(default=timezone.now)
+#     source = models.CharField(max_length=10, choices=source_choice, default='manual')
+#     document = models.ForeignKey(Documents, db_column='document', to_field='name', null=True, blank=True)
 
 #
 # class WorkerScheduledTask(models.Model):
