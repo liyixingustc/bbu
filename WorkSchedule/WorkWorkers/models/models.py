@@ -27,12 +27,13 @@ class WorkerAvailable(models.Model):
     name = models.ForeignKey(Workers, verbose_name='name', db_column='name', to_field='name')
     date = models.DateField()
     duration = models.DurationField(default=timedelta(hours=0))
+    duration_actual = models.DurationField(default=timedelta(hours=0))
     deduction = models.DurationField(default=WorkAvailSheet.DEDUCTION)
     time_start = models.DateTimeField(default=timezone.now)
     time_end = models.DateTimeField(default=timezone.now)
     created_by = models.ForeignKey(User, db_column='created_by', default=1)
     created_on = models.DateTimeField(default=timezone.now)
-    source = models.CharField(max_length=10, choices=source_choice, default='manual')
+    source = models.CharField(max_length=100, choices=source_choice, default='manual')
     document = models.ForeignKey(Documents, db_column='document', to_field='name', null=True, blank=True)
 
 
@@ -47,9 +48,9 @@ class WorkerScheduled(models.Model):
     available_id = models.ForeignKey(WorkerAvailable, db_column='available_id')
     created_by = models.ForeignKey(User, db_column='created_by', default=1)
     created_on = models.DateTimeField(default=timezone.now)
-    source = models.CharField(max_length=10, choices=source_choice, default='manual')
+    source = models.CharField(max_length=100, choices=source_choice, default='manual')
     document = models.ForeignKey(Documents, db_column='document', to_field='name', null=True, blank=True)
-    current_status = models.CharField(max_length=10, choices=source_choice, default='manual')
+    current_status = models.CharField(max_length=100, choices=source_choice, default='manual')
 
 # class WorkerActual(models.Model):
 #
