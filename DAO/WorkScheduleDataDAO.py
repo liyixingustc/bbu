@@ -18,6 +18,8 @@ EST = pytz.timezone(TIME_ZONE)
 
 class WorkScheduleDataDAO:
 
+    open_tasks = ['Approved', 'Scheduled', 'Work Request']
+
     @classmethod
     def get_task_scheduled(cls, task_id):
         pass

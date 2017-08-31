@@ -75,11 +75,11 @@ class TasksLoadProcessor:
                                                        defaults={
                                                                  'description': row['Description'],
                                                                  'work_type': row['Type'],
-                                                                 'current_status_somax': row['Status'],
                                                                  'line': None,
                                                                  'shift': row['Shift'],
                                                                  'priority': row['Priority'],
                                                                  'create_date': row['Created'],
+                                                                 'current_status_somax': row['Status'],
                                                                  'schedule_date_somax': row['Scheduled'],
                                                                  'actual_date_somax': row['Actual Finish'],
                                                                  'estimate_hour': est,
@@ -90,6 +90,12 @@ class TasksLoadProcessor:
                                                                  'creator': creator,
                                                                  'assigned': assigned,
                                                                  })
+
+                        if row['Status'] in ['Canceled', 'Complete', 'Denied']:
+                            Tasks.objects.update_or_create(work_order=row['Work Order'],
+                                                           defaults={
+                                                               'current_status': row['Status'],
+                                                           })
 
                     # update documents
                     Documents.objects.filter(id=file.id).update(status='loaded')
