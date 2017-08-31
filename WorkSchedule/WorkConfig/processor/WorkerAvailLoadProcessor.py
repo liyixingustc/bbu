@@ -53,15 +53,15 @@ class WorkerAvailLoadProcessor:
                         last = row['worker']
 
                     # data init
-                    shift1 = data[worker_range_df['part'] == 1]
+                    shift3 = data[worker_range_df['part'] == 1]
 
+                    cls.worker_avail_shift_processor(shift3, 'shift3', file)
+
+                    shift1 = data[worker_range_df['part'] == 2]
                     cls.worker_avail_shift_processor(shift1, 'shift1', file)
 
-                    shift2 = data[worker_range_df['part'] == 2]
+                    shift2 = data[worker_range_df['part'] == 5]
                     cls.worker_avail_shift_processor(shift2, 'shift2', file)
-
-                    shift3 = data[worker_range_df['part'] == 5]
-                    cls.worker_avail_shift_processor(shift3, 'shift3', file)
 
                     # update documents
                     Documents.objects.filter(id=file.id).update(status='loaded')
@@ -135,15 +135,31 @@ class WorkerAvailLoadProcessor:
 
         worker = Workers.objects.get(name=worker)
         if time_str in [' ', None, np.nan]:
-            if shift == 'shift1' and worker.level == 'lead':
+            if shift == 'shift3' and worker.level == 'lead':
 
+                start_datetime = EST.localize(dt(date.year, date.month, date.day,
+                                                 WorkAvailSheet.Shift3.DEFAULT_TIME_START_LEADER.hour,
+                                                 WorkAvailSheet.Shift3.DEFAULT_TIME_START_LEADER.minute))
+                end_datetime = EST.localize(dt(date.year, date.month, date.day,
+                                               WorkAvailSheet.Shift3.DEFAULT_TIME_END_LEADER.hour,
+                                               WorkAvailSheet.Shift3.DEFAULT_TIME_END_LEADER.minute))
+                start_datetime += timedelta(days=-1)
+                duration = WorkAvailSheet.Shift3.DEFAULT_DURATION_LEADER
+            elif shift == 'shift3' and worker.level == 'worker':
+                start_datetime = EST.localize(dt(date.year, date.month, date.day,
+                                                 WorkAvailSheet.Shift3.DEFAULT_TIME_START_WORKER.hour,
+                                                 WorkAvailSheet.Shift3.DEFAULT_TIME_START_WORKER.minute))
+                end_datetime = EST.localize(dt(date.year, date.month, date.day,
+                                               WorkAvailSheet.Shift3.DEFAULT_TIME_END_WORKER.hour,
+                                               WorkAvailSheet.Shift3.DEFAULT_TIME_END_WORKER.minute))
+                duration = WorkAvailSheet.Shift3.DEFAULT_DURATION_WORKER
+            elif shift == 'shift1' and worker.level == 'lead':
                 start_datetime = EST.localize(dt(date.year, date.month, date.day,
                                                  WorkAvailSheet.Shift1.DEFAULT_TIME_START_LEADER.hour,
                                                  WorkAvailSheet.Shift1.DEFAULT_TIME_START_LEADER.minute))
                 end_datetime = EST.localize(dt(date.year, date.month, date.day,
                                                WorkAvailSheet.Shift1.DEFAULT_TIME_END_LEADER.hour,
                                                WorkAvailSheet.Shift1.DEFAULT_TIME_END_LEADER.minute))
-                start_datetime += timedelta(days=-1)
                 duration = WorkAvailSheet.Shift1.DEFAULT_DURATION_LEADER
             elif shift == 'shift1' and worker.level == 'worker':
                 start_datetime = EST.localize(dt(date.year, date.month, date.day,
@@ -160,6 +176,7 @@ class WorkerAvailLoadProcessor:
                 end_datetime = EST.localize(dt(date.year, date.month, date.day,
                                                WorkAvailSheet.Shift2.DEFAULT_TIME_END_LEADER.hour,
                                                WorkAvailSheet.Shift2.DEFAULT_TIME_END_LEADER.minute))
+                end_datetime += timedelta(days=1)
                 duration = WorkAvailSheet.Shift2.DEFAULT_DURATION_LEADER
             elif shift == 'shift2' and worker.level == 'worker':
                 start_datetime = EST.localize(dt(date.year, date.month, date.day,
@@ -168,25 +185,8 @@ class WorkerAvailLoadProcessor:
                 end_datetime = EST.localize(dt(date.year, date.month, date.day,
                                                WorkAvailSheet.Shift2.DEFAULT_TIME_END_WORKER.hour,
                                                WorkAvailSheet.Shift2.DEFAULT_TIME_END_WORKER.minute))
+                end_datetime += timedelta(days=1)
                 duration = WorkAvailSheet.Shift2.DEFAULT_DURATION_WORKER
-            elif shift == 'shift3' and worker.level == 'lead':
-                start_datetime = EST.localize(dt(date.year, date.month, date.day,
-                                                 WorkAvailSheet.Shift3.DEFAULT_TIME_START_LEADER.hour,
-                                                 WorkAvailSheet.Shift3.DEFAULT_TIME_START_LEADER.minute))
-                end_datetime = EST.localize(dt(date.year, date.month, date.day,
-                                               WorkAvailSheet.Shift3.DEFAULT_TIME_END_LEADER.hour,
-                                               WorkAvailSheet.Shift3.DEFAULT_TIME_END_LEADER.minute))
-                end_datetime += timedelta(days=1)
-                duration = WorkAvailSheet.Shift3.DEFAULT_DURATION_LEADER
-            elif shift == 'shift3' and worker.level == 'worker':
-                start_datetime = EST.localize(dt(date.year, date.month, date.day,
-                                                 WorkAvailSheet.Shift3.DEFAULT_TIME_START_WORKER.hour,
-                                                 WorkAvailSheet.Shift3.DEFAULT_TIME_START_WORKER.minute))
-                end_datetime = EST.localize(dt(date.year, date.month, date.day,
-                                               WorkAvailSheet.Shift3.DEFAULT_TIME_END_WORKER.hour,
-                                               WorkAvailSheet.Shift3.DEFAULT_TIME_END_WORKER.minute))
-                end_datetime += timedelta(days=1)
-                duration = WorkAvailSheet.Shift3.DEFAULT_DURATION_WORKER
             else:
                 return None
 
@@ -209,20 +209,20 @@ class WorkerAvailLoadProcessor:
             start_datetime = EST.localize(dt(date.year, date.month, date.day, start_hour, start_min))
             end_datetime = EST.localize(dt(date.year, date.month, date.day, end_hour, end_min))
 
-            if shift == 'shift1':
+            if shift == 'shift3':
                 if start_hour < 12:
                     start_hour += 12
                     start_datetime += timedelta(days=-1, hours=12)
                 else:
                     start_datetime += timedelta(hours=-12)
-            elif shift == 'shift2':
+            elif shift == 'shift1':
                 if 0 <= start_hour <= 6:
                     start_hour += 12
                     start_datetime += timedelta(hours=12)
                 if 0 <= end_hour <= 6:
                     end_hour += 12
                     end_datetime += timedelta(hours=12)
-            elif shift == 'shift3':
+            elif shift == 'shift2':
                 if 0 <= end_hour < 6:
                     end_datetime += timedelta(days=1)
                 elif 6 <= end_hour <= 12:
