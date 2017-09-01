@@ -42,3 +42,11 @@ class WorkAvailSheet:
 
 class WorkScheduleSheet:
     DEDUCTION = timedelta(hours=1)
+
+class PMs:
+
+    class Bread:
+        Downdays = 'Sun shift1 - Sun shift2'
+
+    class EM:
+        Downdays = 'Fri shift1 - Sat shift2'

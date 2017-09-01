@@ -8,8 +8,10 @@ define(function (require) {
         datepicker = require('bootstrap-datepicker'),
         gentelella = require('gentelella'),
         select2 = require('select2'),
+        moment = require('moment'),
         jqueryUI = require('jquery-ui'),
         fullcalendar = require('fullcalendar'),
+        scheduler = require('scheduler'),
         PNotify = require('pnotify'),
 		PNotify_buttons = require('pnotify-buttons'),
 		PNotify_nonblock = require('pnotify-nonblock'),
@@ -150,14 +152,17 @@ define(function (require) {
             },
             rowAttributes:function (row, index) {
 
-            }
-
+            },
         });
         // $table_container_id.show()
     }
 
     function event() {
 
+        //external_drag_init
+        $table_id.on('all.bs.table', function (data) {
+            external_drag_init()
+        });
 
         //editable events
         $table_id.on('editable-save.bs.table',function (editable, field, row, oldValue, $el) {
@@ -184,6 +189,34 @@ define(function (require) {
             });
         });
     }
+
+    function external_drag_init() {
+		$('#WorkSchedulerPanel2Table1TableId').children('tbody').children('tr').each(function() {
+			// store data so the calendar knows to render an event upon drop
+			var duration = $.trim($(this).children('td').eq(3).text()),
+				duration_hours = duration.split('.')[0],
+				duration_mins = duration.split('.')[1]*6;
+				if(duration_hours<0){duration_hours=0}
+				if(!duration_mins || duration_mins<0){duration_mins=0}
+
+			$(this).data('event', {
+				'title': $.trim($(this).children('td').eq(0).text()), // use the element's text as the event title
+				// stick: true, // maintain when user navigates (see docs on the renderEvent method)
+				'constraint': 'WorkerAvail',
+				'duration': moment({hour: duration_hours,minute:duration_mins}).format("HH:mm"),
+				// color: '#257e4a',
+				// parameters
+				'taskId': $.trim($(this).children('td').eq(0).text())
+			});
+
+			// make the event draggable using jQuery UI
+			$(this).draggable({
+				zIndex: 999,
+				revert: true,      // will cause the event to go back to its
+				revertDuration: 0  //  original position after the drag
+			});
+		});
+	}
 
     return run
 

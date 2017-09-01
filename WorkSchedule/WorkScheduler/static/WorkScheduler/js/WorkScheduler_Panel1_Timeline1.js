@@ -36,33 +36,33 @@ define(function (require) {
 	var start_global, end_global, resourceId_global;
 	var is_fullscreen = false, is_zoom = false;
 
-	function external_drag_init() {
-		$('#WorkSchedulerPanel2Table1TableId').children('tbody').children('tr').each(function() {
-			// store data so the calendar knows to render an event upon drop
-			var duration = $.trim($(this).children('td').eq(3).text()),
-				duration_hours = duration.split('.')[0],
-				duration_mins = duration.split('.')[1]*6;
-				if(duration_hours<0){duration_hours=0}
-				if(!duration_mins || duration_mins<0){duration_mins=0}
-
-			$(this).data('event', {
-				'title': $.trim($(this).children('td').eq(0).text()), // use the element's text as the event title
-				// stick: true, // maintain when user navigates (see docs on the renderEvent method)
-				'constraint': 'WorkerAvail',
-				'duration': moment({hour: duration_hours,minute:duration_mins}).format("HH:mm"),
-				// color: '#257e4a',
-				// parameters
-				'taskId': $.trim($(this).children('td').eq(0).text())
-			});
-
-			// make the event draggable using jQuery UI
-			$(this).draggable({
-				zIndex: 999,
-				revert: true,      // will cause the event to go back to its
-				revertDuration: 0  //  original position after the drag
-			});
-		});
-	}
+	// function external_drag_init() {
+	// 	$('#WorkSchedulerPanel2Table1TableId').children('tbody').children('tr').each(function() {
+	// 		// store data so the calendar knows to render an event upon drop
+	// 		var duration = $.trim($(this).children('td').eq(3).text()),
+	// 			duration_hours = duration.split('.')[0],
+	// 			duration_mins = duration.split('.')[1]*6;
+	// 			if(duration_hours<0){duration_hours=0}
+	// 			if(!duration_mins || duration_mins<0){duration_mins=0}
+    //
+	// 		$(this).data('event', {
+	// 			'title': $.trim($(this).children('td').eq(0).text()), // use the element's text as the event title
+	// 			// stick: true, // maintain when user navigates (see docs on the renderEvent method)
+	// 			'constraint': 'WorkerAvail',
+	// 			'duration': moment({hour: duration_hours,minute:duration_mins}).format("HH:mm"),
+	// 			// color: '#257e4a',
+	// 			// parameters
+	// 			'taskId': $.trim($(this).children('td').eq(0).text())
+	// 		});
+    //
+	// 		// make the event draggable using jQuery UI
+	// 		$(this).draggable({
+	// 			zIndex: 999,
+	// 			revert: true,      // will cause the event to go back to its
+	// 			revertDuration: 0  //  original position after the drag
+	// 		});
+	// 	});
+	// }
 
     function run() {
 
@@ -98,14 +98,14 @@ define(function (require) {
 
     function init() {
 
-    	external_drag_init();
+    	// external_drag_init();
 
         /* initialize the external events
 		-----------------------------------------------------------------*/
 
-		$("#WorkSchedulerPanel2Table1TableId").on('page-change.bs.table',function (num,size) {
-            external_drag_init()
-        });
+        // $("#WorkSchedulerPanel2Table1TableId").on('page-change.bs.table',function (num,size) {
+        //     external_drag_init()
+        // });
 
 
 		/* initialize the calendar
@@ -356,6 +356,11 @@ define(function (require) {
 					}
 				}
 			],
+			resourceGroupField:'shift',
+			resourceGroupText:function (groupValue) {
+
+            	return 'Shift '+ groupValue
+            },
 			resources: { // you can also specify a plain string like 'json/resources.json'
 				url: 'Panel1/TimeLine1/resources/',
 				error: function() {
@@ -470,9 +475,9 @@ define(function (require) {
 					$WorkScheduler_Panel1_Timeline1.fullCalendar('refetchEvents');
 					$WorkScheduler_Panel1_Timeline1.fullCalendar('refetchResources');
 					$("#WorkSchedulerPanel2Table1TableId").bootstrapTable('refresh');
-					setTimeout(function () {
-						external_drag_init()
-					},500)
+					// setTimeout(function () {
+					// 	external_drag_init()
+					// },500)
                 });
 			},
 			eventDrop: function(event) { // called when an event (already on the calendar) is moved
@@ -490,9 +495,9 @@ define(function (require) {
 					$WorkScheduler_Panel1_Timeline1.fullCalendar('refetchEvents');
 					$WorkScheduler_Panel1_Timeline1.fullCalendar('refetchResources');
 					$("#WorkSchedulerPanel2Table1TableId").bootstrapTable('refresh');
-					setTimeout(function () {
-						external_drag_init()
-					},500)
+					// setTimeout(function () {
+					// 	external_drag_init()
+					// },500)
                 });
             },
 			eventResize: function(event, delta, revertFunc) {
@@ -511,9 +516,9 @@ define(function (require) {
 					$WorkScheduler_Panel1_Timeline1.fullCalendar('refetchEvents');
 					$WorkScheduler_Panel1_Timeline1.fullCalendar('refetchResources');
 					$("#WorkSchedulerPanel2Table1TableId").bootstrapTable('refresh');
-					setTimeout(function () {
-						external_drag_init()
-					},500)
+					// setTimeout(function () {
+					// 	external_drag_init()
+					// },500)
                 });
 			},
 			eventClick:function(event, jsEvent, view){
@@ -574,9 +579,9 @@ define(function (require) {
 					$WorkScheduler_Panel1_Timeline1.fullCalendar('refetchEvents');
 					$WorkScheduler_Panel1_Timeline1.fullCalendar('refetchResources');
 					$("#WorkSchedulerPanel2Table1TableId").bootstrapTable('refresh');
-					setTimeout(function () {
-						external_drag_init()
-					},500);
+					// setTimeout(function () {
+					// 	external_drag_init()
+					// },500);
 
 					var notice = new PNotify({
 										title: 'Success!',
@@ -613,9 +618,9 @@ define(function (require) {
 					$WorkScheduler_Panel1_Timeline1.fullCalendar('refetchEvents');
 					$WorkScheduler_Panel1_Timeline1.fullCalendar('refetchResources');
 					$("#WorkSchedulerPanel2Table1TableId").bootstrapTable('refresh');
-					setTimeout(function () {
-						external_drag_init()
-					},500);
+					// setTimeout(function () {
+					// 	external_drag_init()
+					// },500);
 
 					var notice = new PNotify({
 										title: 'Success!',
@@ -698,9 +703,9 @@ define(function (require) {
 					$WorkScheduler_Panel1_Timeline1.fullCalendar('refetchEvents');
 					$WorkScheduler_Panel1_Timeline1.fullCalendar('refetchResources');
 					$("#WorkSchedulerPanel2Table1TableId").bootstrapTable('refresh');
-					setTimeout(function () {
-						external_drag_init()
-					},500);
+					// setTimeout(function () {
+					// 	external_drag_init()
+					// },500);
 
 					var notice = new PNotify({
 										title: 'Success!',

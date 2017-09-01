@@ -29,10 +29,8 @@ define(function (require) {
         //     WorkSchedulerPanel1Timeline1();
         //     console.log(r)
         // });
-        WorkSchedulerPanel2Table1(function () {
-            setTimeout(function () {
-                WorkSchedulerPanel1Timeline1()
-            },100)
-        });
+        WorkSchedulerPanel2Table1();
+        WorkSchedulerPanel1Timeline1()
+
     });
 });

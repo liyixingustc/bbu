@@ -36,7 +36,6 @@ class PageManager:
                 end_date = UDatetime.pick_date_by_one_date(end)
 
                 workers_df = WorkScheduleDataDAO.get_all_include_workers_by_date_range(start_date, end_date)
-
                 response = []
 
                 if not workers_df.empty:
@@ -480,12 +479,7 @@ class PageManager:
                 worker_avail = WorkerAvailable.objects.filter(date__range=[start_date, end_date])
                 worker_scheduled = WorkerScheduled.objects.filter(date__range=[start_date, end_date])
 
-                tasks_all = Tasks.objects.filter(Q(current_status__in=['new', 'pending']) |
-                                                 Q(kitted_date__range=[start, end], current_status__in=['completed']))
-
-                tasks = Tasks.objects.filter(Q(current_status__in=['new', 'pending']))\
-                                     .exclude(priority__in=['T', 'O'])\
-                                     .annotate(scheduled_hour=Sum('workerscheduled__duration'))
+                tasks = WorkScheduleDataDAO.get_all_tasks_scheduled()
 
                 if worker_avail.exists():
                     worker_avail_df = pd.DataFrame.from_records(worker_avail.values('duration', 'deduction'))
@@ -498,11 +492,11 @@ class PageManager:
                     scheduled = worker_scheduled_df['duration'].sum().total_seconds() / 3600
                 else:
                     scheduled = 0
-                if tasks.exists():
-                    tasks_df = pd.DataFrame.from_records(tasks.values('estimate_hour', 'scheduled_hour'))
-                    tasks_est = tasks_df['estimate_hour'].sum().total_seconds() / 3600
+                if not tasks.empty:
+                    tasks_df = tasks[['estimate_hour', 'schedule_hour']]
+                    tasks_est = tasks_df['estimate_hour'].sum()
                     tasks_count = len(tasks_df)
-                    tasks_scheduled_count = len(tasks_df[~tasks_df['scheduled_hour'].isnull()])
+                    tasks_scheduled_count = len(tasks_df[~tasks_df['schedule_hour'].isnull()])
                 else:
                     tasks_est = 0
                     tasks_count = 0
