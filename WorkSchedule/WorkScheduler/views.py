@@ -83,6 +83,12 @@ class Page:
                 response = PageManager.PanelManager.KPIBoardManager.update(request, *args, **kwargs)
                 return response
 
+        class Form:
+            @staticmethod
+            def submit(request, *args, **kwargs):
+                response = PageManager.PanelManager.FormManager.submit(request, *args, **kwargs)
+                return response
+
 
 mapping = pd.DataFrame([
     {'page': 'WorkScheduler', 'panel': 'None', 'widget': 'None', 'func': 'index', 'register': Page.index},
@@ -101,7 +107,9 @@ mapping = pd.DataFrame([
     {'page': 'WorkScheduler', 'panel': 'Panel1', 'widget': 'Modal3', 'func': 'add_worker_workers', 'register': Page.Panel.Modal.add_worker_workers},
     {'page': 'WorkScheduler', 'panel': 'Panel1', 'widget': 'Modal4', 'func': 'worker_submit', 'register': Page.Panel.Modal.worker_submit},
 
-    {'page': 'WorkScheduler', 'panel': 'Panel3', 'widget': 'KPIBoard', 'func': 'update','register': Page.Panel.KPIBoard.update},
+    {'page': 'WorkScheduler', 'panel': 'Panel3', 'widget': 'KPIBoard', 'func': 'update', 'register': Page.Panel.KPIBoard.update},
+
+    {'page': 'WorkScheduler', 'panel': 'Panel4', 'widget': 'Form1', 'func': 'Submit', 'register': Page.Panel.Form.submit},
 ])
 
 

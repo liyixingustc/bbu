@@ -30,7 +30,17 @@ define(function (require) {
         //     console.log(r)
         // });
         WorkSchedulerPanel2Table1();
-        WorkSchedulerPanel1Timeline1()
+        WorkSchedulerPanel1Timeline1();
+
+        $("#WorkSchedulerPanel4Form1FormId").submit(function (e) {
+            var data = $(this).serialize();
+            $("#WorkSchedulerPanel4Form1Submit").html("Loading...");
+            $.get('Panel4/Form1/Submit/',data,function () {
+                $("#WorkSchedulerPanel4Form1Submit").html("Scheduled");
+            });
+
+            return false
+        });
 
     });
 });

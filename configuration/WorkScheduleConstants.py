@@ -43,6 +43,7 @@ class WorkAvailSheet:
 class WorkScheduleSheet:
     DEDUCTION = timedelta(hours=1)
 
+
 class PMs:
 
     class Bread:

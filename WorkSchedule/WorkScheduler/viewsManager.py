@@ -18,6 +18,8 @@ from utils.UDatetime import UDatetime
 
 from DAO.WorkScheduleDataDAO import WorkScheduleDataDAO
 
+from .utils.SmartScheduler import SmartScheduler
+
 EST = pytz.timezone(TIME_ZONE)
 
 
@@ -516,4 +518,20 @@ class PageManager:
                 }
 
                 return JsonResponse(response)
+
+        class FormManager:
+
+            @staticmethod
+            def submit(request, *args, **kwargs):
+                start = request.GET.get('Start')
+                end = request.GET.get('End')
+                print(start, end)
+
+                start = UDatetime.datetime_str_init(start)
+                end = UDatetime.datetime_str_init(end, start, timedelta(days=1))
+
+                SmartScheduler(start, end).run()
+
+                return JsonResponse({})
+
 

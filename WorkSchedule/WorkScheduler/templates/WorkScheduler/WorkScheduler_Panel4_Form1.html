@@ -1,0 +1,23 @@
+  <form method="get" id="WorkSchedulerPanel4Form1FormId" class="form-horizontal form-label-left">
+  {% csrf_token %}
+    <div class="form-group">
+      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="Start">Task Created Start<span class="required">*</span>
+      </label>
+      <div class="col-md-6 col-sm-6 col-xs-12">
+        <input type="text" id="Start" name="Start" class="form-control col-md-7 col-xs-12 datepicker" placeholder="YYYY-MM-DD" data-inputmask="'mask': '99/99/9999'" style="width:80% " required>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="End">Task Create End<span class="required">*</span>
+      </label>
+      <div class="col-md-6 col-sm-6 col-xs-12">
+        <input type="text" id="End" name="End" class="form-control col-md-7 col-xs-12 datepicker" placeholder="YYYY-MM-DD" data-inputmask="'mask': '99/99/9999'" style="width:80% " required>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="control-label col-md-3 col-sm-3 col-xs-12"></label>
+      <div class="col-md-6 col-sm-6 col-xs-12">
+        <button type="submit" class="btn btn-primary " id="WorkSchedulerPanel4Form1Submit">Submit</button>
+      </div>
+    </div>
+  </form>

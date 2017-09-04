@@ -1,0 +1,14 @@
+{% extends 'bbu/panel.html' %}
+{#{% block panel_size  %}class="col-md-8 col-sm-12 col-xs-12"{% endblock %}#}
+{% block panel_title %}Tasks Smart Scheduler{% endblock panel_title %}
+
+{% block panel_content %}
+    <div>
+        {% include 'WorkScheduler/WorkScheduler_Panel4_Table1.html' %}
+    </div>
+    <div>
+        {% include 'WorkScheduler/WorkScheduler_Panel4_Form1.html' %}
+    </div>
+    <div class="clearfix"></div>
+    <br/>
+{% endblock panel_content %}
