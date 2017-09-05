@@ -525,7 +525,6 @@ class PageManager:
             def submit(request, *args, **kwargs):
                 start = request.GET.get('Start')
                 end = request.GET.get('End')
-                print(start, end)
 
                 start = UDatetime.datetime_str_init(start)
                 end = UDatetime.datetime_str_init(end, start, timedelta(days=1))
