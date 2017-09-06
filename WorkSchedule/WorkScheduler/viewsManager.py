@@ -17,6 +17,7 @@ from .tables.tablesManager import *
 from utils.UDatetime import UDatetime
 
 from DAO.WorkScheduleDataDAO import WorkScheduleDataDAO
+from DAO.WorkScheduleReviseDAO import WorkScheduleReviseDAO
 
 from .utils.SmartScheduler import SmartScheduler
 
@@ -155,14 +156,8 @@ class PageManager:
                                                               name__exact=worker)
                 if available_ids.count() > 0:
                     available_id = available_ids[0]
-
-                    worker_scheduled = WorkerScheduled.objects.update_or_create(name=worker,
-                                                                                date=date,
-                                                                                time_start=start,
-                                                                                time_end=end,
-                                                                                task_id=task,
-                                                                                available_id=available_id,
-                                                                                defaults={'duration': duration})
+                    WorkScheduleReviseDAO.update_or_create_schedule(request.user, start, end, date, duration,
+                                                                    available_id, worker, task)
 
                 response = []
 
@@ -192,14 +187,8 @@ class PageManager:
                 if available_id.count() > 0:
                     available_id = available_id[0]
 
-                WorkerScheduled.objects.filter(id__exact=workerscheduledId).update(name=worker,
-                                                                                   date=date,
-                                                                                   duration=duration,
-                                                                                   time_start=start,
-                                                                                   time_end=end,
-                                                                                   task_id=task,
-                                                                                   available_id=available_id
-                                                                                   )
+                WorkScheduleReviseDAO.update_or_create_schedule(request.user, start, end, date, duration,
+                                                                available_id, worker, task)
 
                 response = []
 
@@ -342,7 +331,7 @@ class PageManager:
                 if command_type == 'Revise':
                     WorkerScheduled.objects.filter(id__exact=workerscheduledId).update()
                 elif command_type == 'Remove':
-                    WorkerScheduled.objects.filter(id__exact=workerscheduledId).delete()
+                    WorkScheduleReviseDAO.remove_schedule(workerscheduledId)
 
                 response = []
 

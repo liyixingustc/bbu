@@ -36,7 +36,8 @@ class WorkScheduleDataDAO:
                     'estimate_hour',
                     'work_type',
                     'priority',
-                    'create_date'
+                    'create_date',
+                    'current_status'
                     )\
             .annotate(schedule_hour=Sum('workerscheduled__duration'))
         tasks_record = pd.DataFrame.from_records(tasks)

@@ -120,14 +120,22 @@ define(function (require) {
                     sortable: true,
                     // editable: true,
                     align: 'center'
-                }
+                },
+                {
+                    field: 'current_status',
+                    title: 'status',
+                    sortable: true,
+                    // editable: true,
+                    align: 'center'
+                },
             ],
             rowStyle: function (row, index) {
                 var color = null,
                     bal = row['balance_hour'],
-                    est = row['estimate_hour'];
+                    est = row['estimate_hour'],
+                    status = row['current_status'];
 
-                if(bal===0){
+                if(bal===0 && status!=='Work Request'){
                     color = 'green'
                 }
                 else if (bal<est && bal>0 ){
@@ -168,25 +176,24 @@ define(function (require) {
         $table_id.on('editable-save.bs.table',function (editable, field, row, oldValue, $el) {
 
             $.get('Panel2/Table1/edit/',row,function () {
-
+                $table_id.bootstrapTable('refresh');
+                var notice = new PNotify({
+                                    title: 'Success!',
+                                    text: 'You have successfully extended the worker available hours',
+                                    type: 'success',
+                                    sound: false,
+                                    animate_speed: 'fast',
+                                    styling: 'bootstrap3',
+                                    nonblock: {
+                                        nonblock: true
+                                    }
+                                });
+                notice.get().click(function() {
+                    notice.remove();
+                });
             })
         });
         $table_id.on('editable-hidden.bs.table',function (field, row, $el, reason) {
-            $table_id.bootstrapTable('refresh');
-            var notice = new PNotify({
-                                title: 'Success!',
-                                text: 'You have successfully extended the worker available hours',
-                                type: 'success',
-                                sound: false,
-                                animate_speed: 'fast',
-                                styling: 'bootstrap3',
-                                nonblock: {
-                                    nonblock: true
-                                }
-                            });
-            notice.get().click(function() {
-                notice.remove();
-            });
         });
     }
 

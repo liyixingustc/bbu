@@ -33,7 +33,7 @@ class WorkScheduleReviseDAO:
         pass
 
     @classmethod
-    def update_or_create_schedule(cls, user, start, end, date, est, avail_id, worker, task):
+    def update_or_create_schedule(cls, user, start, end, date, duration, avail_id, worker, task):
 
         WorkerScheduled.objects.update_or_create(name=worker,
                                                  date=date,
@@ -41,7 +41,7 @@ class WorkScheduleReviseDAO:
                                                  available_id=avail_id,
                                                  defaults={
                                                      'created_by': user,
-                                                     'duration': est,
+                                                     'duration': duration,
                                                      'time_start': start,
                                                      'time_end': end,
                                                      'source': 'auto',
@@ -50,3 +50,15 @@ class WorkScheduleReviseDAO:
 
         Tasks.objects.filter(id=task.id).update(current_status='Scheduled',
                                                 scheduled_hour=scheduled_hour)
+
+    @classmethod
+    def remove_schedule(cls, schedule_id):
+        schedule_obj = WorkerScheduled.objects.filter(id__exact=schedule_id)
+        if schedule_obj.exists():
+            task_id = schedule_obj[0].task_id.id
+            scheduld_hour = WorkScheduleDataDAO.get_schedule_hour_by_task_id(task_id)
+            Tasks.objects.filter(id__exact=task_id).update(current_status='Work Request',
+                                                           scheduled_hour=scheduld_hour)
+            WorkerScheduled.objects.filter(id__exact=schedule_id).delete()
+
+        return True
