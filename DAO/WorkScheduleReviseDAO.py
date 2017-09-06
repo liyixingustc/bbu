@@ -52,7 +52,7 @@ class WorkScheduleReviseDAO:
                                                 scheduled_hour=scheduled_hour)
 
     @classmethod
-    def remove_schedule(cls, schedule_id):
+    def remove_schedule_by_id(cls, schedule_id):
         schedule_obj = WorkerScheduled.objects.filter(id__exact=schedule_id)
         if schedule_obj.exists():
             task_id = schedule_obj[0].task_id.id
@@ -60,5 +60,32 @@ class WorkScheduleReviseDAO:
             Tasks.objects.filter(id__exact=task_id).update(current_status='Work Request',
                                                            scheduled_hour=scheduld_hour)
             WorkerScheduled.objects.filter(id__exact=schedule_id).delete()
+
+        return True
+
+    @classmethod
+    def remove_schedule_by_date_range_and_worker(cls, start, end, worker):
+        schedules = WorkerScheduled.objects.filter(date__range=[start, end],
+                                                   name__exact=worker)
+        for schedule in schedules:
+            cls.remove_schedule_by_id(schedule.id)
+
+        return True
+
+    @classmethod
+    def remove_available_by_id(cls, available_id):
+        available_obj = WorkerAvailable.objects.filter(id__exact=available_id)
+        if available_obj.exists():
+            WorkerAvailable.objects.filter(id__exact=available_id).delete()
+
+        return True
+
+    @classmethod
+    def remove_available_by_date_range_and_worker(cls, start, end, worker):
+        availables = WorkerAvailable.objects.filter(date__range=[start, end],
+                                                    name__exact=worker)
+
+        for available in availables:
+            cls.remove_available_by_id(available.id)
 
         return True

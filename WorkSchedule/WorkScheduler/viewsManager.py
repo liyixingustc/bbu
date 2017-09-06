@@ -331,7 +331,7 @@ class PageManager:
                 if command_type == 'Revise':
                     WorkerScheduled.objects.filter(id__exact=workerscheduledId).update()
                 elif command_type == 'Remove':
-                    WorkScheduleReviseDAO.remove_schedule(workerscheduledId)
+                    WorkScheduleReviseDAO.remove_schedule_by_id(workerscheduledId)
 
                 response = []
 
@@ -420,13 +420,11 @@ class PageManager:
                 response = []
 
                 if command_type == 'ClearTasks':
-                    WorkerScheduled.objects.filter(date__range=[start_date, end_date],
-                                                   name__exact=worker).delete()
+                    WorkScheduleReviseDAO.remove_schedule_by_date_range_and_worker(start_date, end_date, worker)
                 elif command_type == 'ClearAll':
-                    WorkerAvailable.objects.filter(date__range=[start_date, end_date],
-                                                   name__exact=worker).delete()
-                    WorkerScheduled.objects.filter(date__range=[start_date, end_date],
-                                                   name__exact=worker).delete()
+                    WorkScheduleReviseDAO.remove_available_by_date_range_and_worker(start_date, end_date, worker)
+                    WorkScheduleReviseDAO.remove_schedule_by_date_range_and_worker(start_date, end_date, worker)
+
 
                 return JsonResponse(response, safe=False)
 
