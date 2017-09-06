@@ -106,7 +106,7 @@ class UDatetime:
         elif latest_start > r1_start and earliest_end < r1_end:
             return [[r1_start, latest_start], [earliest_end, r1_end]]
         else:
-            return []
+            return [[r1_start, r1_end]]
 
     mapping = {'3': 1, '1': 2, '2': 3}
     reverse_mapping = {1: '3', 2: '1', 3: '2'}

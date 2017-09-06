@@ -529,7 +529,7 @@ class PageManager:
                 start = UDatetime.datetime_str_init(start)
                 end = UDatetime.datetime_str_init(end, start, timedelta(days=1))
 
-                SmartScheduler(start, end).run()
+                SmartScheduler(request, start, end).run()
 
                 return JsonResponse({})
 

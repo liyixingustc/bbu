@@ -172,3 +172,8 @@ class WorkScheduleDataDAO:
 
         return workers_df
 
+    @classmethod
+    def get_schedule_hour_by_task_id(cls, task_id):
+        schedule_hour = Tasks.objects.filter(id=task_id).annotate(schedule_hour=Sum('workerscheduled__duration'))
+        return schedule_hour[0].schedule_hour
+

@@ -13,6 +13,7 @@ import datetime
 source_choice = (('manual', 'manual'),
                  ('file', 'file'),
                  ('somax', 'somax'),
+                 ('auto', 'auto')
                 )
 
 current_status_choice = (('Working', 'Working'),
