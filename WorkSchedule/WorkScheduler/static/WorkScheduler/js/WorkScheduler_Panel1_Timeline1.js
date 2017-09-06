@@ -357,9 +357,14 @@ define(function (require) {
 				}
 			],
 			resourceGroupField:'shift',
+			resourceOrder:'shift',
 			resourceGroupText:function (groupValue) {
-
-            	return 'Shift '+ groupValue
+            	if (groupValue==='nan'){
+					return 'Others'
+				}
+				else {
+					return 'Shift '+ Math.round(groupValue)
+				}
             },
 			resources: { // you can also specify a plain string like 'json/resources.json'
 				url: 'Panel1/TimeLine1/resources/',
