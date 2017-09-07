@@ -19,22 +19,89 @@ EST = pytz.timezone(TIME_ZONE)
 
 class WorkScheduleReviseDAO:
 
+    # sync by id
     @classmethod
-    def update_or_create_task_events(cls):
-        pass
+    def sync_task_by_id(cls, task_id, current_status):
+        scheduled_hour_by_task_id = WorkScheduleDataDAO.get_schedule_hour_by_task_id(task_id)
+        Tasks.objects.filter(id=task_id).update(current_status=current_status,
+                                                scheduled_hour=scheduled_hour_by_task_id)
+        return True
 
     @classmethod
-    def update_or_create_avail_events(cls):
+    def sync_avail_by_id(cls, available_id):
+        schedule_hour_by_available_id = WorkScheduleDataDAO.get_schedule_hour_by_available_id(available_id)
+        available = WorkerAvailable.objects.get(id=available_id)
+        balance = available.duration - schedule_hour_by_available_id
+        WorkerAvailable.objects.filter(id=available_id).update(balance=balance)
+        print(available_id)
+        return True
 
-        pass
+    # remove by id
+    @classmethod
+    def remove_schedule_by_id(cls, schedule_id):
+        schedule_obj = WorkerScheduled.objects.filter(id__exact=schedule_id)
+        if schedule_obj.exists():
+            task_id = schedule_obj[0].task_id.id
+            available_id = schedule_obj[0].available_id.id
+            WorkerScheduled.objects.filter(id__exact=schedule_id).delete()
+            cls.sync_task_by_id(task_id, 'Work Request')
+            cls.sync_avail_by_id(available_id)
+        return True
 
     @classmethod
-    def update_or_create_time_off_events(cls):
-        pass
+    def remove_available_by_id(cls, available_id):
+        available_obj = WorkerAvailable.objects.filter(id__exact=available_id)
+        if available_obj.exists():
+            WorkerAvailable.objects.filter(id__exact=available_id).delete()
+        return True
 
+    @classmethod
+    def remove_task_by_id(cls, task_id):
+        task_obj = Tasks.objects.filter(id__exact=task_id)
+        if task_obj.exists():
+            Tasks.objects.filter(id__exact=task_id).delete()
+        return True
+
+    # update or create
     @classmethod
     def update_or_create_schedule(cls, user, start, end, date, duration, avail_id, worker, task,
-                                  source='auto', document=None):
+                                  schedule_id=None, source='auto', document=None):
+
+        if schedule_id:
+            WorkerScheduled.objects.update_or_create(
+                                                     id=schedule_id,
+                                                     defaults={
+                                                         'created_by': user,
+                                                         'duration': duration,
+                                                         'time_start': start,
+                                                         'time_end': end,
+                                                         'source': source,
+                                                         'document': document,
+                                                         'name': worker,
+                                                         'date': date,
+                                                         'task_id': task,
+                                                         'available_id': avail_id
+                                                     })
+        else:
+            WorkerScheduled.objects.update_or_create(name=worker,
+                                                     date=date,
+                                                     task_id=task,
+                                                     available_id=avail_id,
+                                                     defaults={
+                                                         'created_by': user,
+                                                         'duration': duration,
+                                                         'time_start': start,
+                                                         'time_end': end,
+                                                         'source': source,
+                                                         'document': document
+                                                     })
+
+        cls.sync_task_by_id(task.id, 'Scheduled')
+        cls.sync_avail_by_id(avail_id.id)
+
+    @classmethod
+    def update_or_create_available(cls, user, start, end, date, duration, avail_id, worker, task,
+                                   source='auto', document=None):
 
         WorkerScheduled.objects.update_or_create(name=worker,
                                                  date=date,
@@ -48,22 +115,11 @@ class WorkScheduleReviseDAO:
                                                      'source': source,
                                                      'document': document
                                                  })
-        scheduled_hour = WorkScheduleDataDAO.get_schedule_hour_by_task_id(task.id)
 
-        Tasks.objects.filter(id=task.id).update(current_status='Scheduled',
-                                                scheduled_hour=scheduled_hour)
+        cls.sync_task_by_id(task.id, 'Scheduled')
+        cls.sync_avail_by_id(avail_id.id)
 
-    @classmethod
-    def remove_schedule_by_id(cls, schedule_id):
-        schedule_obj = WorkerScheduled.objects.filter(id__exact=schedule_id)
-        if schedule_obj.exists():
-            task_id = schedule_obj[0].task_id.id
-            scheduld_hour = WorkScheduleDataDAO.get_schedule_hour_by_task_id(task_id)
-            Tasks.objects.filter(id__exact=task_id).update(current_status='Work Request',
-                                                           scheduled_hour=scheduld_hour)
-            WorkerScheduled.objects.filter(id__exact=schedule_id).delete()
-
-        return True
+    # high level method
 
     @classmethod
     def remove_schedule_by_date_range_and_worker(cls, start, end, worker):
@@ -71,14 +127,6 @@ class WorkScheduleReviseDAO:
                                                    name__exact=worker)
         for schedule in schedules:
             cls.remove_schedule_by_id(schedule.id)
-
-        return True
-
-    @classmethod
-    def remove_available_by_id(cls, available_id):
-        available_obj = WorkerAvailable.objects.filter(id__exact=available_id)
-        if available_obj.exists():
-            WorkerAvailable.objects.filter(id__exact=available_id).delete()
 
         return True
 

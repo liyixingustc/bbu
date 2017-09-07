@@ -188,7 +188,8 @@ class PageManager:
                     available_id = available_id[0]
 
                 WorkScheduleReviseDAO.update_or_create_schedule(request.user, start, end, date, duration,
-                                                                available_id, worker, task)
+                                                                available_id, worker, task,
+                                                                schedule_id=workerscheduledId)
 
                 response = []
 
@@ -425,7 +426,6 @@ class PageManager:
                     WorkScheduleReviseDAO.remove_available_by_date_range_and_worker(start_date, end_date, worker)
                     WorkScheduleReviseDAO.remove_schedule_by_date_range_and_worker(start_date, end_date, worker)
 
-
                 return JsonResponse(response, safe=False)
 
         class TableManager:
@@ -485,7 +485,6 @@ class PageManager:
                     tasks_df = tasks[['estimate_hour', 'schedule_hour']]
                     tasks_est = tasks_df['estimate_hour'].sum()
                     tasks_count = len(tasks_df)
-                    print(tasks_df)
                     tasks_scheduled_count = len(tasks_df[tasks_df['schedule_hour'] > 0])
                 else:
                     tasks_est = 0

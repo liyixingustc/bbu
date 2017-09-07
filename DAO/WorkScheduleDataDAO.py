@@ -202,6 +202,17 @@ class WorkScheduleDataDAO:
 
     @classmethod
     def get_schedule_hour_by_task_id(cls, task_id):
-        schedule_hour = Tasks.objects.filter(id=task_id).annotate(schedule_hour=Sum('workerscheduled__duration'))
-        return schedule_hour[0].schedule_hour
+        schedule_hour_obj = Tasks.objects.filter(id=task_id).annotate(schedule_hour=Sum('workerscheduled__duration'))
+        schedule_hour = schedule_hour_obj[0].schedule_hour
+        if not schedule_hour:
+            schedule_hour = timedelta(hours=0)
+        return schedule_hour
+
+    @classmethod
+    def get_schedule_hour_by_available_id(cls, available_id):
+        schedule_hour_obj = WorkerAvailable.objects.filter(id=available_id).annotate(schedule_hour=Sum('workerscheduled__duration'))
+        schedule_hour = schedule_hour_obj[0].schedule_hour
+        if not schedule_hour:
+            schedule_hour = timedelta(hours=0)
+        return schedule_hour
 

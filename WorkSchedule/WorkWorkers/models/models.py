@@ -28,6 +28,7 @@ class WorkerAvailable(models.Model):
     name = models.ForeignKey(Workers, verbose_name='name', db_column='name', to_field='name')
     date = models.DateField()
     duration = models.DurationField(default=timedelta(hours=0))
+    balance = models.DurationField(default=timedelta(hours=0))
     deduction = models.DurationField(default=WorkAvailSheet.DEDUCTION)
     time_start = models.DateTimeField(default=timezone.now)
     time_end = models.DateTimeField(default=timezone.now)
