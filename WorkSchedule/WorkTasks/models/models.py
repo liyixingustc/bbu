@@ -34,6 +34,16 @@ priority_choice = (('s', 's'),
                    )
 
 
+class PMs(models.Model):
+
+    masterjob_id = models.CharField(max_length=100, null=True, blank=True)
+    description = models.CharField(max_length=100, null=True, blank=True)
+    schedule_type = models.CharField(max_length=100, null=True, blank=True)
+    duration = models.DurationField(default=timedelta(hours=0))
+    PMs_type = models.CharField(max_length=100, null=True, blank=True)
+    due_days = models.DurationField(default=timedelta(days=0), null=True, blank=True)
+
+
 class Tasks(models.Model):
 
     # model fields
@@ -60,12 +70,4 @@ class Tasks(models.Model):
     AOR = models.ForeignKey(AOR, db_column='AOR', null=True, blank=True)
     creator = models.ForeignKey(SomaxAccount, db_column='creator', related_name='Tasks_creator', null=True, blank=True)
     assigned = models.ForeignKey(SomaxAccount, db_column='assigned', related_name='Tasks_assigned', null=True, blank=True)
-
-
-class PMs(models.Model):
-
-    masterjob_id = models.CharField(max_length=100, null=True, blank=True)
-    description = models.CharField(max_length=100, null=True, blank=True)
-    schedule_type = models.CharField(max_length=100, null=True, blank=True)
-    duration = models.DurationField(default=timedelta(hours=0))
-    PMs_type = models.CharField(max_length=100, null=True, blank=True)
+    PMs = models.ForeignKey(PMs, db_column='PMs', null=True, blank=True)

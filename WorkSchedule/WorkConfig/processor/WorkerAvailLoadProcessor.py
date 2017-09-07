@@ -13,6 +13,8 @@ from ...WorkConfig.models.models import *
 from ...WorkWorkers.models.models import *
 from ...WorkTasks.models.models import *
 
+from DAO.WorkScheduleReviseDAO import WorkScheduleReviseDAO
+
 from configuration.WorkScheduleConstants import WorkAvailSheet
 from utils.UDatetime import UDatetime
 
