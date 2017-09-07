@@ -21,10 +21,6 @@ class WorkScheduleDataDAO:
     open_tasks_status = ['Approved', 'Scheduled', 'Work Request']
 
     @classmethod
-    def get_task_scheduled(cls, task_id):
-        pass
-
-    @classmethod
     def get_all_tasks_open(cls):
 
         tasks = Tasks.objects.filter(current_status__in=cls.open_tasks_status)\
