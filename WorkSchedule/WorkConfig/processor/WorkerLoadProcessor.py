@@ -43,6 +43,7 @@ class WorkerLoadProcessor:
                                                              'first_name': row['first_name'],
                                                              'company': company,
                                                              'level': row['level'],
+                                                             'status': row['status'],
                                                              'shift': row['shift'],
                                                              'type': row['type'],
                                                              'somax_account': somax_account
