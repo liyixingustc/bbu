@@ -135,7 +135,7 @@ define(function (require) {
                     est = row['estimate_hour'],
                     status = row['current_status'];
 
-                if(bal===0 && status!=='Work Request'){
+                if(bal===0 && status === 'Scheduled'){
                     color = 'green'
                 }
                 else if (bal<est && bal>0 ){
