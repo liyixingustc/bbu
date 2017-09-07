@@ -42,7 +42,7 @@ class PageManager:
                 if file_type == 'Tasks':
                     TasksLoadProcessor.tasks_load_processor()
                 elif file_type == 'WorkerAvail':
-                    WorkerAvailLoadProcessor.worker_avail_load_processor()
+                    WorkerAvailLoadProcessor.worker_avail_load_processor(request)
                 elif file_type == 'AOR':
                     AORLoadProcessor.aor_load_processor()
                 elif file_type == 'Company':

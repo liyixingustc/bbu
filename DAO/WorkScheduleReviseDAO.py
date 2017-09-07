@@ -33,7 +33,8 @@ class WorkScheduleReviseDAO:
         pass
 
     @classmethod
-    def update_or_create_schedule(cls, user, start, end, date, duration, avail_id, worker, task):
+    def update_or_create_schedule(cls, user, start, end, date, duration, avail_id, worker, task,
+                                  source='auto', document=None):
 
         WorkerScheduled.objects.update_or_create(name=worker,
                                                  date=date,
@@ -44,7 +45,8 @@ class WorkScheduleReviseDAO:
                                                      'duration': duration,
                                                      'time_start': start,
                                                      'time_end': end,
-                                                     'source': 'auto',
+                                                     'source': source,
+                                                     'document': document
                                                  })
         scheduled_hour = WorkScheduleDataDAO.get_schedule_hour_by_task_id(task.id)
 

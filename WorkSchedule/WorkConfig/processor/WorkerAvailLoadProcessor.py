@@ -23,7 +23,7 @@ EST = pytz.timezone(TIME_ZONE)
 
 class WorkerAvailLoadProcessor:
     @classmethod
-    def worker_avail_load_processor(cls):
+    def worker_avail_load_processor(cls, request):
 
         files = Documents.objects.filter(status__exact='new', file_type__exact='WorkerAvail')
         if files.exists():
@@ -56,23 +56,23 @@ class WorkerAvailLoadProcessor:
 
                     # data init
                     shift3 = data[worker_range_df['part'] == 1]
-                    cls.worker_avail_shift_processor(shift3, 'shift3', file)
+                    cls.worker_avail_shift_processor(request, shift3, 'shift3', file)
 
                     shift1 = data[worker_range_df['part'] == 2]
-                    cls.worker_avail_shift_processor(shift1, 'shift1', file)
+                    cls.worker_avail_shift_processor(request, shift1, 'shift1', file)
 
                     shift2 = data[worker_range_df['part'] == 5]
-                    cls.worker_avail_shift_processor(shift2, 'shift2', file)
+                    cls.worker_avail_shift_processor(request, shift2, 'shift2', file)
                     print(file.name)
                     intern1 = data[worker_range_df['part'] == 3].iloc[[0]]
                     intern2 = data[worker_range_df['part'] == 3].iloc[[1]]
                     intern3 = data[worker_range_df['part'] == 3].iloc[[2]]
                     intern4 = data[worker_range_df['part'] == 3].iloc[[3]]
 
-                    cls.worker_avail_shift_processor(intern1, 'shift2', file)
-                    cls.worker_avail_shift_processor(intern2, 'shift3', file)
-                    cls.worker_avail_shift_processor(intern3, 'shift1', file)
-                    cls.worker_avail_shift_processor(intern4, 'shift1', file)
+                    cls.worker_avail_shift_processor(request, intern1, 'shift2', file)
+                    cls.worker_avail_shift_processor(request, intern2, 'shift3', file)
+                    cls.worker_avail_shift_processor(request, intern3, 'shift1', file)
+                    cls.worker_avail_shift_processor(request, intern4, 'shift1', file)
 
                     # update documents
                     Documents.objects.filter(id=file.id).update(status='loaded')
@@ -83,7 +83,7 @@ class WorkerAvailLoadProcessor:
         return JsonResponse({})
 
     @classmethod
-    def worker_avail_shift_processor(cls, data, shift, file):
+    def worker_avail_shift_processor(cls, request, data, shift, file):
 
         data = data.dropna(how='all')
         data_melt = pd.melt(data, id_vars=["worker"],
@@ -120,28 +120,38 @@ class WorkerAvailLoadProcessor:
                                                                      'document': file
                                                                  })
             if is_union_bus:
-                cls.union_bus_parser(row, parsed_time, deduction, file, available[0])
+                cls.union_bus_parser(request, row, parsed_time, deduction, file, available[0])
             # else:
             #     return False
         return True
 
     @classmethod
-    def union_bus_parser(cls, row, parsed_time, deduction, file, available_id):
+    def union_bus_parser(cls, request, row, parsed_time, deduction, file, available_id):
         worker = Workers.objects.filter(name__exact=row['worker'])
         task = Tasks.objects.filter(work_order='10')
         if worker.exists() and task.exists():
-            WorkerScheduled.objects.update_or_create(name=worker[0],
-                                                     date=row['date'],
-                                                     defaults={
-                                                         'duration': parsed_time['duration'],
-                                                         'time_start': parsed_time['start_datetime'],
-                                                         'time_end': parsed_time['end_datetime'] - deduction,
-                                                         'task_id': task[0],
-                                                         'available_id': available_id,
-                                                         'source': 'file',
-                                                         'document': file
-                                                     }
-                                                     )
+            WorkScheduleReviseDAO.update_or_create_schedule(request.user,
+                                                            parsed_time['start_datetime'],
+                                                            parsed_time['end_datetime'] - deduction,
+                                                            row['date'],
+                                                            parsed_time['duration'],
+                                                            available_id,
+                                                            worker[0],
+                                                            task[0],
+                                                            source='file',
+                                                            document=file)
+            # WorkerScheduled.objects.update_or_create(name=worker[0],
+            #                                          date=row['date'],
+            #                                          defaults={
+            #                                              'duration': parsed_time['duration'],
+            #                                              'time_start': parsed_time['start_datetime'],
+            #                                              'time_end': parsed_time['end_datetime'] - deduction,
+            #                                              'task_id': task[0],
+            #                                              'available_id': available_id,
+            #                                              'source': 'file',
+            #                                              'document': file
+            #                                          }
+            #                                          )
 
         return row
 
