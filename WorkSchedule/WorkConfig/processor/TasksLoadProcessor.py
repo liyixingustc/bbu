@@ -65,16 +65,23 @@ class TasksLoadProcessor:
                         else:
                             assigned = None
 
-                        estimate_hour = PMs.objects.filter(description__exact=row['Description'])
-                        if estimate_hour.exists():
-                            est = estimate_hour[0].duration
+                        pms = PMs.objects.filter(description__exact=row['Description'])
+                        if pms.exists():
+                            pms = pms[0]
+                            est = pms.duration
+                            due_days = pms.due_days
                         else:
+                            pms = None
                             est = timedelta(hours=0)
+                            due_days = None
+
+                        current_status = cls.smart_status_choice(row['Work Order'], row['Status'], due_days, row['Created'])
 
                         Tasks.objects.update_or_create(work_order=row['Work Order'],
                                                        defaults={
                                                                  'description': row['Description'],
                                                                  'work_type': row['Type'],
+                                                                 'current_status': current_status,
                                                                  'line': None,
                                                                  'shift': row['Shift'],
                                                                  'priority': row['Priority'],
@@ -89,20 +96,65 @@ class TasksLoadProcessor:
                                                                  'AOR': aor,
                                                                  'creator': creator,
                                                                  'assigned': assigned,
+                                                                 'PMs': pms
                                                                  })
 
-                        if row['Status'] in ['Canceled', 'Complete', 'Denied']:
-                            Tasks.objects.update_or_create(work_order=row['Work Order'],
-                                                           defaults={
-                                                               'current_status': row['Status'],
-                                                           })
-
                     # update documents
-                    Documents.objects.filter(id=file.id).update(status='loaded')
+                    # Documents.objects.filter(id=file.id).update(status='loaded')
 
                     return JsonResponse({})
         else:
             return JsonResponse({})
+
+    close_status = ['Canceled', 'Complete', 'Denied']
+    open_status = ['Approved', 'Scheduled', 'Work Request']
+
+    @classmethod
+    def smart_status_choice(cls, work_order, somax_status, due_days, create_date):
+
+        task_obj = Tasks.objects.filter(work_order=work_order)
+        if task_obj.exists():
+            current_status = task_obj[0].current_status
+            # create_date = task_obj[0].create_date
+            if due_days:
+                today = UDatetime.now_local()
+                is_overdue = ((create_date + due_days) < today)
+                if is_overdue:
+                    if current_status in cls.open_status and somax_status in cls.open_status:
+                        if current_status == 'Scheduled' or somax_status == 'Scheduled':
+                            current_status = 'Complete'
+                        else:
+                            current_status = 'Canceled'
+                    elif current_status in cls.close_status and somax_status in cls.open_status:
+                        current_status = current_status
+                    else:
+                        current_status = somax_status
+                else:
+                    if current_status in cls.open_status and somax_status in cls.open_status:
+                        current_status = current_status
+                    elif current_status in cls.close_status and somax_status in cls.open_status:
+                        current_status = current_status
+                    else:
+                        current_status = somax_status
+            else:
+                if current_status in cls.open_status and somax_status in cls.open_status:
+                    current_status = current_status
+                elif current_status in cls.close_status and somax_status in cls.open_status:
+                    current_status = current_status
+                else:
+                    current_status = somax_status
+        else:
+            current_status = somax_status
+            if due_days:
+                today = UDatetime.now_local()
+                is_overdue = ((create_date + due_days) < today)
+                if is_overdue:
+                    if somax_status in ['Approved', 'Work Request']:
+                        current_status = 'Canceled'
+                    elif somax_status in ['Scheduled']:
+                        current_status = 'Complete'
+
+        return current_status
 
     # @classmethod
     # def tasks_load_processor(cls):
