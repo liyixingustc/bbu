@@ -100,7 +100,7 @@ class TasksLoadProcessor:
                                                                  })
 
                     # update documents
-                    # Documents.objects.filter(id=file.id).update(status='loaded')
+                    Documents.objects.filter(id=file.id).update(status='loaded')
 
                     return JsonResponse({})
         else:
