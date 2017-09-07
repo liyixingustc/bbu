@@ -153,6 +153,12 @@ class TasksLoadProcessor:
                         current_status = 'Canceled'
                     elif somax_status in ['Scheduled']:
                         current_status = 'Complete'
+                else:
+                    if somax_status == 'Scheduled':
+                        current_status = 'Work Request'
+            else:
+                if somax_status == 'Scheduled':
+                    current_status = 'Work Request'
 
         return current_status
 

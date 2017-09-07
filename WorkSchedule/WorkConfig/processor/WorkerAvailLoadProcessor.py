@@ -221,7 +221,6 @@ class WorkerAvailLoadProcessor:
                                r'\s*-\s*'
                                r'((?P<end_hour>\d{1,2})?\w{0,2}):?((?P<end_min>\d{1,2})?\w{0,2}).*')
             parts = regex.match(time_str)
-            print(time_str)
             if parts:
                 parts = parts.groupdict()
             else:
