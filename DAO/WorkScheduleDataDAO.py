@@ -25,9 +25,40 @@ class WorkScheduleDataDAO:
         pass
 
     @classmethod
-    def get_all_tasks_scheduled(cls):
+    def get_all_tasks_open(cls):
 
         tasks = Tasks.objects.filter(current_status__in=cls.open_tasks_status)\
+            .exclude(priority__in=['T', 'O'])\
+            .values('line',
+                    'work_order',
+                    'description',
+                    'AOR__worker__name',
+                    'estimate_hour',
+                    'work_type',
+                    'priority',
+                    'create_date',
+                    'current_status'
+                    )\
+            .annotate(schedule_hour=Sum('workerscheduled__duration'))
+        tasks_record = pd.DataFrame.from_records(tasks)
+        tasks_record.rename_axis({'AOR__worker__name': 'AOR'}, axis=1, inplace=True)
+
+        tasks_record['schedule_hour'].fillna(timedelta(hours=0),inplace=True)
+        tasks_record['balance_hour'] = tasks_record['estimate_hour'] - tasks_record['schedule_hour']
+
+        tasks_record['schedule_hour'] = tasks_record['schedule_hour'].apply(lambda x: x.total_seconds()/3600)
+        tasks_record['estimate_hour'] = tasks_record['estimate_hour'].apply(lambda x: x.total_seconds()/3600)
+        tasks_record['balance_hour'] = tasks_record['balance_hour'].apply(lambda x: x.total_seconds()/3600)
+        now_date = UDatetime.now_local().date()
+        tasks_record['OLD'] = tasks_record['create_date'].apply(lambda x: int((now_date - x.date()).total_seconds()/(3600*24)))
+        tasks_record.drop('create_date', axis=1, inplace=True)
+
+        return tasks_record
+
+    @classmethod
+    def get_all_tasks_scheduled(cls):
+
+        tasks = Tasks.objects.filter(current_status__exact='Scheduled')\
             .exclude(priority__in=['T', 'O'])\
             .values('line',
                     'work_order',

@@ -81,14 +81,14 @@ define(function (require) {
                 },
                 {
                     field: 'balance_hour',
-                    title: 'EST',
+                    title: 'BAL',
                     sortable: true,
                     // editable: true,
                     align: 'center'
                 },
                 {
                     field: 'estimate_hour',
-                    title: 'EST Orig',
+                    title: 'EST',
                     sortable: true,
                     editable: true,
                     align: 'center'

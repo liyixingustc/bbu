@@ -468,7 +468,7 @@ class PageManager:
                 worker_avail = WorkerAvailable.objects.filter(date__range=[start_date, end_date])
                 worker_scheduled = WorkerScheduled.objects.filter(date__range=[start_date, end_date])
 
-                tasks = WorkScheduleDataDAO.get_all_tasks_scheduled()
+                tasks = WorkScheduleDataDAO.get_all_tasks_open()
 
                 if worker_avail.exists():
                     worker_avail_df = pd.DataFrame.from_records(worker_avail.values('duration', 'deduction'))
@@ -485,7 +485,8 @@ class PageManager:
                     tasks_df = tasks[['estimate_hour', 'schedule_hour']]
                     tasks_est = tasks_df['estimate_hour'].sum()
                     tasks_count = len(tasks_df)
-                    tasks_scheduled_count = len(tasks_df[~tasks_df['schedule_hour'].isnull()])
+                    print(tasks_df)
+                    tasks_scheduled_count = len(tasks_df[tasks_df['schedule_hour'] > 0])
                 else:
                     tasks_est = 0
                     tasks_count = 0

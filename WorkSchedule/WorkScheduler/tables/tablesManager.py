@@ -17,6 +17,6 @@ class WorkSchedulerPanel2Table1Manager:
 
     @classmethod
     def set_data(cls):
-        tasks = WorkScheduleDataDAO.get_all_tasks_scheduled()
+        tasks = WorkScheduleDataDAO.get_all_tasks_open()
 
         return tasks
