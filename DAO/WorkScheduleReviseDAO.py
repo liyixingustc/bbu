@@ -33,7 +33,6 @@ class WorkScheduleReviseDAO:
         available = WorkerAvailable.objects.get(id=available_id)
         balance = available.duration - schedule_hour_by_available_id
         WorkerAvailable.objects.filter(id=available_id).update(balance=balance)
-        print(available_id)
         return True
 
     # remove by id
@@ -100,24 +99,38 @@ class WorkScheduleReviseDAO:
         cls.sync_avail_by_id(avail_id.id)
 
     @classmethod
-    def update_or_create_available(cls, user, start, end, date, duration, avail_id, worker, task,
-                                   source='auto', document=None):
+    def update_or_create_available(cls, user, start, end, date, duration, deduction, worker,
+                                   avail_id=None, source='auto', document=None):
 
-        WorkerScheduled.objects.update_or_create(name=worker,
-                                                 date=date,
-                                                 task_id=task,
-                                                 available_id=avail_id,
-                                                 defaults={
-                                                     'created_by': user,
-                                                     'duration': duration,
-                                                     'time_start': start,
-                                                     'time_end': end,
-                                                     'source': source,
-                                                     'document': document
-                                                 })
-
-        cls.sync_task_by_id(task.id, 'Scheduled')
-        cls.sync_avail_by_id(avail_id.id)
+        if avail_id:
+            WorkerAvailable.objects.update_or_create(id=avail_id,
+                                                     defaults={
+                                                         'created_by': user,
+                                                         'name': worker,
+                                                         'date': date,
+                                                         'duration': duration,
+                                                         'deduction': deduction,
+                                                         'time_start': start,
+                                                         'time_end': end,
+                                                         'source': source,
+                                                         'document': document
+                                                     })
+        else:
+            avail_obj = WorkerAvailable.objects.update_or_create(name=worker,
+                                                                 date=date,
+                                                                 defaults={
+                                                                     'created_by': user,
+                                                                     'name': worker,
+                                                                     'date': date,
+                                                                     'duration': duration,
+                                                                     'deduction': deduction,
+                                                                     'time_start': start,
+                                                                     'time_end': end,
+                                                                     'source': source,
+                                                                     'document': document
+                                                                 })
+            avail_id = avail_obj[0].id
+        cls.sync_avail_by_id(avail_id)
 
     # high level method
 

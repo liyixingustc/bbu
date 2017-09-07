@@ -145,15 +145,15 @@ class PageManager:
 
                 date = UDatetime.pick_date_by_two_date(start, end)
 
-                print(start,end)
+                print(start, end)
 
                 duration = end - start
 
                 worker = Workers.objects.get(id__exact=resourceId)
                 task = Tasks.objects.get(work_order__exact=taskId)
                 available_ids = WorkerAvailable.objects.filter(time_start__lte=start,
-                                                              time_end__gte=end,
-                                                              name__exact=worker)
+                                                               time_end__gte=end,
+                                                               name__exact=worker)
                 if available_ids.count() > 0:
                     available_id = available_ids[0]
                     WorkScheduleReviseDAO.update_or_create_schedule(request.user, start, end, date, duration,
@@ -222,9 +222,9 @@ class PageManager:
 
                         avails_df = pd.DataFrame.from_records(avails.values())
                         if avails.count() == 1:
-                            ids = avails_df['id'].tolist()
+                            avail_id = avails_df['id'].tolist()[0]
                         else:
-                            ids = 1
+                            return
 
                         start_list = avails_df['time_start'].tolist()
                         start_list.append(start)
@@ -236,25 +236,42 @@ class PageManager:
 
                         duration_new = end_new - start_new
 
-                        WorkerAvailable.objects.update_or_create(id__in=ids,
-                                                                 defaults={
-                                                                     'name': worker,
-                                                                     'date': date,
-                                                                     'duration': duration_new,
-                                                                     'deduction': WorkAvailSheet.DEDUCTION,
-                                                                     'time_start': start_new,
-                                                                     'time_end': end_new
-                                                                 })
+                        WorkScheduleReviseDAO.update_or_create_available(request.user,
+                                                                         start_new,
+                                                                         end_new,
+                                                                         date,
+                                                                         duration_new,
+                                                                         WorkAvailSheet.DEDUCTION,
+                                                                         worker,
+                                                                         avail_id=avail_id,
+                                                                         source='manual')
+                        # WorkerAvailable.objects.update_or_create(id=avail_id,
+                        #                                          defaults={
+                        #                                              'name': worker,
+                        #                                              'date': date,
+                        #                                              'duration': duration_new,
+                        #                                              'deduction': WorkAvailSheet.DEDUCTION,
+                        #                                              'time_start': start_new,
+                        #                                              'time_end': end_new
+                        #                                          })
 
                     else:
                         duration = end - start
-                        WorkerAvailable.objects.update_or_create(name=worker,
-                                                                 date=start.date(),
-                                                                 duration=duration,
-                                                                 deduction=WorkAvailSheet.DEDUCTION,
-                                                                 time_start=start,
-                                                                 time_end=end,
-                                                                 source='manual')
+                        WorkScheduleReviseDAO.update_or_create_available(request.user,
+                                                                         start,
+                                                                         end,
+                                                                         start.date(),
+                                                                         duration,
+                                                                         WorkAvailSheet.DEDUCTION,
+                                                                         worker,
+                                                                         source='manual')
+                        # WorkerAvailable.objects.update_or_create(name=worker,
+                        #                                          date=start.date(),
+                        #                                          duration=duration,
+                        #                                          deduction=WorkAvailSheet.DEDUCTION,
+                        #                                          time_start=start,
+                        #                                          time_end=end,
+                        #                                          source='manual')
 
                 elif command_type == 'CutWorkerAvailable':
                     avails = WorkerAvailable.objects.filter(Q(time_start__range=[start, end]) |
@@ -265,7 +282,7 @@ class PageManager:
                     if avails.exists():
                         avails_df = pd.DataFrame.from_records(avails.values())
                         if avails.count() == 1:
-                            ids = avails_df['id'].tolist()
+                            avail_id = avails_df['id'].tolist()[0]
 
                             start_list = avails_df['time_start'].tolist()
                             start_list.append(start)
@@ -276,21 +293,31 @@ class PageManager:
                                 start_new = range_new[0][0]
                                 end_new = range_new[0][1]
                                 if start_new == end_new:
-                                    WorkerAvailable.objects.filter(id__in=ids).delete()
+                                    WorkScheduleReviseDAO.remove_available_by_id(avail_id)
+                                    # WorkerAvailable.objects.filter(id__in=avail_id).delete()
                                 else:
                                     date = UDatetime.pick_date_by_two_date(start_new, end_new)
 
                                     duration_new = end_new - start_new
 
-                                    WorkerAvailable.objects.update_or_create(id__in=ids,
-                                                                             defaults={
-                                                                                 'name': worker,
-                                                                                 'date': date,
-                                                                                 'duration': duration_new,
-                                                                                 'deduction': WorkAvailSheet.DEDUCTION,
-                                                                                 'time_start': start_new,
-                                                                                 'time_end': end_new
-                                                                             })
+                                    WorkScheduleReviseDAO.update_or_create_available(request.user,
+                                                                                     start_new,
+                                                                                     end_new,
+                                                                                     date,
+                                                                                     duration_new,
+                                                                                     WorkAvailSheet.DEDUCTION,
+                                                                                     worker,
+                                                                                     avail_id=avail_id,
+                                                                                     source='manual')
+                                    # WorkerAvailable.objects.update_or_create(id__in=ids,
+                                    #                                          defaults={
+                                    #                                              'name': worker,
+                                    #                                              'date': date,
+                                    #                                              'duration': duration_new,
+                                    #                                              'deduction': WorkAvailSheet.DEDUCTION,
+                                    #                                              'time_start': start_new,
+                                    #                                              'time_end': end_new
+                                    #                                          })
                             else:
                                 response = {}
 
@@ -309,14 +336,16 @@ class PageManager:
                                                                   name__exact=worker)
                     if available_ids.count() > 0:
                         available_id = available_ids[0]
-
-                        worker_scheduled = WorkerScheduled.objects.update_or_create(name=worker,
-                                                                                    date=date,
-                                                                                    time_start=start,
-                                                                                    time_end=end,
-                                                                                    task_id=task,
-                                                                                    available_id=available_id,
-                                                                                    defaults={'duration': duration})
+                        WorkScheduleReviseDAO.update_or_create_schedule(request.user, start, end, date, duration,
+                                                                        available_id, worker, task,
+                                                                        source='manual')
+                        # worker_scheduled = WorkerScheduled.objects.update_or_create(name=worker,
+                        #                                                             date=date,
+                        #                                                             time_start=start,
+                        #                                                             time_end=end,
+                        #                                                             task_id=task,
+                        #                                                             available_id=available_id,
+                        #                                                             defaults={'duration': duration})
 
                 return JsonResponse(response)
 

@@ -109,16 +109,24 @@ class WorkerAvailLoadProcessor:
 
             # if parsed_time:
                 # update db
-            available = WorkerAvailable.objects.update_or_create(name=worker,
-                                                                 date=date,
-                                                                 defaults={
-                                                                     'duration': parsed_time['duration'],
-                                                                     'time_start': parsed_time['start_datetime'],
-                                                                     'time_end': parsed_time['end_datetime'],
-                                                                     'deduction': deduction,
-                                                                     'source': 'file',
-                                                                     'document': file
-                                                                 })
+            WorkScheduleReviseDAO.update_or_create_available(request.user,
+                                                             parsed_time['start_datetime'],
+                                                             parsed_time['end_datetime'],
+                                                             date,
+                                                             parsed_time['duration'],
+                                                             WorkAvailSheet.DEDUCTION,
+                                                             worker,
+                                                             source='manual')
+            # available = WorkerAvailable.objects.update_or_create(name=worker,
+            #                                                      date=date,
+            #                                                      defaults={
+            #                                                          'duration': parsed_time['duration'],
+            #                                                          'time_start': parsed_time['start_datetime'],
+            #                                                          'time_end': parsed_time['end_datetime'],
+            #                                                          'deduction': deduction,
+            #                                                          'source': 'file',
+            #                                                          'document': file
+            #                                                      })
             if is_union_bus:
                 cls.union_bus_parser(request, row, parsed_time, deduction, file, available[0])
             # else:
