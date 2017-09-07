@@ -54,7 +54,6 @@ class WorkerAvailLoadProcessor:
 
                     # data init
                     shift3 = data[worker_range_df['part'] == 1]
-
                     cls.worker_avail_shift_processor(shift3, 'shift3', file)
 
                     shift1 = data[worker_range_df['part'] == 2]
@@ -62,6 +61,16 @@ class WorkerAvailLoadProcessor:
 
                     shift2 = data[worker_range_df['part'] == 5]
                     cls.worker_avail_shift_processor(shift2, 'shift2', file)
+                    print(file.name)
+                    intern1 = data[worker_range_df['part'] == 3].iloc[[0]]
+                    intern2 = data[worker_range_df['part'] == 3].iloc[[1]]
+                    intern3 = data[worker_range_df['part'] == 3].iloc[[2]]
+                    intern4 = data[worker_range_df['part'] == 3].iloc[[3]]
+
+                    cls.worker_avail_shift_processor(intern1, 'shift2', file)
+                    cls.worker_avail_shift_processor(intern2, 'shift3', file)
+                    cls.worker_avail_shift_processor(intern3, 'shift1', file)
+                    cls.worker_avail_shift_processor(intern4, 'shift1', file)
 
                     # update documents
                     Documents.objects.filter(id=file.id).update(status='loaded')
@@ -96,7 +105,8 @@ class WorkerAvailLoadProcessor:
             worker = Workers.objects.get(name=row['worker'])
             parsed_time = cls.time_parser(row['time'], row['worker'], date, shift)
 
-            # update db
+            # if parsed_time:
+                # update db
             available = WorkerAvailable.objects.update_or_create(name=worker,
                                                                  date=date,
                                                                  defaults={
@@ -109,6 +119,9 @@ class WorkerAvailLoadProcessor:
                                                                  })
             if is_union_bus:
                 cls.union_bus_parser(row, parsed_time, deduction, file, available[0])
+            # else:
+            #     return False
+        return True
 
     @classmethod
     def union_bus_parser(cls, row, parsed_time, deduction, file, available_id):
@@ -134,7 +147,7 @@ class WorkerAvailLoadProcessor:
     def time_parser(cls, time_str, worker, date, shift):
 
         worker = Workers.objects.get(name=worker)
-        if time_str in [' ', None, np.nan]:
+        if time_str in [' ', None, np.nan, '/T', 'T/', 'T']:
             if shift == 'shift3' and worker.level == 'lead':
 
                 start_datetime = EST.localize(dt(date.year, date.month, date.day,
@@ -191,11 +204,12 @@ class WorkerAvailLoadProcessor:
                 return None
 
         else:
-            regex = re.compile(r'((?P<start_hour>\d{1,2})?\w{0,2}):?((?P<start_min>\d{1,2})?\w{0,2})'
+            regex = re.compile(r'(\s*T\s*/\s*)?'
+                               r'((?P<start_hour>\d{1,2})?\w{0,2}):?((?P<start_min>\d{1,2})?\w{0,2})'
                                r'\s*-\s*'
                                r'((?P<end_hour>\d{1,2})?\w{0,2}):?((?P<end_min>\d{1,2})?\w{0,2}).*')
             parts = regex.match(time_str)
-
+            print(time_str)
             if parts:
                 parts = parts.groupdict()
             else:
