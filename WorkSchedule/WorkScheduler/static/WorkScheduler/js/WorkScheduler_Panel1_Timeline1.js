@@ -319,7 +319,7 @@ define(function (require) {
 				}
 			},
 			// eventOverlap: false, // will cause the event to take up entire resource height
-			resourceAreaWidth: 165,
+			resourceAreaWidth: 205,
 			// resourceLabelText: 'Workers',
 			lazyFetching: false,
             refetchResourcesOnNavigate: true,
@@ -327,12 +327,12 @@ define(function (require) {
 				{
 					labelText: 'Workers',
 					field: 'title',
-					width: "80%"
+					width: "85%"
 				},
 				{
 					labelText: 'Hrs',
 					field: 'Avail',
-					width: "20%",
+					width: "15%",
 					render: function(resource, el) {
 
 						if (resource.Avail>0) {
