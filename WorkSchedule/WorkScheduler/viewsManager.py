@@ -323,13 +323,13 @@ class PageManager:
 
                 elif command_type in ['Lunch', 'Breaks', 'UnionBus']:
                     if command_type == 'Lunch':
-                        task = Tasks.objects.get(work_order__exact='0')
+                        task = WorkScheduleReviseDAO.create_or_update_timeoff_lunch_task(request.user, source='manual')
                     elif command_type == 'Breaks':
-                        task = Tasks.objects.get(work_order__exact='1')
+                        task = WorkScheduleReviseDAO.create_or_update_timeoff_breaks_task(request.user, source='manual')
                     elif command_type == 'UnionBus':
-                        task = Tasks.objects.get(work_order__exact='10')
+                        task = WorkScheduleReviseDAO.create_or_update_union_bus_task(request.user, duration, source='manual')
                     else:
-                        task = Tasks.objects.get(work_order__exact='0')
+                        return JsonResponse(response)
 
                     available_ids = WorkerAvailable.objects.filter(time_start__lte=start,
                                                                   time_end__gte=end,

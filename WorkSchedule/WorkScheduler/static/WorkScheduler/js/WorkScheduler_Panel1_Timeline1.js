@@ -408,9 +408,9 @@ define(function (require) {
 						case undefined:color = 'grey';break;
 					}
 					// <span class="fc-title" style="position: relative; top: 0px; left: 0px;">17004298</span>
-					if(event.taskId==="0"){event.title = 'L';event.equip_code = ''}
-					else if(event.taskId==="1"){event.title = 'B';event.equip_code = ''}
-					else if(event.taskId==="10"){event.title = 'Union Bus';event.equip_code = ''}
+					if(event.description==="Lunch Time"){event.title = 'L';event.equip_code = ''}
+					else if(event.description==="Break Time"){event.title = 'B';event.equip_code = ''}
+					else if(event.description==="Union Business"){event.title = 'Union Bus';event.equip_code = ''}
 					else {event.title = event.taskId}
 
 					var html_content =

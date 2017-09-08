@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import pytz
+import re
 from datetime import datetime as dt
 from dateutil.parser import parse
 from dateutil.tz import tzlocal
@@ -21,10 +22,13 @@ class WorkScheduleReviseDAO:
 
     # sync by id
     @classmethod
-    def sync_task_by_id(cls, task_id, current_status):
+    def sync_task_by_id(cls, task_id, current_status=None):
         scheduled_hour_by_task_id = WorkScheduleDataDAO.get_schedule_hour_by_task_id(task_id)
-        Tasks.objects.filter(id=task_id).update(current_status=current_status,
-                                                scheduled_hour=scheduled_hour_by_task_id)
+        if current_status:
+            Tasks.objects.filter(id=task_id).update(current_status=current_status,
+                                                    scheduled_hour=scheduled_hour_by_task_id)
+        else:
+            Tasks.objects.filter(id=task_id).update(scheduled_hour=scheduled_hour_by_task_id)
         return True
 
     @classmethod
@@ -41,9 +45,17 @@ class WorkScheduleReviseDAO:
         schedule_obj = WorkerScheduled.objects.filter(id__exact=schedule_id)
         if schedule_obj.exists():
             task_id = schedule_obj[0].task_id.id
+            task_priority = schedule_obj[0].task_id.priority
+
             available_id = schedule_obj[0].available_id.id
-            WorkerScheduled.objects.filter(id__exact=schedule_id).delete()
-            cls.sync_task_by_id(task_id, 'Work Request')
+            schedule_obj = WorkerScheduled.objects.filter(id__exact=schedule_id)
+
+            if task_priority in ['O', 'T']:
+                cls.remove_task_by_id(task_id)
+
+            schedule_obj.delete()
+            if task_priority not in ['O', 'T']:
+                cls.sync_task_by_id(task_id, 'Work Request')
             cls.sync_avail_by_id(available_id)
         return True
 
@@ -83,22 +95,27 @@ class WorkScheduleReviseDAO:
                                                                      })
         else:
             schedule_obj = WorkerScheduled.objects.update_or_create(name=worker,
-                                                                         date=date,
-                                                                         task_id=task,
-                                                                         available_id=avail_id,
-                                                                         defaults={
-                                                                             'created_by': user,
-                                                                             'duration': duration,
-                                                                             'time_start': start,
-                                                                             'time_end': end,
-                                                                             'source': source,
-                                                                             'document': document
-                                                                         })
+                                                                    date=date,
+                                                                    task_id=task,
+                                                                    available_id=avail_id,
+                                                                    defaults={
+                                                                         'created_by': user,
+                                                                         'duration': duration,
+                                                                         'time_start': start,
+                                                                         'time_end': end,
+                                                                         'source': source,
+                                                                         'document': document
+                                                                    })
 
-        cls.sync_task_by_id(task.id, 'Scheduled')
+        task_priority = task.priority
+        if task_priority in ['O', 'T']:
+            current_status = 'Complete'
+        else:
+            current_status = 'Scheduled'
+        cls.sync_task_by_id(task.id, current_status)
         cls.sync_avail_by_id(avail_id.id)
 
-        return schedule_obj
+        return schedule_obj[0]
 
     @classmethod
     def update_or_create_available(cls, user, start, end, date, duration, deduction, worker,
@@ -134,7 +151,96 @@ class WorkScheduleReviseDAO:
             avail_id = avail_obj[0].id
         cls.sync_avail_by_id(avail_id)
 
-        return avail_obj
+        return avail_obj[0]
+
+    @classmethod
+    def create_or_update_task(cls,
+                              work_order, created_by,
+                              description=None,
+                              work_type=None,
+                              current_status='Complete',
+                              line=None,
+                              shift=None,
+                              priority=None,
+                              create_date=None,
+                              current_status_somax='Complete', schedule_date_somax=None,
+                              actual_date_somax=None,
+                              estimate_hour=timedelta(hours=0),
+                              scheduled_hour=timedelta(hours=0),
+                              actual_hour=timedelta(hours=0),
+                              fail_code=None, completion_comments=None,
+                              equipment=None, aor=None, creator=None, assigned=None, pms=None,
+                              created_on=None,
+                              task_id=None, source='auto', document=None):
+
+        if not create_date:
+            create_date = UDatetime.now_local().date()
+        if not created_on:
+            created_on = UDatetime.now_local()
+
+        if task_id:
+            task_obj = Tasks.objects.update_or_create(
+                id=task_id,
+                defaults={
+                    'work_order': work_order,
+                    'description': description,
+                    'work_type': work_type,
+                    'current_status': current_status,
+                    'line': line,
+                    'shift': shift,
+                    'priority': priority,
+                    'create_date': create_date,
+                    'current_status_somax': current_status_somax,
+                    'schedule_date_somax': schedule_date_somax,
+                    'actual_date_somax': actual_date_somax,
+                    'estimate_hour': estimate_hour,
+                    'scheduled_hour': scheduled_hour,
+                    'actual_hour': actual_hour,
+                    'fail_code': fail_code,
+                    'completion_comments': completion_comments,
+                    'equipment': equipment,
+                    'AOR': aor,
+                    'creator': creator,
+                    'assigned': assigned,
+                    'PMs': pms,
+                    'created_by': created_by,
+                    'created_on': created_on,
+                    'source': source,
+                    'document': document
+                })
+        else:
+            task_obj = Tasks.objects.update_or_create(
+                work_order=work_order,
+                defaults={
+                    'description': description,
+                    'work_type': work_type,
+                    'current_status': current_status,
+                    'line': line,
+                    'shift': shift,
+                    'priority': priority,
+                    'create_date': create_date,
+                    'current_status_somax': current_status_somax,
+                    'schedule_date_somax': schedule_date_somax,
+                    'actual_date_somax': actual_date_somax,
+                    'estimate_hour': estimate_hour,
+                    'scheduled_hour': scheduled_hour,
+                    'actual_hour': actual_hour,
+                    'fail_code': fail_code,
+                    'completion_comments': completion_comments,
+                    'equipment': equipment,
+                    'AOR': aor,
+                    'creator': creator,
+                    'assigned': assigned,
+                    'PMs': pms,
+                    'created_by': created_by,
+                    'created_on': created_on,
+                    'source': source,
+                    'document': document
+                })
+            task_id = task_obj[0].id
+        cls.sync_task_by_id(task_id)
+
+        return task_obj[0]
 
     # high level method
 
@@ -156,3 +262,100 @@ class WorkScheduleReviseDAO:
             cls.remove_available_by_id(available.id)
 
         return True
+
+    # other special tasks
+    @classmethod
+    def create_or_update_union_bus_task(cls, created_by, estimate_hour,
+                                        work_order=None,
+                                        current_status='Complete',
+                                        current_status_somax='Complete',
+                                        task_id=None, source='auto'):
+
+        if not work_order:
+            work_order = cls.get_latest_available_work_order('O')
+        task_obj = cls.create_or_update_task(work_order=work_order, created_by=created_by,
+                                             description='Union Business',
+                                             priority='O',
+                                             current_status=current_status,
+                                             current_status_somax=current_status_somax,
+                                             estimate_hour=estimate_hour,
+                                             task_id=task_id, source=source)
+
+        return task_obj
+
+    @classmethod
+    def create_or_update_timeoff_lunch_task(cls, created_by,
+                                            work_order=None,
+                                            current_status='Complete',
+                                            current_status_somax='Complete',
+                                            task_id=None, source='auto'):
+
+        if not work_order:
+            work_order = cls.get_latest_available_work_order('T')
+        task_obj = cls.create_or_update_task(work_order=work_order, created_by=created_by,
+                                             description='Lunch Time',
+                                             priority='T',
+                                             current_status=current_status,
+                                             current_status_somax=current_status_somax,
+                                             estimate_hour=timedelta(minutes=30),
+                                             task_id=task_id, source=source)
+
+        return task_obj
+
+    @classmethod
+    def create_or_update_timeoff_breaks_task(cls, created_by,
+                                             work_order=None,
+                                             current_status='Complete',
+                                             current_status_somax='Complete',
+                                             task_id=None, source='auto'):
+
+        if not work_order:
+            work_order = cls.get_latest_available_work_order('T')
+        task_obj = cls.create_or_update_task(work_order=work_order, created_by=created_by,
+                                             description='Break Time',
+                                             priority='T',
+                                             current_status=current_status,
+                                             current_status_somax=current_status_somax,
+                                             estimate_hour=timedelta(minutes=15),
+                                             task_id=task_id, source=source)
+
+        return task_obj
+
+    @classmethod
+    def get_latest_available_work_order(cls, work_type=None):
+        work_order = None
+        regex = re.compile(r'\w?(?P<order_number>\d{1,2})?')
+        if work_type == 'T':
+            tasks_obj = Tasks.objects.filter(priority__exact='T')
+            if tasks_obj.exists():
+                tasks_df = pd.DataFrame.from_records(tasks_obj.values('work_order'))
+                tasks_df.sort_values('work_order', inplace=True)
+                work_order = tasks_df.iloc[-1]['work_order']
+                parts = regex.match(work_order)
+                if parts:
+                    parts = parts.groupdict()
+                    order_number = int(parts['order_number'])
+                    work_order = 'T' + str((order_number+1))
+                else:
+                    work_order = None
+            else:
+                work_order = 'T1'
+        elif work_type == 'O':
+            tasks_obj = Tasks.objects.filter(priority__exact='O')
+            if tasks_obj.exists():
+                tasks_df = pd.DataFrame.from_records(tasks_obj.values('work_order'))
+                tasks_df.sort_values('work_order', inplace=True)
+                work_order = tasks_df.iloc[-1]['work_order']
+                parts = regex.match(work_order)
+                if parts:
+                    parts = parts.groupdict()
+                    order_number = int(parts['order_number'])
+                    work_order = 'O' + str((order_number + 1))
+                else:
+                    work_order = None
+            else:
+                work_order = 'O1'
+        else:
+            pass
+
+        return work_order

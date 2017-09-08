@@ -31,3 +31,9 @@ class BaseConstants:
                        ('T', 'T'),
                        ('O', 'O'),
                        )
+
+    source_choice = (('manual', 'manual'),
+                     ('file', 'file'),
+                     ('somax', 'somax'),
+                     ('auto', 'auto')
+                     )

@@ -128,7 +128,7 @@ class WorkerAvailLoadProcessor:
             #                                                          'document': file
             #                                                      })
             if is_union_bus:
-                cls.union_bus_parser(request, row, parsed_time, deduction, file, available[0])
+                cls.union_bus_parser(request, row, parsed_time, deduction, file, available)
             # else:
             #     return False
         return True

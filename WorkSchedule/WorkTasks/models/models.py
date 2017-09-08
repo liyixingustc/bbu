@@ -71,3 +71,8 @@ class Tasks(models.Model):
     creator = models.ForeignKey(SomaxAccount, db_column='creator', related_name='Tasks_creator', null=True, blank=True)
     assigned = models.ForeignKey(SomaxAccount, db_column='assigned', related_name='Tasks_assigned', null=True, blank=True)
     PMs = models.ForeignKey(PMs, db_column='PMs', null=True, blank=True)
+
+    created_by = models.ForeignKey(User, db_column='created_by', default=1)
+    created_on = models.DateTimeField(default=timezone.now)
+    source = models.CharField(max_length=100, choices=BaseConstants.source_choice, default='manual')
+    document = models.ForeignKey(Documents, db_column='document', to_field='name', null=True, blank=True)

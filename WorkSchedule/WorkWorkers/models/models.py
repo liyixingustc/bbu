@@ -6,15 +6,11 @@ from ...WorkConfig.models.models import *
 from ...WorkTasks.models.models import *
 
 from configuration.WorkScheduleConstants import WorkAvailSheet
+from configuration.ModelChoiceConstants import BaseConstants
+
 import datetime
 
 # Create your models here.
-
-source_choice = (('manual', 'manual'),
-                 ('file', 'file'),
-                 ('somax', 'somax'),
-                 ('auto', 'auto')
-                )
 
 current_status_choice = (('Working', 'Working'),
                          ('Canceled', 'Canceled'),
@@ -34,7 +30,7 @@ class WorkerAvailable(models.Model):
     time_end = models.DateTimeField(default=timezone.now)
     created_by = models.ForeignKey(User, db_column='created_by', default=1)
     created_on = models.DateTimeField(default=timezone.now)
-    source = models.CharField(max_length=100, choices=source_choice, default='manual')
+    source = models.CharField(max_length=100, choices=BaseConstants.source_choice, default='manual')
     document = models.ForeignKey(Documents, db_column='document', to_field='name', null=True, blank=True)
 
 
@@ -50,9 +46,9 @@ class WorkerScheduled(models.Model):
     available_id = models.ForeignKey(WorkerAvailable, db_column='available_id')
     created_by = models.ForeignKey(User, db_column='created_by', default=1)
     created_on = models.DateTimeField(default=timezone.now)
-    source = models.CharField(max_length=100, choices=source_choice, default='manual')
+    source = models.CharField(max_length=100, choices=BaseConstants.source_choice, default='manual')
     document = models.ForeignKey(Documents, db_column='document', to_field='name', null=True, blank=True)
-    current_status = models.CharField(max_length=100, choices=source_choice, default='Working')
+    current_status = models.CharField(max_length=100, choices=current_status_choice, default='Working')
 
 # class WorkerActual(models.Model):
 #
