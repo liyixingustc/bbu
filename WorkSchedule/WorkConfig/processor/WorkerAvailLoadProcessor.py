@@ -109,14 +109,14 @@ class WorkerAvailLoadProcessor:
 
             # if parsed_time:
                 # update db
-            WorkScheduleReviseDAO.update_or_create_available(request.user,
-                                                             parsed_time['start_datetime'],
-                                                             parsed_time['end_datetime'],
-                                                             date,
-                                                             parsed_time['duration'],
-                                                             WorkAvailSheet.DEDUCTION,
-                                                             worker,
-                                                             source='manual')
+            available = WorkScheduleReviseDAO.update_or_create_available(request.user,
+                                                                         parsed_time['start_datetime'],
+                                                                         parsed_time['end_datetime'],
+                                                                         date,
+                                                                         parsed_time['duration'],
+                                                                         WorkAvailSheet.DEDUCTION,
+                                                                         worker,
+                                                                         source='manual')
             # available = WorkerAvailable.objects.update_or_create(name=worker,
             #                                                      date=date,
             #                                                      defaults={

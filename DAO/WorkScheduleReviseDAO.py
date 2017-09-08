@@ -67,54 +67,56 @@ class WorkScheduleReviseDAO:
                                   schedule_id=None, source='auto', document=None):
 
         if schedule_id:
-            WorkerScheduled.objects.update_or_create(
-                                                     id=schedule_id,
-                                                     defaults={
-                                                         'created_by': user,
-                                                         'duration': duration,
-                                                         'time_start': start,
-                                                         'time_end': end,
-                                                         'source': source,
-                                                         'document': document,
-                                                         'name': worker,
-                                                         'date': date,
-                                                         'task_id': task,
-                                                         'available_id': avail_id
-                                                     })
+            schedule_obj = WorkerScheduled.objects.update_or_create(
+                                                                     id=schedule_id,
+                                                                     defaults={
+                                                                         'created_by': user,
+                                                                         'duration': duration,
+                                                                         'time_start': start,
+                                                                         'time_end': end,
+                                                                         'source': source,
+                                                                         'document': document,
+                                                                         'name': worker,
+                                                                         'date': date,
+                                                                         'task_id': task,
+                                                                         'available_id': avail_id
+                                                                     })
         else:
-            WorkerScheduled.objects.update_or_create(name=worker,
-                                                     date=date,
-                                                     task_id=task,
-                                                     available_id=avail_id,
-                                                     defaults={
-                                                         'created_by': user,
-                                                         'duration': duration,
-                                                         'time_start': start,
-                                                         'time_end': end,
-                                                         'source': source,
-                                                         'document': document
-                                                     })
+            schedule_obj = WorkerScheduled.objects.update_or_create(name=worker,
+                                                                         date=date,
+                                                                         task_id=task,
+                                                                         available_id=avail_id,
+                                                                         defaults={
+                                                                             'created_by': user,
+                                                                             'duration': duration,
+                                                                             'time_start': start,
+                                                                             'time_end': end,
+                                                                             'source': source,
+                                                                             'document': document
+                                                                         })
 
         cls.sync_task_by_id(task.id, 'Scheduled')
         cls.sync_avail_by_id(avail_id.id)
+
+        return schedule_obj
 
     @classmethod
     def update_or_create_available(cls, user, start, end, date, duration, deduction, worker,
                                    avail_id=None, source='auto', document=None):
 
         if avail_id:
-            WorkerAvailable.objects.update_or_create(id=avail_id,
-                                                     defaults={
-                                                         'created_by': user,
-                                                         'name': worker,
-                                                         'date': date,
-                                                         'duration': duration,
-                                                         'deduction': deduction,
-                                                         'time_start': start,
-                                                         'time_end': end,
-                                                         'source': source,
-                                                         'document': document
-                                                     })
+            avail_obj = WorkerAvailable.objects.update_or_create(id=avail_id,
+                                                                 defaults={
+                                                                     'created_by': user,
+                                                                     'name': worker,
+                                                                     'date': date,
+                                                                     'duration': duration,
+                                                                     'deduction': deduction,
+                                                                     'time_start': start,
+                                                                     'time_end': end,
+                                                                     'source': source,
+                                                                     'document': document
+                                                                 })
         else:
             avail_obj = WorkerAvailable.objects.update_or_create(name=worker,
                                                                  date=date,
@@ -131,6 +133,8 @@ class WorkScheduleReviseDAO:
                                                                  })
             avail_id = avail_obj[0].id
         cls.sync_avail_by_id(avail_id)
+
+        return avail_obj
 
     # high level method
 
