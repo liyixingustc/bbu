@@ -107,13 +107,17 @@ class WorkerAvailLoadProcessor:
             worker = Workers.objects.get(name=row['worker'])
             parsed_time = cls.time_parser(row['time'], row['worker'], date, shift)
 
+            start = parsed_time['start_datetime']
+            end = parsed_time['end_datetime']
+            duration = parsed_time['duration']
+
             # if parsed_time:
                 # update db
             available = WorkScheduleReviseDAO.update_or_create_available(request.user,
-                                                                         parsed_time['start_datetime'],
-                                                                         parsed_time['end_datetime'],
+                                                                         start,
+                                                                         end,
                                                                          date,
-                                                                         parsed_time['duration'],
+                                                                         duration,
                                                                          WorkAvailSheet.DEDUCTION,
                                                                          worker,
                                                                          source='manual')
@@ -127,41 +131,147 @@ class WorkerAvailLoadProcessor:
             #                                                          'source': 'file',
             #                                                          'document': file
             #                                                      })
-            if is_union_bus:
-                cls.union_bus_parser(request, row, parsed_time, deduction, file, available)
+
+            # additional tasks
+            cls.add_default_tasks(request, worker, date, start, end, duration, file, available,
+                                  is_union_bus)
+
             # else:
             #     return False
         return True
 
     @classmethod
-    def union_bus_parser(cls, request, row, parsed_time, deduction, file, available_id):
-        worker = Workers.objects.filter(name__exact=row['worker'])
-        task = Tasks.objects.filter(work_order='10')
-        if worker.exists() and task.exists():
-            WorkScheduleReviseDAO.update_or_create_schedule(request.user,
-                                                            parsed_time['start_datetime'],
-                                                            parsed_time['end_datetime'] - deduction,
-                                                            row['date'],
-                                                            parsed_time['duration'],
-                                                            available_id,
-                                                            worker[0],
-                                                            task[0],
-                                                            source='file',
-                                                            document=file)
-            # WorkerScheduled.objects.update_or_create(name=worker[0],
-            #                                          date=row['date'],
-            #                                          defaults={
-            #                                              'duration': parsed_time['duration'],
-            #                                              'time_start': parsed_time['start_datetime'],
-            #                                              'time_end': parsed_time['end_datetime'] - deduction,
-            #                                              'task_id': task[0],
-            #                                              'available_id': available_id,
-            #                                              'source': 'file',
-            #                                              'document': file
-            #                                          }
-            #                                          )
+    def add_default_tasks(cls, request, worker, date, start, end, duration, file, available_id, is_union_bus):
 
-        return row
+        lunch_task = None
+        lunch_schedule = None
+        break1_task = None
+        break1_schedule = None
+        break2_task = None
+        break2_schedule = None
+        union_bus_task = None
+        union_bus_schedule = None
+
+        # add lunch
+        lunch_obj = WorkerScheduled.objects.filter(date=date, name=worker, task_id__description='Lunch Time')
+        if not lunch_obj.exists():
+            lunch_start = end - timedelta(minutes=60)
+            lunch_end = end - timedelta(minutes=30)
+            lunch_duration = lunch_end - lunch_start
+            lunch_task = WorkScheduleReviseDAO.create_or_update_timeoff_lunch_task(request.user, source='manual')
+            lunch_schedule = WorkScheduleReviseDAO.update_or_create_schedule(request.user,
+                                                                             lunch_start,
+                                                                             lunch_end,
+                                                                             date,
+                                                                             lunch_duration,
+                                                                             available_id,
+                                                                             worker,
+                                                                             lunch_task,
+                                                                             source='file',
+                                                                             document=file)
+        # add breaks
+        break_obj = WorkerScheduled.objects.filter(date=date, name=worker, task_id__description='Break Time')
+        break1_start = end - timedelta(minutes=30)
+        break1_end = end - timedelta(minutes=15)
+        break1_duration = break1_end - break1_start
+        break2_start = end - timedelta(minutes=15)
+        break2_end = end - timedelta(minutes=0)
+        break2_duration = break2_end - break2_start
+        if not break_obj.exists():
+            break1_task = WorkScheduleReviseDAO.create_or_update_timeoff_breaks_task(request.user, source='manual')
+            break2_task = WorkScheduleReviseDAO.create_or_update_timeoff_breaks_task(request.user, source='manual')
+            break1_schedule = WorkScheduleReviseDAO.update_or_create_schedule(request.user,
+                                                                              break1_start,
+                                                                              break1_end,
+                                                                              date,
+                                                                              break1_duration,
+                                                                              available_id,
+                                                                              worker,
+                                                                              break1_task,
+                                                                              source='file',
+                                                                              document=file)
+            break2_schedule = WorkScheduleReviseDAO.update_or_create_schedule(request.user,
+                                                                              break2_start,
+                                                                              break2_end,
+                                                                              date,
+                                                                              break2_duration,
+                                                                              available_id,
+                                                                              worker,
+                                                                              break2_task,
+                                                                              source='file',
+                                                                              document=file)
+        if break_obj.count() == 1:
+            break_obj_exist = break_obj[0]
+            if break_obj_exist.time_start == break1_start and break_obj_exist.time_end == break1_end:
+                break2_task = WorkScheduleReviseDAO.create_or_update_timeoff_breaks_task(request.user, source='manual')
+                break2_schedule = WorkScheduleReviseDAO.update_or_create_schedule(request.user,
+                                                                                  break2_start,
+                                                                                  break2_end,
+                                                                                  date,
+                                                                                  break2_duration,
+                                                                                  available_id,
+                                                                                  worker,
+                                                                                  break2_task,
+                                                                                  source='file',
+                                                                                  document=file)
+            elif break_obj_exist.time_start == break2_start and break_obj_exist.time_end == break2_end:
+                break1_task = WorkScheduleReviseDAO.create_or_update_timeoff_breaks_task(request.user, source='manual')
+                break1_schedule = WorkScheduleReviseDAO.update_or_create_schedule(request.user,
+                                                                                  break1_start,
+                                                                                  break1_end,
+                                                                                  date,
+                                                                                  break1_duration,
+                                                                                  available_id,
+                                                                                  worker,
+                                                                                  break1_task,
+                                                                                  source='file',
+                                                                                  document=file)
+            else:
+                break2_task = WorkScheduleReviseDAO.create_or_update_timeoff_breaks_task(request.user, source='manual')
+                break2_schedule = WorkScheduleReviseDAO.update_or_create_schedule(request.user,
+                                                                                  break2_start,
+                                                                                  break2_end,
+                                                                                  date,
+                                                                                  break2_duration,
+                                                                                  available_id,
+                                                                                  worker,
+                                                                                  break2_task,
+                                                                                  source='file',
+                                                                                  document=file)
+
+        # add union business
+        if is_union_bus:
+
+
+            union_bus_obj = WorkerScheduled.objects.filter(date=date, name=worker, task_id__description='Union Business')
+            if not union_bus_obj.exists():
+                union_bus_start = start
+                union_bus_end = end - timedelta(minutes=60)
+                union_bus_duration = union_bus_end - union_bus_start
+
+                union_bus_task = WorkScheduleReviseDAO.create_or_update_union_bus_task(request.user, duration,
+                                                                                       source='file', document=file)
+                union_bus_schedule = WorkScheduleReviseDAO.update_or_create_schedule(request.user,
+                                                                                     union_bus_start,
+                                                                                     union_bus_end,
+                                                                                     date,
+                                                                                     union_bus_duration,
+                                                                                     available_id,
+                                                                                     worker,
+                                                                                     union_bus_task,
+                                                                                     source='file',
+                                                                                     document=file)
+
+        return {
+            'lunch_task': lunch_task,
+            'lunch_schedule': lunch_schedule,
+            'break1_task': break1_task,
+            'break1_schedule': break1_schedule,
+            'break2_task': break2_task,
+            'break2_schedule': break2_schedule,
+            'union_bus_task': union_bus_task,
+            'union_bus_schedule': union_bus_schedule
+        }
 
     @classmethod
     def time_parser(cls, time_str, worker, date, shift):

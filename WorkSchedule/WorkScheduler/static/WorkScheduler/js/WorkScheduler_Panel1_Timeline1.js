@@ -327,12 +327,12 @@ define(function (require) {
 				{
 					labelText: 'Workers',
 					field: 'title',
-					width: "85%"
+					width: "82%"
 				},
 				{
 					labelText: 'Hrs',
 					field: 'Avail',
-					width: "15%",
+					width: "18%",
 					render: function(resource, el) {
 
 						if (resource.Avail>0) {

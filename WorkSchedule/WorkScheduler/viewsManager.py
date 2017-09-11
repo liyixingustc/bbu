@@ -492,17 +492,20 @@ class PageManager:
 
                 start_date = UDatetime.pick_date_by_one_date(start)
                 end_date = UDatetime.pick_date_by_one_date(end)
-                print(start_date,end_date)
+                print(start_date, end_date)
 
                 worker_avail = WorkerAvailable.objects.filter(date__range=[start_date, end_date])
-                worker_scheduled = WorkerScheduled.objects.filter(date__range=[start_date, end_date])
+                worker_scheduled = WorkerScheduled.objects.filter(date__range=[start_date, end_date])\
+                                                          .exclude(task_id__priority__in=['0', 'T'])
+                worker_scheduled_others = WorkerScheduled.objects.filter(date__range=[start_date, end_date],
+                                                                         task_id__priority__in=['0', 'T'])
 
                 tasks = WorkScheduleDataDAO.get_all_tasks_open()
 
                 if worker_avail.exists():
                     worker_avail_df = pd.DataFrame.from_records(worker_avail.values('duration', 'deduction'))
 
-                    avail = (worker_avail_df['duration']-worker_avail_df['deduction']).sum().total_seconds() / 3600
+                    avail = (worker_avail_df['duration']).sum().total_seconds() / 3600
                 else:
                     avail = 0
                 if worker_scheduled.exists():
@@ -510,6 +513,11 @@ class PageManager:
                     scheduled = worker_scheduled_df['duration'].sum().total_seconds() / 3600
                 else:
                     scheduled = 0
+                if worker_scheduled_others.exists():
+                    worker_scheduled_others_df = pd.DataFrame.from_records(worker_scheduled_others.values('duration'))
+                    scheduled_others = worker_scheduled_others_df['duration'].sum().total_seconds() / 3600
+                else:
+                    scheduled_others = 0
                 if not tasks.empty:
                     tasks_df = tasks[['estimate_hour', 'schedule_hour']]
                     tasks_est = tasks_df['estimate_hour'].sum()
@@ -519,13 +527,13 @@ class PageManager:
                     tasks_est = 0
                     tasks_count = 0
                     tasks_scheduled_count = 0
-
-                avail_remain = avail - scheduled
+                avail_orig = avail - scheduled_others
+                avail_remain = avail - scheduled - scheduled_others
                 task_est_remain = tasks_est - scheduled
 
                 response = {
                             'scheduled': scheduled,
-                            'avail': avail,
+                            'avail': avail_orig,
                             'avail_remain': avail_remain,
                             'tasks_est': tasks_est,
                             'task_est_remain': task_est_remain,

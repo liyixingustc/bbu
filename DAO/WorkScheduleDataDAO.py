@@ -173,7 +173,7 @@ class WorkScheduleDataDAO:
 
         workers_df['id'] = workers_df['id'].astype('str')
 
-        workers_df['balance'] = workers_df['available_hour'] - workers_df['deduction'] - workers_df['scheduled_hour']
+        workers_df['balance'] = workers_df['available_hour'] - workers_df['scheduled_hour']
         workers_df['balance'] = workers_df['balance'].apply(lambda x: np.round(x.total_seconds()/3600, 2))
 
         workers_df.sort_values('name', inplace=True)

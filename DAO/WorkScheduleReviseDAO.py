@@ -174,7 +174,7 @@ class WorkScheduleReviseDAO:
                               task_id=None, source='auto', document=None):
 
         if not create_date:
-            create_date = UDatetime.now_local().date()
+            create_date = UDatetime.now_local()
         if not created_on:
             created_on = UDatetime.now_local()
 
@@ -269,7 +269,8 @@ class WorkScheduleReviseDAO:
                                         work_order=None,
                                         current_status='Complete',
                                         current_status_somax='Complete',
-                                        task_id=None, source='auto'):
+                                        task_id=None,
+                                        source='auto', document=None):
 
         if not work_order:
             work_order = cls.get_latest_available_work_order('O')
@@ -279,7 +280,8 @@ class WorkScheduleReviseDAO:
                                              current_status=current_status,
                                              current_status_somax=current_status_somax,
                                              estimate_hour=estimate_hour,
-                                             task_id=task_id, source=source)
+                                             task_id=task_id,
+                                             source=source, document=document)
 
         return task_obj
 
@@ -288,7 +290,8 @@ class WorkScheduleReviseDAO:
                                             work_order=None,
                                             current_status='Complete',
                                             current_status_somax='Complete',
-                                            task_id=None, source='auto'):
+                                            task_id=None,
+                                            source='auto', document=None):
 
         if not work_order:
             work_order = cls.get_latest_available_work_order('T')
@@ -298,7 +301,8 @@ class WorkScheduleReviseDAO:
                                              current_status=current_status,
                                              current_status_somax=current_status_somax,
                                              estimate_hour=timedelta(minutes=30),
-                                             task_id=task_id, source=source)
+                                             task_id=task_id,
+                                             source=source, document=document)
 
         return task_obj
 
@@ -307,7 +311,8 @@ class WorkScheduleReviseDAO:
                                              work_order=None,
                                              current_status='Complete',
                                              current_status_somax='Complete',
-                                             task_id=None, source='auto'):
+                                             task_id=None,
+                                             source='auto', document=None):
 
         if not work_order:
             work_order = cls.get_latest_available_work_order('T')
@@ -317,24 +322,24 @@ class WorkScheduleReviseDAO:
                                              current_status=current_status,
                                              current_status_somax=current_status_somax,
                                              estimate_hour=timedelta(minutes=15),
-                                             task_id=task_id, source=source)
+                                             task_id=task_id,
+                                             source=source, document=document)
 
         return task_obj
 
     @classmethod
     def get_latest_available_work_order(cls, work_type=None):
         work_order = None
-        regex = re.compile(r'\w?(?P<order_number>\d{1,2})?')
+        regex = re.compile(r'(?P<work_type>\w)?(?P<order_number>\d*)?')
         if work_type == 'T':
             tasks_obj = Tasks.objects.filter(priority__exact='T')
             if tasks_obj.exists():
                 tasks_df = pd.DataFrame.from_records(tasks_obj.values('work_order'))
-                tasks_df.sort_values('work_order', inplace=True)
-                work_order = tasks_df.iloc[-1]['work_order']
-                parts = regex.match(work_order)
-                if parts:
-                    parts = parts.groupdict()
-                    order_number = int(parts['order_number'])
+                tasks_df = tasks_df['work_order'].str.extract(regex, expand=True)
+                tasks_df['order_number'] = tasks_df['order_number'].astype(int)
+                tasks_df.sort_values('order_number', inplace=True)
+                order_number = tasks_df.iloc[-1]['order_number']
+                if order_number:
                     work_order = 'T' + str((order_number+1))
                 else:
                     work_order = None
@@ -344,13 +349,12 @@ class WorkScheduleReviseDAO:
             tasks_obj = Tasks.objects.filter(priority__exact='O')
             if tasks_obj.exists():
                 tasks_df = pd.DataFrame.from_records(tasks_obj.values('work_order'))
-                tasks_df.sort_values('work_order', inplace=True)
-                work_order = tasks_df.iloc[-1]['work_order']
-                parts = regex.match(work_order)
-                if parts:
-                    parts = parts.groupdict()
-                    order_number = int(parts['order_number'])
-                    work_order = 'O' + str((order_number + 1))
+                tasks_df = tasks_df['work_order'].str.extract(regex, expand=True)
+                tasks_df['order_number'] = tasks_df['order_number'].astype(int)
+                tasks_df.sort_values('order_number', inplace=True)
+                order_number = tasks_df.iloc[-1]['order_number']
+                if order_number:
+                    work_order = 'O' + str((order_number+1))
                 else:
                     work_order = None
             else:
