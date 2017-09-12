@@ -47,7 +47,11 @@ class WorkScheduleSheet:
 class PMs:
 
     class Bread:
-        Downdays = 'Sun shift1 - Sun shift2'
+        class Downdays:
+            start = 'Sun 8:00'
+            end = 'Mon 0:00'
 
     class EM:
-        Downdays = 'Fri shift1 - Sat shift2'
+        class Downdays:
+            start = 'Fri 8:00'
+            end = 'Sat 16:00'

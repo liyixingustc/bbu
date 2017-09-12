@@ -97,16 +97,17 @@ class UDatetime:
         latest_start = max(r1_start, r2_start)
         earliest_end = min(r1_end, r2_end)
 
-        if latest_start == r1_start and earliest_end == r1_end:
-            return [[r1_start, r1_start]]
-        elif latest_start == r1_start and earliest_end < r1_end:
-            return [[earliest_end, r1_end]]
-        elif earliest_end == r1_end and latest_start > r1_start:
-            return [[r1_start, latest_start]]
-        elif latest_start > r1_start and earliest_end < r1_end:
-            return [[r1_start, latest_start], [earliest_end, r1_end]]
-        else:
-            return [[r1_start, r1_end]]
+        result = [[r1_start, r1_end]]
+        if latest_start < earliest_end:
+            if latest_start == r1_start and earliest_end == r1_end:
+                result = [[r1_end, r1_end]]
+            elif latest_start == r1_start and earliest_end == r2_end:
+                result = [[earliest_end, r1_end]]
+            elif latest_start == r2_start and earliest_end == r1_end:
+                result = [[r1_start, latest_start]]
+            elif latest_start == r2_start and earliest_end == r2_end:
+                result = [[r1_start, latest_start], [earliest_end, r1_end]]
+        return result
 
     mapping = {'3': 1, '1': 2, '2': 3}
     reverse_mapping = {1: '3', 2: '1', 3: '2'}
