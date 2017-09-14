@@ -5,7 +5,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.views.decorators.csrf import csrf_protect
 from django.contrib import auth
 
-from .forms import SignUpForm,LoginForm
+from .forms import SignUpForm, LoginForm
 from accounts.models import User
 
 # Create your views here.

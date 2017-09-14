@@ -157,10 +157,6 @@ MEDIA_ROOT = 'media'
 # Custom User
 AUTH_USER_MODEL='accounts.User'
 
-#Angular url
-ANGULAR_URL = '/ng/'
-ANGULAR_ROOT = os.path.join(BASE_DIR, 'ngApp/')
-
 # CORS setting
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
