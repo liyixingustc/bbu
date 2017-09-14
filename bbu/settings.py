@@ -25,7 +25,7 @@ SECRET_KEY = 'g09)et^$8rjua)2^tsgv!l=9c!u#=170cv8kqb!p%90mvcn!=b'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['ec2-54-162-166-112.compute-1.amazonaws.com', 'bbu.tlinvestmentllc.com', '127.0.0.1']
+ALLOWED_HOSTS = ['ec2-54-162-166-112.compute-1.amazonaws.com', 'bbu.tlinvestmentllc.com', '127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'bootstrap_tables',
+    'corsheaders',
 ]
 
 INSTALLED_APPS += [
@@ -57,6 +58,7 @@ INSTALLED_APPS += [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -158,3 +160,7 @@ AUTH_USER_MODEL='accounts.User'
 #Angular url
 ANGULAR_URL = '/ng/'
 ANGULAR_ROOT = os.path.join(BASE_DIR, 'ngApp/')
+
+# CORS setting
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
