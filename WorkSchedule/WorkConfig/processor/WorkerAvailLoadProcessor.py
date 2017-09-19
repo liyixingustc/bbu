@@ -69,10 +69,10 @@ class WorkerAvailLoadProcessor:
                     intern3 = data[worker_range_df['part'] == 3].iloc[[2]]
                     intern4 = data[worker_range_df['part'] == 3].iloc[[3]]
 
-                    cls.worker_avail_shift_processor(request, intern1, 'shift2', file)
-                    cls.worker_avail_shift_processor(request, intern2, 'shift3', file)
-                    cls.worker_avail_shift_processor(request, intern3, 'shift1', file)
-                    cls.worker_avail_shift_processor(request, intern4, 'shift1', file)
+                    cls.worker_avail_shift_processor(request, intern1, 'shift2', file, 'intern1')
+                    cls.worker_avail_shift_processor(request, intern2, 'shift3', file, 'intern2')
+                    cls.worker_avail_shift_processor(request, intern3, 'shift1', file, 'intern3')
+                    cls.worker_avail_shift_processor(request, intern4, 'shift1', file, 'intern4')
 
                     # update documents
                     Documents.objects.filter(id=file.id).update(status='loaded')
@@ -83,7 +83,7 @@ class WorkerAvailLoadProcessor:
         return JsonResponse({})
 
     @classmethod
-    def worker_avail_shift_processor(cls, request, data, shift, file):
+    def worker_avail_shift_processor(cls, request, data, shift, file, worker_type=None):
 
         data = data.dropna(how='all')
         data_melt = pd.melt(data, id_vars=["worker"],
@@ -105,7 +105,9 @@ class WorkerAvailLoadProcessor:
             date = row['date']
             deduction = timedelta(hours=1)
             worker = Workers.objects.get(name=row['worker'])
-            parsed_time = cls.time_parser(row['time'], row['worker'], date, shift)
+            parsed_time = cls.time_parser(row['time'], row['worker'], date, shift, worker_type)
+            if not parsed_time:
+                continue
 
             start = parsed_time['start_datetime']
             end = parsed_time['end_datetime']
@@ -274,7 +276,7 @@ class WorkerAvailLoadProcessor:
         }
 
     @classmethod
-    def time_parser(cls, time_str, worker, date, shift):
+    def time_parser(cls, time_str, worker, date, shift, worker_type=None):
 
         worker = Workers.objects.get(name=worker)
         if time_str in [' ', None, np.nan, '/T', 'T/', 'T']:
@@ -335,22 +337,80 @@ class WorkerAvailLoadProcessor:
 
         else:
             regex = re.compile(r'(\s*T\s*/\s*)?'
-                               r'((?P<start_hour>\d{1,2})?\w{0,2}):?((?P<start_min>\d{1,2})?\w{0,2})'
+                               r'((?P<start_hour>\d{1,2})?\s*(?P<start_para1>\w{0,2})?):?'
+                               r'((?P<start_min>\d{1,2})?\w{0,2}\s*(?P<start_para2>\w{0,2})?)'
                                r'\s*-\s*'
-                               r'((?P<end_hour>\d{1,2})?\w{0,2}):?((?P<end_min>\d{1,2})?\w{0,2}).*')
+                               r'((?P<end_hour>\d{1,2})?\s*(?P<end_para1>\w{0,2})?):?'
+                               r'((?P<end_min>\d{1,2})?\s*(?P<end_para2>\w{0,2})?).*')
             parts = regex.match(time_str)
             if parts:
                 parts = parts.groupdict()
             else:
                 return None
 
+            # parse time parameter
+            AM = ['a', 'A', 'am', 'Am', 'AM']
+            PM = ['p', 'P', 'pm', 'Pm', 'PM']
+
+            if parts['start_para1'] in AM or parts['start_para2'] in AM:
+                start_para = 'AM'
+            elif parts['start_para1'] in PM or parts['start_para2'] in PM:
+                start_para = 'PM'
+            else:
+                start_para = None
+
+            if parts['end_para1'] in AM or parts['end_para2'] in AM:
+                end_para = 'AM'
+            elif parts['end_para1'] in PM or parts['end_para2'] in PM:
+                end_para = 'PM'
+            else:
+                end_para = None
+
+            # init start timestamp and end timestamp
             start_hour, start_min = cls.str_to_int(parts['start_hour']), cls.str_to_int(parts['start_min'])
             end_hour, end_min = cls.str_to_int(parts['end_hour']), cls.str_to_int(parts['end_min'])
 
-            # init start timestamp and end timestamp
+            if start_para:
+                if start_para in AM and start_hour >= 12:
+                    start_hour -= 12
+                elif start_para in PM and start_hour <= 12:
+                    start_hour += 12
+
+            if end_para:
+                if end_para in AM and end_hour >= 12:
+                    end_hour -= 12
+                elif end_para in PM and end_hour <= 12:
+                    end_hour += 12
 
             start_datetime = EST.localize(dt(date.year, date.month, date.day, start_hour, start_min))
             end_datetime = EST.localize(dt(date.year, date.month, date.day, end_hour, end_min))
+            duration = end_datetime - start_datetime
+
+            if duration <= timedelta(hours=4) or duration >= timedelta(hours=12):
+
+                start_datetime1 = start_datetime - timedelta(days=-1)
+                duration1 = end_datetime - start_datetime1
+                if timedelta(hours=4) <= duration1 <= timedelta(hours=12):
+                    return {
+                        'start_datetime': start_datetime1,
+                        'end_datetime': end_datetime,
+                        'duration': duration1
+                    }
+
+                end_datetime2 = end_datetime + timedelta(days=+1)
+                duration2 = end_datetime2 - start_datetime
+                if timedelta(hours=4) <= duration2 <= timedelta(hours=12):
+                    return {
+                        'start_datetime': start_datetime,
+                        'end_datetime': end_datetime2,
+                        'duration': duration2
+                    }
+            else:
+                return {
+                    'start_datetime': start_datetime,
+                    'end_datetime': end_datetime,
+                    'duration': duration
+                }
 
             if shift == 'shift3':
                 if start_hour < 12:
@@ -375,11 +435,14 @@ class WorkerAvailLoadProcessor:
 
             duration = end_datetime - start_datetime
 
-        return {
-            'start_datetime': start_datetime,
-            'end_datetime': end_datetime,
-            'duration': duration
-        }
+        if timedelta(hours=4) <= duration <= timedelta(hours=12):
+            return {
+                'start_datetime': start_datetime,
+                'end_datetime': end_datetime,
+                'duration': duration
+            }
+        else:
+            return None
 
     @classmethod
     def header_processor(cls, data):

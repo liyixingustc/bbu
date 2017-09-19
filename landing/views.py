@@ -2,19 +2,24 @@ from django.shortcuts import render,HttpResponse,redirect
 from django.http import JsonResponse
 
 from django.contrib.admin.views.decorators import staff_member_required
-from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.contrib import auth
+
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
 from .forms import SignUpForm, LoginForm
 from accounts.models import User
 
 # Create your views here.
 
-@csrf_protect
+
+@api_view(['GET', 'POST'])
 def login(request):
 
     if request.method == 'POST':
-        form = LoginForm(request.POST)
+        form = LoginForm(request.data)
 
         if form.is_valid():
             username = form.cleaned_data['username']
@@ -26,17 +31,18 @@ def login(request):
                 if user.is_active:
                     auth.login(request, user)
                     # Redirect to a success page.
-
-                    return JsonResponse({'status':1,'message':'OK', 'url': 'WorkSchedule/1/WorkConfig/index'})
+                    return Response({'status':1,'message':'OK', 'url': 'WorkSchedule/1/WorkConfig/index'})
                 else:
                     # Return a 'disabled account' error message
-                    return JsonResponse({'status':0,'message':'Disabled account'})
+                    return Response({'status':0,'message':'Disabled account'})
             else:
                 # Return an 'invalid login' error message.
-                return JsonResponse({'status':0,'message':'Wrong username or password'})
-    else:
-        pass
+                return Response({'status': 0, 'message': 'Wrong username or password format'})
+        else:
+            return Response({'status': 0,'message':'Wrong username or password'})
+
     return render(request,'landing/login.html')
+
 
 @csrf_protect
 def signup(request):
