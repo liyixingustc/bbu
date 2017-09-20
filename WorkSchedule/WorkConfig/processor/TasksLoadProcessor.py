@@ -21,90 +21,102 @@ EST = pytz.timezone(TIME_ZONE)
 class TasksLoadProcessor:
 
     @classmethod
-    def tasks_load_processor(cls):
+    def tasks_load_processor(cls, files_path=None):
 
-        files = Documents.objects.filter(status__exact='new', file_type__exact='Tasks')
-        if files.exists():
-            for file in files:
-                path = BASE_DIR + file.document.url
-                if os.path.exists(path):
-                    data = pd.read_csv(path, encoding='iso-8859-1')
-
-                    data['Created'] = pd.to_datetime(data['Created'], format='%m/%d/%Y')
-                    data['Created'] = data['Created'].apply(lambda x: UDatetime.localize(x))
-
-                    data['Scheduled'] = pd.to_datetime(data['Scheduled'], format='%m/%d/%Y')
-                    data['Scheduled'] = data['Scheduled'].apply(lambda x: UDatetime.localize(x))
-
-                    data['Actual Finish'] = pd.to_datetime(data['Actual Finish'], format='%m/%d/%Y')
-                    data['Actual Finish'] = data['Actual Finish'].apply(lambda x: UDatetime.localize(x))
-
-                    for index, row in data.iterrows():
-
-                        equipment = Equipment.objects.filter(equipment_id__exact=row['Charge To'])
-                        if equipment.exists():
-                            equipment = equipment[0]
-                        else:
-                            equipment = None
-
-                        aor = AOR.objects.filter(equip_id__equipment_id__exact=row['Charge To'])
-                        if aor.exists():
-                            aor = aor[0]
-                        else:
-                            aor = None
-
-                        creator = SomaxAccount.objects.filter(user_name__exact=row['Creator'])
-                        if creator.exists():
-                            creator = creator[0]
-                        else:
-                            creator = None
-
-                        assigned = SomaxAccount.objects.filter(user_name__exact=row['Assigned'])
-                        if assigned.exists():
-                            assigned = assigned[0]
-                        else:
-                            assigned = None
-
-                        pms = PMs.objects.filter(description__exact=row['Description'])
-                        if pms.exists():
-                            pms = pms[0]
-                            est = pms.duration
-                            due_days = pms.due_days
-                        else:
-                            pms = None
-                            est = timedelta(hours=0)
-                            due_days = None
-
-                        current_status = cls.smart_status_choice(row['Work Order'], row['Status'], due_days, row['Created'])
-
-                        Tasks.objects.update_or_create(work_order=row['Work Order'],
-                                                       defaults={
-                                                                 'description': row['Description'],
-                                                                 'work_type': row['Type'],
-                                                                 'current_status': current_status,
-                                                                 'line': None,
-                                                                 'shift': row['Shift'],
-                                                                 'priority': row['Priority'],
-                                                                 'create_date': row['Created'],
-                                                                 'current_status_somax': row['Status'],
-                                                                 'schedule_date_somax': row['Scheduled'],
-                                                                 'actual_date_somax': row['Actual Finish'],
-                                                                 'estimate_hour': est,
-                                                                 'fail_code': row['Fail Code'],
-                                                                 'completion_comments': row['Completion Comments'],
-                                                                 'equipment': equipment,
-                                                                 'AOR': aor,
-                                                                 'creator': creator,
-                                                                 'assigned': assigned,
-                                                                 'PMs': pms
-                                                                 })
-
-                    # update documents
-                    Documents.objects.filter(id=file.id).update(status='loaded')
-
-                    return JsonResponse({})
+        if files_path:
+            for file_path in files_path:
+                if os.path.exists(file_path):
+                    data = pd.read_csv(file_path, encoding='iso-8859-1')
+                    cls.tasks_data_processor(data)
+            else:
+                return JsonResponse({})
         else:
-            return JsonResponse({})
+            files = Documents.objects.filter(status__exact='new', file_type__exact='Tasks')
+            if files.exists():
+                for file in files:
+                    path = BASE_DIR + file.document.url
+                    if os.path.exists(path):
+                        data = pd.read_csv(path, encoding='iso-8859-1')
+                        cls.tasks_data_processor(data)
+
+                        # update documents
+                        Documents.objects.filter(id=file.id).update(status='loaded')
+
+                        return JsonResponse({})
+            else:
+                return JsonResponse({})
+
+    @classmethod
+    def tasks_data_processor(cls, data):
+
+        data['Created'] = pd.to_datetime(data['Created'], format='%m/%d/%Y')
+        data['Created'] = data['Created'].apply(lambda x: UDatetime.localize(x))
+
+        data['Scheduled'] = pd.to_datetime(data['Scheduled'], format='%m/%d/%Y')
+        data['Scheduled'] = data['Scheduled'].apply(lambda x: UDatetime.localize(x))
+
+        data['Actual Finish'] = pd.to_datetime(data['Actual Finish'], format='%m/%d/%Y')
+        data['Actual Finish'] = data['Actual Finish'].apply(lambda x: UDatetime.localize(x))
+
+        for index, row in data.iterrows():
+
+            equipment = Equipment.objects.filter(equipment_id__exact=row['Charge To'])
+            if equipment.exists():
+                equipment = equipment[0]
+            else:
+                equipment = None
+
+            aor = AOR.objects.filter(equip_id__equipment_id__exact=row['Charge To'])
+            if aor.exists():
+                aor = aor[0]
+            else:
+                aor = None
+
+            creator = SomaxAccount.objects.filter(user_name__exact=row['Creator'])
+            if creator.exists():
+                creator = creator[0]
+            else:
+                creator = None
+
+            assigned = SomaxAccount.objects.filter(user_name__exact=row['Assigned'])
+            if assigned.exists():
+                assigned = assigned[0]
+            else:
+                assigned = None
+
+            pms = PMs.objects.filter(description__exact=row['Description'])
+            if pms.exists():
+                pms = pms[0]
+                est = pms.duration
+                due_days = pms.due_days
+            else:
+                pms = None
+                est = timedelta(hours=0)
+                due_days = None
+
+            current_status = cls.smart_status_choice(row['Work Order'], row['Status'], due_days, row['Created'])
+
+            Tasks.objects.update_or_create(work_order=row['Work Order'],
+                                           defaults={
+                                               'description': row['Description'],
+                                               'work_type': row['Type'],
+                                               'current_status': current_status,
+                                               'line': None,
+                                               'shift': row['Shift'],
+                                               'priority': row['Priority'],
+                                               'create_date': row['Created'],
+                                               'current_status_somax': row['Status'],
+                                               'schedule_date_somax': row['Scheduled'],
+                                               'actual_date_somax': row['Actual Finish'],
+                                               'estimate_hour': est,
+                                               'fail_code': row['Fail Code'],
+                                               'completion_comments': row['Completion Comments'],
+                                               'equipment': equipment,
+                                               'AOR': aor,
+                                               'creator': creator,
+                                               'assigned': assigned,
+                                               'PMs': pms
+                                           })
 
     close_status = ['Canceled', 'Complete', 'Denied']
     open_status = ['Approved', 'Scheduled', 'Work Request']

@@ -28,8 +28,8 @@ class SmartScheduler:
         self.start = start
         self.end = end
 
-        self.start = dt(2017, 8, 27, 0, 0, 0, tzinfo=EST)
-        self.end = dt(2017, 8, 30, 0, 0, 0, tzinfo=EST)
+        # self.start = dt(2017, 8, 27, 0, 0, 0, tzinfo=EST)
+        # self.end = dt(2017, 8, 30, 0, 0, 0, tzinfo=EST)
 
         self.data_init()
 
