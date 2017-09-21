@@ -12,3 +12,5 @@ djangorestframework == 3.6.4
 selenium == 3.5.0
 scrapy == 1.4.0
 beautifulsoup4 == 4.6.0
+celery == 4.1.0
+redis == 2.10.6

@@ -108,6 +108,7 @@ class PageManager:
                                                'duration': 'duration',
                                                'time_start': 'start',
                                                'time_end': 'end'}, axis=1, inplace=True)
+
                     event_records['resourceId'] = event_records['resourceId'].astype('str')
                     event_records['title'] = event_records['taskId']
                     event_records['constraint'] = 'WorkerAvail'
