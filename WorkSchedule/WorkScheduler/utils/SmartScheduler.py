@@ -23,22 +23,31 @@ EST = pytz.timezone(TIME_ZONE)
 
 class SmartScheduler:
 
-    def __init__(self, request, start, end):
+    def __init__(self, request=None, start=None, end=None, work_orders=None):
         self.request = request
         self.start = start
         self.end = end
+        self.work_orders = work_orders
 
         # self.start = dt(2017, 8, 27, 0, 0, 0, tzinfo=EST)
         # self.end = dt(2017, 8, 30, 0, 0, 0, tzinfo=EST)
 
-        self.data_init()
+        self.data_init(start, end, work_orders)
 
-    def data_init(self):
+    def data_init(self, start, end, work_orders):
         open_tasks = ['Approved']
-        data = Tasks.objects.filter(current_status__in=open_tasks,
-                                    create_date__range=[self.start, self.end],
-                                    )\
-                            .exclude(estimate_hour__exact=timedelta(hours=0))
+        if start and end:
+            data = Tasks.objects.filter(current_status__in=open_tasks,
+                                        create_date__range=[self.start, self.end],
+                                        )\
+                                .exclude(estimate_hour__exact=timedelta(hours=0))
+        elif work_orders:
+            data = Tasks.objects.filter(current_status__in=open_tasks,
+                                        work_order__in= work_orders
+                                        )\
+                                .exclude(estimate_hour__exact=timedelta(hours=0))
+        else:
+            data = Tasks.objects.none()
         self.data = pd.DataFrame.from_records(data.values())
 
     def scheduler_scheduled_tasks(self):
@@ -55,7 +64,7 @@ class SmartScheduler:
         if data.empty:
             return
 
-        data = data[790:800]
+        # data = data[790:800]
 
         for index, row in data.iterrows():
             work_order = row['work_order']
@@ -76,8 +85,11 @@ class SmartScheduler:
             else:
                 worker = worker[0]
 
-            availables = WorkerAvailable.objects.filter(name=worker, date__gte=scheduled_date)\
+            availables = WorkerAvailable.objects.filter(name=worker, date=scheduled_date)\
                                                 .order_by('date', 'time_start')[:10]
+            # availables = WorkerAvailable.objects.filter(name=worker, date__gte=scheduled_date)\
+            #                                     .order_by('date', 'time_start')[:10]
+
             if availables.exists():
 
                 # add schedule
@@ -115,8 +127,12 @@ class SmartScheduler:
         available_duration = end - start
         if available_duration >= est:
             available_id = WorkerAvailable.objects.get(id=avail_id)
-            # WorkScheduleReviseDAO.update_or_create_schedule(request.user, start, start + est, date, est,
-            #                                                 available_id, worker, task)
+            if not request:
+                user = None
+            else:
+                user = request.user
+            WorkScheduleReviseDAO.update_or_create_schedule(user, start, start + est, date, est,
+                                                            available_id, worker, task)
             return True
         else:
             return False

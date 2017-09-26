@@ -8,6 +8,9 @@ from utils.mapper import mapper
 from .viewsManager import PageManager
 # Create your views here.
 # from .utils.LoadConfigData import LoadConfigData
+from spider.somax import tasks
+# from WorkSchedule.WorkScheduler.utils.SmartScheduler import SmartScheduler
+
 
 class Page:
 
@@ -17,6 +20,9 @@ class Page:
     def index(request, *args, **kwargs):
         template_name = 'WorkConfig/{page}.html'.format(page=kwargs['page'])
         # LoadConfigData().load()
+        # tasks.sync_task.delay()
+        # SmartScheduler(work_orders=['17037018']).run()
+
         return render(request, template_name)
 
     class Panel:

@@ -78,6 +78,9 @@ class WorkScheduleReviseDAO:
     def update_or_create_schedule(cls, user, start, end, date, duration, avail_id, worker, task,
                                   schedule_id=None, source='auto', document=None):
 
+        if not user:
+            user = User.objects.filter()[0]
+
         if schedule_id:
             schedule_obj = WorkerScheduled.objects.update_or_create(
                                                                      id=schedule_id,

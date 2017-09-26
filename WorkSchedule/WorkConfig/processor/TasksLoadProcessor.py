@@ -15,6 +15,8 @@ from ...WorkTasks.models.models import *
 
 from utils.UDatetime import UDatetime
 
+from WorkSchedule.WorkScheduler import tasks
+
 EST = pytz.timezone(TIME_ZONE)
 
 
@@ -52,9 +54,9 @@ class TasksLoadProcessor:
         data_old = pd.DataFrame.from_records(Tasks.objects.all().values('work_order',
                                                                         'current_status_somax'))
         data = cls.get_new_and_update_data(data_old, data_new)
-
+        # print(len(data))
         if data.empty:
-            return JsonResponse({})
+            return
 
         data['Created'] = pd.to_datetime(data['Created'], format='%m/%d/%Y')
         data['Created'] = data['Created'].apply(lambda x: UDatetime.localize(x))
@@ -66,7 +68,8 @@ class TasksLoadProcessor:
         data['Actual Finish'] = data['Actual Finish'].apply(lambda x: UDatetime.localize(x))
 
         for index, row in data.iterrows():
-
+            # if index in list(np.arange(0,40000, 100)):
+            #     print(index)
             equipment = Equipment.objects.filter(equipment_id__exact=row['Charge To'])
             if equipment.exists():
                 equipment = equipment[0]
@@ -124,6 +127,11 @@ class TasksLoadProcessor:
                                                'assigned': assigned,
                                                'PMs': pms
                                            })
+
+        # auto schedule
+        work_orders = data['Work Order'].tolist()
+        tasks.auto_schedule.delay(work_orders=work_orders)
+
 
     @classmethod
     def get_new_and_update_data(cls, old, new):
@@ -196,7 +204,7 @@ class TasksLoadProcessor:
                         current_status = 'Complete'
                 else:
                     if somax_status == 'Scheduled':
-                        current_status = 'Work Request'
+                        current_status = 'Approved'
             else:
                 if somax_status == 'Scheduled':
                     current_status = 'Approved'
