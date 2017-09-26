@@ -34,7 +34,7 @@ class SmartScheduler:
         self.data_init()
 
     def data_init(self):
-        open_tasks = ['Approved', 'Work Request']
+        open_tasks = ['Approved']
         data = Tasks.objects.filter(current_status__in=open_tasks,
                                     create_date__range=[self.start, self.end],
                                     )\

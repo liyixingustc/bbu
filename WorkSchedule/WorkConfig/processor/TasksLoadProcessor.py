@@ -47,7 +47,14 @@ class TasksLoadProcessor:
                 return JsonResponse({})
 
     @classmethod
-    def tasks_data_processor(cls, data):
+    def tasks_data_processor(cls, data_new):
+
+        data_old = pd.DataFrame.from_records(Tasks.objects.all().values('work_order',
+                                                                        'current_status_somax'))
+        data = cls.get_new_and_update_data(data_old, data_new)
+
+        if data.empty:
+            return JsonResponse({})
 
         data['Created'] = pd.to_datetime(data['Created'], format='%m/%d/%Y')
         data['Created'] = data['Created'].apply(lambda x: UDatetime.localize(x))
@@ -117,6 +124,23 @@ class TasksLoadProcessor:
                                                'assigned': assigned,
                                                'PMs': pms
                                            })
+
+    @classmethod
+    def get_new_and_update_data(cls, old, new):
+
+        if new.empty:
+            return pd.DataFrame()
+        if old.empty:
+            return new
+
+        new['Work Order'] = new['Work Order'].astype(str)
+
+        merged = pd.merge(new, old, how='left', left_on=['Work Order'], right_on=['work_order'])
+
+        data = merged[(merged['Status'] != merged['current_status_somax']) |
+                      (merged['work_order'].isnull())]
+
+        return data
 
     close_status = ['Canceled', 'Complete', 'Denied']
     open_status = ['Approved', 'Scheduled', 'Work Request']
