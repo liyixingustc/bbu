@@ -185,5 +185,3 @@ class SomaxSpider:
         # soup = bs(self.driver.page_source, 'xml')
         # time.sleep(10)
         # # print(soup)
-
-SomaxSpider().spider()

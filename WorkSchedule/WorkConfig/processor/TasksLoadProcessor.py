@@ -143,7 +143,12 @@ class TasksLoadProcessor:
                         current_status = somax_status
                 else:
                     if current_status in cls.open_status and somax_status in cls.open_status:
-                        current_status = current_status
+                        if somax_status == 'Scheduled' and current_status != 'Scheduled':
+                            current_status = 'Approved'
+                        elif somax_status == 'Approved' and current_status == 'Work Request':
+                            current_status = 'Approved'
+                        else:
+                            current_status = current_status
                     elif current_status in cls.close_status and somax_status in cls.open_status:
                         current_status = current_status
                     else:
@@ -170,7 +175,7 @@ class TasksLoadProcessor:
                         current_status = 'Work Request'
             else:
                 if somax_status == 'Scheduled':
-                    current_status = 'Work Request'
+                    current_status = 'Approved'
 
         return current_status
 

@@ -1,12 +1,12 @@
 from __future__ import absolute_import, unicode_literals
-import os
 from celery import Celery
 
+# set the default Django settings module for the 'celery' program.
+import os
 import sys
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(BASE_DIR)
 
-# set the default Django settings module for the 'celery' program.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'bbu.settings')
 
 app = Celery('bbu')

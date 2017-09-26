@@ -19,11 +19,12 @@ EST = pytz.timezone(TIME_ZONE)
 class WorkScheduleDataDAO:
 
     open_tasks_status = ['Approved', 'Scheduled', 'Work Request']
+    ready_for_schedule_tasks_status = ['Approved', 'Scheduled']
 
     @classmethod
     def get_all_tasks_open(cls):
 
-        tasks = Tasks.objects.filter(current_status__in=cls.open_tasks_status)\
+        tasks = Tasks.objects.filter(current_status__in=cls.ready_for_schedule_tasks_status)\
             .exclude(priority__in=['T', 'O'])\
             .values('line',
                     'work_order',

@@ -54,6 +54,8 @@ INSTALLED_APPS += [
 
     'Reports.ReportConfig',
     'Reports.ReportTimeDetail',
+
+    # 'spider.somax'
 ]
 
 MIDDLEWARE = [
@@ -172,11 +174,27 @@ REST_FRAMEWORK = {
 }
 
 # Celery settings
+from kombu import Exchange, Queue
+
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
 
 #: Only add pickle to this list if your broker is secured
 #: from unwanted access (see userguide/security.html)
 CELERY_ACCEPT_CONTENT = ['json']
-CELERY_RESULT_BACKEND = 'db+sqlite:///db.sqlite3'
+# CELERY_RESULT_BACKEND = 'db+sqlite:///db.sqlite3'
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
+
+# Celery import tasks
+CELERY_IMPORTS = ('spider.somax.tasks', )
+
+# Queues and Router
+CELERY_QUEUES = (
+    # Queue('queue_add_reduce', exchange=Exchange('calculate_exchange', type='direct'), routing_key='key1'),
+    Queue('celery', Exchange('celery'), routing_key='celery'),
+)
+
+CELERY_ROUTES = {
+    'spider.somax.tasks': {'queue': 'celery', 'routing_key': 'celery'},
+    # 'celeryservice.tasks.reduce': {'queue': 'queue_add_reduce', 'routing_key': 'key1', 'delivery_mode': 1},
+}
