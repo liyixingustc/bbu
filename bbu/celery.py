@@ -25,3 +25,23 @@ app.autodiscover_tasks()
 @app.task(bind=True)
 def debug_task(self):
     print('Request: {0!r}'.format(self.request))
+
+app.conf.beat_schedule = {
+    # Executes every Monday morning at 7:30 a.m.
+    'sync_equipment': {
+        'task': 'spider.somax.tasks.sync_equipment',
+        'schedule': crontab(minute=0, hour=0),
+        # 'schedule': crontab(minute='*'),
+        'args': (),
+    },
+    'sync_pm': {
+        'task': 'spider.somax.tasks.sync_pm',
+        'schedule': crontab(minute=0, hour=0),
+        'args': (),
+    },
+    'sync_task': {
+        'task': 'spider.somax.tasks.sync_task',
+        'schedule': crontab(minute=0, hour='*/12'),
+        'args': (),
+    },
+}
