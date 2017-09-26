@@ -83,6 +83,8 @@ class SomaxSpider:
             shutil.move(os.path.join(self.download_path, filename),
                         os.path.join(target_path, filename))
 
+        self.driver.quit()
+
         file_path = os.path.join(target_path, filename)
         EquipmentLoadProcessor.equipment_load_processor([file_path])
 
@@ -111,6 +113,8 @@ class SomaxSpider:
             shutil.move(os.path.join(self.download_path, filename),
                         os.path.join(target_path, filename))
 
+        self.driver.quit()
+
         file_path = os.path.join(target_path, filename)
         PMsLoadProcessor.pms_load_processor([file_path])
 
@@ -138,6 +142,8 @@ class SomaxSpider:
 
             shutil.move(os.path.join(self.download_path, filename),
                         os.path.join(target_path, filename))
+
+        self.driver.quit()
 
         file_path = os.path.join(target_path, filename)
         TasksLoadProcessor.tasks_load_processor([file_path])
@@ -185,3 +191,6 @@ class SomaxSpider:
         # soup = bs(self.driver.page_source, 'xml')
         # time.sleep(10)
         # # print(soup)
+
+if __name__ == '__main__':
+    SomaxSpider().equipment_spider()
