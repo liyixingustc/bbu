@@ -1,4 +1,8 @@
 from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
 from bs4 import BeautifulSoup as bs
 import os
 import shutil
@@ -30,6 +34,11 @@ class SomaxSpider:
     somax_pm_url = 'https://somaxonline.somax.com/PreventiveMaintenanceSearch.aspx'
     somax_pm_edit_url = 'https://somaxonline.somax.com/PreventiveMaintenanceDetails.aspx'
 
+    somax_logo_id = 'imgLogo'
+    somax_task_filter_work_order_id = 'MainContent_grdResults_DXFREditorcol0_I'
+    somax_task_first_row_work_order_a_id = 'MainContent_grdResults_cell0_0_ColClientLookUpId_0'
+    somax_task_first_row_work_order_td_id = 'MainContent_grdResults_tccell0_0'
+
     download_path = os.path.join(BASE_DIR, MEDIA_ROOT, 'spider', 'somax')
 
     def __init__(self, account=None, password=None):
@@ -50,7 +59,9 @@ class SomaxSpider:
             self.account = account
             self.password = password
         self.driver.get(self.somax_login_url)
+        self.driver.find_element_by_id('txtUserName').clear()
         self.driver.find_element_by_id('txtUserName').send_keys(self.account)
+        self.driver.find_element_by_id('txtPassword').clear()
         self.driver.find_element_by_id('txtPassword').send_keys(self.password)
         self.driver.find_element_by_id('btnLogin').click()
 
@@ -150,6 +161,42 @@ class SomaxSpider:
 
         return True
 
+    def task_edit_spider(self, work_orders_dict=None):
+        if not work_orders_dict:
+            return True
+        self.driver.get(self.somax_task_url)
+        current_url = self.driver.current_url
+        if current_url == self.somax_login_url:
+            self.login()
+
+        self.get_and_ready(self.somax_task_url)
+
+        for work_order_dict in work_orders_dict:
+
+            work_order = work_order_dict['work_order']
+            current_status = work_order_dict['current_status']
+
+            element_filter = WebDriverWait(self.driver, 60).until(
+                EC.presence_of_element_located((By.ID, self.somax_task_filter_work_order_id)))
+            element_filter.clear()
+            self.driver.find_element_by_id(self.somax_logo_id).click()
+
+            WebDriverWait(self.driver, 60).until(
+                EC.text_to_be_present_in_element((By.ID, self.somax_task_filter_work_order_id), ''))
+            element_filter.send_keys(work_order)
+            self.driver.find_element_by_id(self.somax_logo_id).click()
+
+            WebDriverWait(self.driver, 60).until(
+                EC.text_to_be_present_in_element((By.ID, self.somax_task_first_row_work_order_a_id), work_order))
+            self.driver.find_element_by_id(self.somax_task_first_row_work_order_td_id).click()
+
+            time.sleep(10)
+
+
+        self.driver.quit()
+
+        return True
+
     def get_and_ready(self, url):
         self.driver.get(url)
         while True:
@@ -193,4 +240,7 @@ class SomaxSpider:
         # # print(soup)
 
 if __name__ == '__main__':
-    SomaxSpider().equipment_spider()
+    SomaxSpider().task_edit_spider([{'work_order': '17037018',
+                                     'current_status': 'Scheduled',
+                                     'current_status_somax': 'Scheduled'}])
+    # SomaxSpider().task_spider()
