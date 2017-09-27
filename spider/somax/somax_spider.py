@@ -174,9 +174,9 @@ class SomaxSpider:
 
         # filter out no change record
         worker_order_df = pd.DataFrame.from_records(work_orders_dict)
-        # worker_order_df = worker_order_df[worker_order_df['current_status'] != worker_order_df['current_status_somax']]
-        # if worker_order_df.empty:
-        #     return True
+        worker_order_df = worker_order_df[worker_order_df['current_status'] != worker_order_df['current_status_somax']]
+        if worker_order_df.empty:
+            return True
 
         # wait and check again
         time.sleep(100)
