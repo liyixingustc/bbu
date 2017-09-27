@@ -176,19 +176,27 @@ class SomaxSpider:
             work_order = work_order_dict['work_order']
             current_status = work_order_dict['current_status']
 
-            element_filter = WebDriverWait(self.driver, 60).until(
-                EC.presence_of_element_located((By.ID, self.somax_task_filter_work_order_id)))
-            element_filter.clear()
-            self.driver.find_element_by_id(self.somax_logo_id).click()
+            element_text = self.driver.find_element_by_id(self.somax_task_first_row_work_order_a_id).text
+            if element_text == work_order:
+                element_click = WebDriverWait(self.driver, 60).until(
+                    EC.element_to_be_clickable((By.ID, self.somax_task_first_row_work_order_a_id)))
+            else:
+                element_filter = WebDriverWait(self.driver, 60).until(
+                    EC.presence_of_element_located((By.ID, self.somax_task_filter_work_order_id)))
+                element_filter.clear()
+                self.driver.find_element_by_id(self.somax_logo_id).click()
 
-            WebDriverWait(self.driver, 60).until(
-                EC.text_to_be_present_in_element((By.ID, self.somax_task_filter_work_order_id), ''))
-            element_filter.send_keys(work_order)
-            self.driver.find_element_by_id(self.somax_logo_id).click()
+                WebDriverWait(self.driver, 60).until(
+                    EC.text_to_be_present_in_element((By.ID, self.somax_task_filter_work_order_id), ''))
+                element_filter.send_keys(work_order)
+                self.driver.find_element_by_id(self.somax_logo_id).click()
 
-            WebDriverWait(self.driver, 60).until(
-                EC.text_to_be_present_in_element((By.ID, self.somax_task_first_row_work_order_a_id), work_order))
-            self.driver.find_element_by_id(self.somax_task_first_row_work_order_td_id).click()
+                WebDriverWait(self.driver, 60).until(
+                    EC.text_to_be_present_in_element((By.ID, self.somax_task_first_row_work_order_a_id), work_order))
+                element_click = WebDriverWait(self.driver, 60).until(
+                    EC.element_to_be_clickable((By.ID, self.somax_task_first_row_work_order_a_id)))
+
+            element_click.click()
 
             time.sleep(10)
 
