@@ -9,6 +9,9 @@ import shutil
 import glob
 import time
 
+import numpy as np
+import pandas as pd
+
 import django
 from bbu.settings import BASE_DIR, MEDIA_ROOT
 
@@ -18,6 +21,10 @@ django.setup()
 from WorkSchedule.WorkConfig.processor.EquipmentLoadProcessor import EquipmentLoadProcessor
 from WorkSchedule.WorkConfig.processor.PMsLoadProcessor import PMsLoadProcessor
 from WorkSchedule.WorkConfig.processor.TasksLoadProcessor import TasksLoadProcessor
+
+from WorkSchedule.WorkConfig.models.models import *
+from WorkSchedule.WorkWorkers.models.models import *
+from WorkSchedule.WorkTasks.models.models import *
 
 
 class SomaxSpider:
@@ -45,7 +52,7 @@ class SomaxSpider:
 
         self.driver = self.chromedriver()
         # self.login(account, password)
-        self.cookies = self.driver.get_cookies()
+        # self.cookies = self.driver.get_cookies()
 
     def chromedriver(self):
         options = webdriver.ChromeOptions()
@@ -164,6 +171,32 @@ class SomaxSpider:
     def task_edit_spider(self, work_orders_dict=None):
         if not work_orders_dict:
             return True
+
+        # filter out no change record
+        worker_order_df = pd.DataFrame.from_records(work_orders_dict)
+        # worker_order_df = worker_order_df[worker_order_df['current_status'] != worker_order_df['current_status_somax']]
+        # if worker_order_df.empty:
+        #     return True
+
+        # wait and check again
+        time.sleep(100)
+
+        for index, row in worker_order_df.iterrows():
+            work_order = row['work_order']
+            tasks_obj = Tasks.objects.filter(work_order__exact=work_order)
+            if tasks_obj.exists():
+                current_status = tasks_obj[0].current_status
+            else:
+                continue
+
+            worker_order_df.set_value(index, 'current_status', current_status)
+
+        # filter out no change record
+        worker_order_df = worker_order_df[worker_order_df['current_status'] != worker_order_df['current_status_somax']]
+        if worker_order_df.empty:
+            return True
+
+        # edit somax
         self.driver.get(self.somax_task_url)
         current_url = self.driver.current_url
         if current_url == self.somax_login_url:
@@ -197,9 +230,6 @@ class SomaxSpider:
                     EC.element_to_be_clickable((By.ID, self.somax_task_first_row_work_order_a_id)))
 
             element_click.click()
-
-            time.sleep(10)
-
 
         self.driver.quit()
 
