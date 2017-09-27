@@ -8,6 +8,7 @@ require.config({
         'jquery' : ['/static/gentelella/vendors/jquery/dist/jquery.min'
                     // ,'https://ajax.googleapis.com/ajax/libs/jquery/2.2.3/jquery.min'
                     ],
+        'js-cookie' : ['/static/js-cookie/src/js.cookie',],
         'bootstrap' : [
                         // 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min',
                        '/static/gentelella/vendors/bootstrap/dist/js/bootstrap.min'],
@@ -52,6 +53,10 @@ require.config({
 
         'jquery':{
             exports:'jquery'
+        },
+        'js-cookie':{
+            deps:['jquery'],
+            exports:'Cookies'
         },
         'bootstrap':{
             deps:['jquery'],
