@@ -1,17 +1,21 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 from bs4 import BeautifulSoup as bs
 import os
+import sys
 import shutil
 import glob
 import time
 
 import numpy as np
 import pandas as pd
+from openpyxl import load_workbook
 
+sys.path.append('../..')
 import django
 from bbu.settings import BASE_DIR, MEDIA_ROOT
 
@@ -42,9 +46,14 @@ class SomaxSpider:
     somax_pm_edit_url = 'https://somaxonline.somax.com/PreventiveMaintenanceDetails.aspx'
 
     somax_logo_id = 'imgLogo'
+    somax_page_title_id = 'ctlPageDetails_lblPageTitle'
     somax_task_filter_work_order_id = 'MainContent_grdResults_DXFREditorcol0_I'
     somax_task_first_row_work_order_a_id = 'MainContent_grdResults_cell0_0_ColClientLookUpId_0'
     somax_task_first_row_work_order_td_id = 'MainContent_grdResults_tccell0_0'
+    somax_task_detail_actual_open_span_id = 'MainContent_cpcActuals_lblHeaderCollapsed'
+    somax_task_detail_actual_tab_a_id = 'MainContent_cpcActuals_ctl00_ASPxPageControlActuals_T1'
+    somax_task_detail_actual_table_id = 'MainContent_cpcActuals_ctl00_ASPxPageControlActuals_grdWorkOrderLabor_DXMainTable'
+
 
     download_path = os.path.join(BASE_DIR, MEDIA_ROOT, 'spider', 'somax')
 
@@ -174,12 +183,12 @@ class SomaxSpider:
 
         # filter out no change record
         worker_order_df = pd.DataFrame.from_records(work_orders_dict)
-        worker_order_df = worker_order_df[worker_order_df['current_status'] != worker_order_df['current_status_somax']]
-        if worker_order_df.empty:
-            return True
+        # worker_order_df = worker_order_df[worker_order_df['current_status'] != worker_order_df['current_status_somax']]
+        # if worker_order_df.empty:
+        #     return True
 
         # wait and check again
-        time.sleep(100)
+        # time.sleep(100)
 
         for index, row in worker_order_df.iterrows():
             work_order = row['work_order']
@@ -192,9 +201,9 @@ class SomaxSpider:
             worker_order_df.set_value(index, 'current_status', current_status)
 
         # filter out no change record
-        worker_order_df = worker_order_df[worker_order_df['current_status'] != worker_order_df['current_status_somax']]
-        if worker_order_df.empty:
-            return True
+        # worker_order_df = worker_order_df[worker_order_df['current_status'] != worker_order_df['current_status_somax']]
+        # if worker_order_df.empty:
+        #     return True
 
         # edit somax
         self.driver.get(self.somax_task_url)
@@ -209,29 +218,110 @@ class SomaxSpider:
             work_order = work_order_dict['work_order']
             current_status = work_order_dict['current_status']
 
-            element_text = self.driver.find_element_by_id(self.somax_task_first_row_work_order_a_id).text
-            if element_text == work_order:
-                element_click = WebDriverWait(self.driver, 60).until(
-                    EC.element_to_be_clickable((By.ID, self.somax_task_first_row_work_order_a_id)))
-            else:
-                element_filter = WebDriverWait(self.driver, 60).until(
-                    EC.presence_of_element_located((By.ID, self.somax_task_filter_work_order_id)))
-                element_filter.clear()
-                self.driver.find_element_by_id(self.somax_logo_id).click()
-
-                WebDriverWait(self.driver, 60).until(
-                    EC.text_to_be_present_in_element((By.ID, self.somax_task_filter_work_order_id), ''))
-                element_filter.send_keys(work_order)
-                self.driver.find_element_by_id(self.somax_logo_id).click()
-
-                WebDriverWait(self.driver, 60).until(
-                    EC.text_to_be_present_in_element((By.ID, self.somax_task_first_row_work_order_a_id), work_order))
-                element_click = WebDriverWait(self.driver, 60).until(
-                    EC.element_to_be_clickable((By.ID, self.somax_task_first_row_work_order_a_id)))
-
-            element_click.click()
+            self.get_work_order_detail(work_order)
 
         self.driver.quit()
+
+        return True
+
+    def task_actual_hour_spider(self, start, end):
+
+        # remove
+        data = pd.read_excel('Work hour result.xlsx')
+        data = data.loc[int(start): int(end)]
+        data_unfilled = data[data['hours'].isnull()]
+        # data_unfilled = data[data['hours']==-1]
+
+        data['Scheduled'] = data['Scheduled'].apply(lambda x: x.date())
+        data['Created'] = data['Created'].apply(lambda x: x.date())
+
+        self.driver.get(self.somax_task_url)
+        current_url = self.driver.current_url
+        if current_url == self.somax_login_url:
+            self.login()
+
+        self.get_and_ready(self.somax_task_url)
+
+        i = 0
+        for index, row in data_unfilled.iterrows():
+            try:
+                work_order = str(row['Work Order'])
+                self.get_work_order_detail(work_order)
+
+                element_click_plus = WebDriverWait(self.driver, 60).until(
+                    EC.element_to_be_clickable((By.ID, self.somax_task_detail_actual_open_span_id)))
+                element_click_plus.click()
+
+                element_click_tab = WebDriverWait(self.driver, 60).until(
+                    EC.element_to_be_clickable((By.ID, self.somax_task_detail_actual_tab_a_id)))
+                element_click_tab.click()
+
+                element_table = WebDriverWait(self.driver, 60).until(
+                    EC.presence_of_element_located((By.ID, self.somax_task_detail_actual_table_id)))
+
+                table_html = element_table.get_attribute('outerHTML')
+                soup = bs(table_html, 'lxml')
+
+            # with open("output1.html", "w") as file:
+            #     file.write(str(soup))
+            # print(table_html)
+            # print(pd.read_html(table_html))
+
+                columns = ['username_somax', 'full_name', 'date', 'hours', 'value']
+                table_data = pd.DataFrame(columns=columns)
+
+                for script in soup.find_all('script'):
+                    script.extract()
+                tr_s = soup.find_all('tr', class_='dxgvDataRow_GridTheme')
+
+                for tr in tr_s:
+                    td_s = tr.find_all('td')[1:-1]
+                    row = {'username_somax': td_s[0].get_text(),
+                           'full_name': td_s[1].get_text(),
+                           'date': td_s[2].get_text(),
+                           'hours': float(td_s[3].get_text()),
+                           'value': float(td_s[4].get_text())
+                           }
+
+                    table_data = table_data.append(pd.Series(row), ignore_index=True)
+
+                total_actual = table_data['hours'].sum()
+
+                # data.set_value(index, 'hours', total_actual)
+
+            except Exception as e:
+                print(e)
+                total_actual = -1
+                # data.set_value(index, 'hours', -1)
+
+            self.to_excel(index + 2, total_actual)
+            print(i)
+            i = i + 1
+            self.get_and_ready(self.somax_task_url)
+
+        self.driver.quit()
+        return True
+
+    def get_work_order_detail(self, work_order):
+
+        try:
+            element_text = self.driver.find_element_by_id(self.somax_task_first_row_work_order_a_id).text
+        except Exception as e:
+            element_text = ''
+
+        if element_text != work_order:
+            element_filter = WebDriverWait(self.driver, 60).until(
+                EC.presence_of_element_located((By.ID, self.somax_task_filter_work_order_id)))
+            self.driver.execute_script("arguments[0].setAttribute('value', {work_order})".format(work_order=work_order),
+                                       element_filter)
+            element_filter.send_keys(Keys.ENTER)
+
+            WebDriverWait(self.driver, 60).until(
+                EC.text_to_be_present_in_element((By.ID, self.somax_task_first_row_work_order_a_id), str(work_order)))
+
+        element_click = WebDriverWait(self.driver, 60).until(
+            EC.element_to_be_clickable((By.ID, self.somax_task_first_row_work_order_a_id)))
+        element_click.click()
 
         return True
 
@@ -265,20 +355,22 @@ class SomaxSpider:
         # self.pm_spider()
         self.task_spider()
 
-        # self.driver.get('https://somaxonline.somax.com/EquipmentSearch.aspx')
-        # time.sleep(10)
-        # self.driver.find_element_by_id('ctrlNavigation_btnSiteMap').click()
-        # time.sleep(10)
-        # self.driver.find_element_by_id('Equipment').click()
-        # time.sleep(10)
-        # self.driver.find_element_by_id('MainContent_uicSearchHeader_dxBtnExport').click()
+    @classmethod
+    def to_excel(cls, row, value):
+        wb = load_workbook('/home/arthurtu/projects/bbu/spider/somax/Work hour result.xlsx')
+        ws = wb.get_active_sheet()
+        ws.cell(row=row, column=16).value = value
 
-        # soup = bs(self.driver.page_source, 'xml')
-        # time.sleep(10)
-        # # print(soup)
+        wb.save('/home/arthurtu/projects/bbu/spider/somax/Work hour result.xlsx')
+
+
+
 
 if __name__ == '__main__':
-    SomaxSpider().task_edit_spider([{'work_order': '17037018',
-                                     'current_status': 'Scheduled',
-                                     'current_status_somax': 'Scheduled'}])
+    # SomaxSpider().task_edit_spider([{'work_order': '17037018',
+    #                                  'current_status': 'Scheduled',
+    #                                  'current_status_somax': 'Scheduled'}])
     # SomaxSpider().task_spider()
+    start = input('start:')
+    end = input('end:')
+    SomaxSpider().task_actual_hour_spider(start, end)

@@ -3,6 +3,7 @@ cython == 0.25.2
 django == 1.11.1
 numpy == 1.13.0
 pandas == 0.20.1
+html5lib == 0.999999999
 xlrd == 1.0.0
 openpyxl == 2.4.8
 tzlocal == 1.4

@@ -29,7 +29,11 @@ class PageManager:
             def submit(cls, request, *args, **kwargs):
                 file_type = request.GET.get('FileType')
                 if file_type == 'ReportLostTimeDetail':
-                    ReportLostTimeDetailProcessor.report_lost_time_detail_processor()
+                    try:
+                        ReportLostTimeDetailProcessor.report_lost_time_detail_processor()
+                    except Exception as e:
+                        error = 'database is locked'
+                        print(e)
                 elif file_type == 'ReportTimeDetail':
                     ReportTimeDetailProcessor.report_time_detail_processor()
 
