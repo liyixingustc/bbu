@@ -132,7 +132,6 @@ class TasksLoadProcessor:
         work_orders = data['Work Order'].tolist()
         tasks.auto_schedule.delay(work_orders=work_orders)
 
-
     @classmethod
     def get_new_and_update_data(cls, old, new):
 
