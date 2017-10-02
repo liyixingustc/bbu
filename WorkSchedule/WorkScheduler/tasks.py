@@ -4,6 +4,7 @@ import time
 
 from .utils.SmartScheduler import SmartScheduler
 
+
 @app.task
 def auto_schedule(work_orders=None):
 
