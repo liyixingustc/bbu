@@ -40,6 +40,9 @@ class WorkScheduleDataDAO:
         tasks_record = pd.DataFrame.from_records(tasks)
         tasks_record.rename_axis({'AOR__worker__name': 'AOR'}, axis=1, inplace=True)
 
+        if tasks_record.empty:
+            return pd.DataFrame()
+
         tasks_record['schedule_hour'].fillna(timedelta(hours=0),inplace=True)
         tasks_record['balance_hour'] = tasks_record['estimate_hour'] - tasks_record['schedule_hour']
 
@@ -70,6 +73,9 @@ class WorkScheduleDataDAO:
             .annotate(schedule_hour=Sum('workerscheduled__duration'))
         tasks_record = pd.DataFrame.from_records(tasks)
         tasks_record.rename_axis({'AOR__worker__name': 'AOR'}, axis=1, inplace=True)
+
+        if tasks_record.empty:
+            return pd.DataFrame()
 
         tasks_record['schedule_hour'].fillna(timedelta(hours=0),inplace=True)
         tasks_record['balance_hour'] = tasks_record['estimate_hour'] - tasks_record['schedule_hour']
