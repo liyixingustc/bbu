@@ -77,8 +77,15 @@ define(function (require) {
 
             var data = $(this).serialize();
             $("#WorkConfigDataUploadSubmit").html("Loading...");
-            $.get('Panel1/Form1/Submit/',data,function () {
-                $("#WorkConfigDataUploadSubmit").html("Loaded");
+            $.get('Panel1/Form1/Submit/',data,function (res) {
+                var status = res['status'],
+                    msg = res['msg'];
+                if (status === 1){
+                    $("#WorkConfigDataUploadSubmit").html("Loaded");
+                }else {
+                    $("#WorkConfigDataUploadSubmit").html("Try Again");
+                    alert(msg)
+                }
             });
 
             return false

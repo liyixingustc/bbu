@@ -11,8 +11,8 @@ from django.http import JsonResponse
 
 from .models.models import *
 
-from configuration.WorkScheduleConstants import WorkAvailSheet
 from utils.UDatetime import UDatetime
+from Exception.Exception import ExceptionCustom
 
 from .processor.ReportTimeDetailProcessor import ReportTimeDetailProcessor
 from .processor.ReportLostTimeDetailProcessor import ReportLostTimeDetailProcessor
@@ -32,12 +32,12 @@ class PageManager:
                     try:
                         ReportLostTimeDetailProcessor.report_lost_time_detail_processor()
                     except Exception as e:
-                        error = 'database is locked'
-                        print(e)
+                        msg = ExceptionCustom.get_client_message(e)
+                        return JsonResponse({'status': 0, 'msg': msg})
                 elif file_type == 'ReportTimeDetail':
                     ReportTimeDetailProcessor.report_time_detail_processor()
 
-                return JsonResponse({})
+                return JsonResponse({'status': 1, 'msg': ''})
 
             @classmethod
             def fileupload(cls,request, *args, **kwargs):
