@@ -20,7 +20,7 @@ class Page:
     def index(request, *args, **kwargs):
         template_name = 'WorkConfig/{page}.html'.format(page=kwargs['page'])
         # LoadConfigData().load()
-        # tasks.sync_task.delay()
+        tasks.sync_equipment.delay()
         # SmartScheduler(work_orders=['17037018']).run()
 
         return render(request, template_name)

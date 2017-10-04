@@ -3,6 +3,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from pyvirtualdisplay import Display
 
 from bs4 import BeautifulSoup as bs
 import os
@@ -33,6 +34,8 @@ from WorkSchedule.WorkTasks.models.models import *
 
 class SomaxSpider:
 
+    DISPLAY = False
+
     account = 'BBUGRNATU'
     password = 'ARTHUR'
 
@@ -59,6 +62,9 @@ class SomaxSpider:
 
     def __init__(self, account=None, password=None):
 
+        if not self.DISPLAY:
+            self.display = Display(visible=0, size=(800, 600))
+            self.display.start()
         self.driver = self.chromedriver()
         # self.login(account, password)
         # self.cookies = self.driver.get_cookies()
@@ -68,6 +74,12 @@ class SomaxSpider:
         prefs = {'profile.default_content_settings.popups': 0, 'download.default_directory': self.download_path}
         options.add_experimental_option('prefs', prefs)
         driver = webdriver.Chrome(chrome_options=options)
+        return driver
+
+    def phantomjsdriver(self):
+
+        driver = webdriver.PhantomJS()
+
         return driver
 
     def login(self, account=None, password=None):
@@ -111,6 +123,8 @@ class SomaxSpider:
                         os.path.join(target_path, filename))
 
         self.driver.quit()
+        if not self.DISPLAY:
+            self.display.stop()
 
         file_path = os.path.join(target_path, filename)
         EquipmentLoadProcessor.equipment_load_processor([file_path])
@@ -141,6 +155,8 @@ class SomaxSpider:
                         os.path.join(target_path, filename))
 
         self.driver.quit()
+        if not self.DISPLAY:
+            self.display.stop()
 
         file_path = os.path.join(target_path, filename)
         PMsLoadProcessor.pms_load_processor([file_path])
@@ -171,6 +187,8 @@ class SomaxSpider:
                         os.path.join(target_path, filename))
 
         self.driver.quit()
+        if not self.DISPLAY:
+            self.display.stop()
 
         file_path = os.path.join(target_path, filename)
         TasksLoadProcessor.tasks_load_processor([file_path])
@@ -221,6 +239,8 @@ class SomaxSpider:
             self.get_work_order_detail(work_order)
 
         self.driver.quit()
+        if not self.DISPLAY:
+            self.display.stop()
 
         return True
 
@@ -300,6 +320,9 @@ class SomaxSpider:
             self.get_and_ready(self.somax_task_url)
 
         self.driver.quit()
+        if not self.DISPLAY:
+            self.display.stop()
+
         return True
 
     def get_work_order_detail(self, work_order):
@@ -370,7 +393,8 @@ if __name__ == '__main__':
     # SomaxSpider().task_edit_spider([{'work_order': '17037018',
     #                                  'current_status': 'Scheduled',
     #                                  'current_status_somax': 'Scheduled'}])
+    SomaxSpider().equipment_spider()
     # SomaxSpider().task_spider()
-    start = input('start:')
-    end = input('end:')
-    SomaxSpider().task_actual_hour_spider(start, end)
+    # start = input('start:')
+    # end = input('end:')
+    # SomaxSpider().task_actual_hour_spider(start, end)
