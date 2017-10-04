@@ -23,7 +23,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'g09)et^$8rjua)2^tsgv!l=9c!u#=170cv8kqb!p%90mvcn!=b'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+if 'EC2_HOME' in os.environ:
+    DEBUG = False
+else:
+    DEBUG = True
 
 ALLOWED_HOSTS = ['ec2-54-162-166-112.compute-1.amazonaws.com', 'bbu.tlinvestmentllc.com', '127.0.0.1', 'localhost']
 
@@ -93,23 +96,24 @@ WSGI_APPLICATION = 'bbu.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 # if 'EC2_HOME' in os.environ:
-#     DATABASES = {
-#         'default': {
-#             'ENGINE': 'django.db.backends.mysql',
-#             'NAME': 'bbu',
-#             'USER': 'bbu',
-#             'PASSWORD': 'Tsh19920328',
-#             'HOST': 'bbu.comop3eprq5n.us-east-1.rds.amazonaws.com',
-#             'PORT': '3306',
-#         }
-#     }
-# else:
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'bbu',
+        'USER': 'tlinvestment',
+        'PASSWORD': 'Tsh19920328',
+        'HOST': 'tlinvestment.comop3eprq5n.us-east-1.rds.amazonaws.com',
+        'PORT': '3306',
     }
 }
+
+# else:
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#     }
+# }
 
 
 # Password validation
@@ -150,7 +154,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = 'static'
-STATICFILES_DIRS=[os.path.join(BASE_DIR,'static_public'),]
+STATICFILES_DIRS = [os.path.join(BASE_DIR,'static_public'),]
 
 # MEDIA_ROOT = "/Users/mayaroselip/Documents/LodgIQ/_source/lodgiq_ingestor/webadmin/didash/didash/media/"
 # MEDIA_URL = "http://localhost:8000/tracking/static/"
