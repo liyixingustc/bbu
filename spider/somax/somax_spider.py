@@ -34,7 +34,7 @@ from WorkSchedule.WorkTasks.models.models import *
 
 class SomaxSpider:
 
-    DISPLAY = False
+    DISPLAY = True
 
     account = 'BBUGRNATU'
     password = 'ARTHUR'
@@ -70,8 +70,7 @@ class SomaxSpider:
         # self.cookies = self.driver.get_cookies()
 
     def firefoxdriver(self):
-
-        driver = webdriver.Firefox()
+        driver = webdriver.Firefox(executable_path='/usr/bin/geckodriver')
 
         return driver
 
@@ -107,6 +106,7 @@ class SomaxSpider:
         return True
 
     def equipment_spider(self):
+        print(1)
         self.driver.get(self.somax_equipment_url)
         current_url = self.driver.current_url
         if current_url == self.somax_login_url:
