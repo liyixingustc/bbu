@@ -28,7 +28,7 @@ if 'EC2_HOME' in os.environ:
 else:
     DEBUG = True
 
-ALLOWED_HOSTS = ['ec2-54-162-166-112.compute-1.amazonaws.com', 'bbu.tlinvestmentllc.com', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['54.174.76.236', 'bbu.tlinvestmentllc.com', '127.0.0.1', 'localhost']
 
 
 # Application definition
