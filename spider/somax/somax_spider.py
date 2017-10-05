@@ -65,9 +65,16 @@ class SomaxSpider:
         if not self.DISPLAY:
             self.display = Display(visible=0, size=(800, 600))
             self.display.start()
-        self.driver = self.chromedriver()
+        self.driver = self.firefoxdriver()
         # self.login(account, password)
         # self.cookies = self.driver.get_cookies()
+
+    def firefoxdriver(self):
+
+        driver = webdriver.Firefox()
+
+        return driver
+
 
     def chromedriver(self):
         options = webdriver.ChromeOptions()
