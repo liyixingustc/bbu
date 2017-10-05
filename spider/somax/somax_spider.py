@@ -65,7 +65,7 @@ class SomaxSpider:
         if not self.DISPLAY:
             self.display = Display(visible=0, size=(800, 600))
             self.display.start()
-        self.driver = self.firefoxdriver()
+        self.driver = self.chromedriver()
         # self.login(account, password)
         # self.cookies = self.driver.get_cookies()
 
@@ -79,7 +79,7 @@ class SomaxSpider:
         options = webdriver.ChromeOptions()
         prefs = {'profile.default_content_settings.popups': 0, 'download.default_directory': self.download_path}
         options.add_experimental_option('prefs', prefs)
-        driver = webdriver.Chrome(chrome_options=options)
+        driver = webdriver.Chrome(chrome_options=options,executable_path='/usr/bin/chromedriver')
         return driver
 
     def phantomjsdriver(self):
