@@ -80,22 +80,19 @@ class SomaxSpider:
         os.makedirs(pm_folder_path, exist_ok=True)
         os.makedirs(task_folder_path, exist_ok=True)
 
-    @staticmethod
-    def firefoxdriver():
+    def firefoxdriver(self):
         driver = webdriver.Firefox(executable_path='/usr/bin/geckodriver')
 
         return driver
 
-    @staticmethod
-    def chromedriver():
+    def chromedriver(self):
         options = webdriver.ChromeOptions()
         prefs = {'profile.default_content_settings.popups': 0, 'download.default_directory': self.download_path}
         options.add_experimental_option('prefs', prefs)
         driver = webdriver.Chrome(chrome_options=options,executable_path='/usr/bin/chromedriver')
         return driver
 
-    @staticmethod
-    def phantomjsdriver():
+    def phantomjsdriver(self):
 
         driver = webdriver.PhantomJS()
 
