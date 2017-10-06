@@ -75,10 +75,11 @@ class SomaxSpider:
 
     @staticmethod
     def init_folder():
-        equipment_folder_path = os.path.join(MEDIA_ROOT, 'spider/somax/equipment')
-        pm_folder_path = os.path.join(MEDIA_ROOT, 'spider/somax/pm')
-        task_folder_path = os.path.join(MEDIA_ROOT, 'spider/somax/task')
+        equipment_folder_path = os.path.join(BASE_DIR, MEDIA_ROOT, 'spider/somax/equipment')
+        pm_folder_path = os.path.join(BASE_DIR, MEDIA_ROOT, 'spider/somax/pm')
+        task_folder_path = os.path.join(BASE_DIR, MEDIA_ROOT, 'spider/somax/task')
 
+        print(equipment_folder_path)
         os.makedirs(equipment_folder_path, exist_ok=True)
         os.makedirs(pm_folder_path, exist_ok=True)
         os.makedirs(task_folder_path, exist_ok=True)
