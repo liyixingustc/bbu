@@ -119,39 +119,43 @@ class SomaxSpider:
         return True
 
     def equipment_spider(self):
-        print(0)
-        self.driver.get(self.somax_equipment_url)
-        print(0.5)
-        current_url = self.driver.current_url
-        print(0.7)
-        if current_url == self.somax_login_url:
-            self.login()
-        print(1)
-        before = os.listdir(self.download_path)
-        self.get_and_ready(self.somax_equipment_url)
-        print(2)
-        self.driver.find_element_by_id('MainContent_uicSearchHeader_dxBtnExport').click()
-        print(3)
-        after = os.listdir(self.download_path)
-        self.driver.execute_script("window.stop();")
-        filename = self.get_download_file_name(before, after, self.download_path)
-        if not filename:
-            return None
-        else:
-            target_path = os.path.join(self.download_path, 'equipment')
-            r = glob.glob(os.path.join(target_path, '*'))
-            for i in r:
-                    os.remove(i)
+        try:
+            print(0)
+            self.driver.get(self.somax_equipment_url)
+            print(0.5)
+            current_url = self.driver.current_url
+            print(0.7)
+            if current_url == self.somax_login_url:
+                self.login()
+            print(1)
+            before = os.listdir(self.download_path)
+            self.get_and_ready(self.somax_equipment_url)
+            print(2)
+            self.driver.find_element_by_id('MainContent_uicSearchHeader_dxBtnExport').click()
+            print(3)
+            after = os.listdir(self.download_path)
+            self.driver.execute_script("window.stop();")
+            filename = self.get_download_file_name(before, after, self.download_path)
+            if not filename:
+                return None
+            else:
+                target_path = os.path.join(self.download_path, 'equipment')
+                r = glob.glob(os.path.join(target_path, '*'))
+                for i in r:
+                        os.remove(i)
 
-            shutil.move(os.path.join(self.download_path, filename),
-                        os.path.join(target_path, filename))
-        print(4)
-        self.driver.quit()
-        if not self.DISPLAY:
-            self.display.stop()
-        print(5)
-        file_path = os.path.join(target_path, filename)
-        EquipmentLoadProcessor.equipment_load_processor([file_path])
+                shutil.move(os.path.join(self.download_path, filename),
+                            os.path.join(target_path, filename))
+            print(4)
+            self.driver.quit()
+            if not self.DISPLAY:
+                self.display.stop()
+            print(5)
+            file_path = os.path.join(target_path, filename)
+            EquipmentLoadProcessor.equipment_load_processor([file_path])
+        except Exception as e:
+            self.driver.quit()
+            print(e)
 
         return True
 
