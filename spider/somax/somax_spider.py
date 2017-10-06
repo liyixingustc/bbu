@@ -140,8 +140,11 @@ class SomaxSpider:
             # self.driver.find_element_by_id('MainContent_uicSearchHeader_dxBtnExport').click()
             print(3)
             after = os.listdir(self.download_path)
+            print(4)
             self.driver.execute_script("window.stop();")
+            print(5)
             filename = self.get_download_file_name(before, after, self.download_path)
+            print(6)
             if not filename:
                 return None
             else:
@@ -152,11 +155,11 @@ class SomaxSpider:
 
                 shutil.move(os.path.join(self.download_path, filename),
                             os.path.join(target_path, filename))
-            print(4)
+            print(7)
             self.driver.quit()
             if not self.DISPLAY:
                 self.display.stop()
-            print(5)
+            print(8)
             file_path = os.path.join(target_path, filename)
             EquipmentLoadProcessor.equipment_load_processor([file_path])
         except Exception as e:
