@@ -62,6 +62,7 @@ class SomaxSpider:
 
     def __init__(self, account=None, password=None):
 
+        self.init_folder()
         if not self.DISPLAY:
             self.display = Display(visible=0, size=(800, 600))
             self.display.start()
@@ -69,20 +70,32 @@ class SomaxSpider:
         # self.login(account, password)
         # self.cookies = self.driver.get_cookies()
 
-    def firefoxdriver(self):
+    @staticmethod
+    def init_folder():
+        equipment_folder_path = os.path.join(MEDIA_ROOT, 'spider/somax/equipment')
+        pm_folder_path = os.path.join(MEDIA_ROOT, 'spider/somax/pm')
+        task_folder_path = os.path.join(MEDIA_ROOT, 'spider/somax/task')
+
+        os.makedirs(equipment_folder_path, exist_ok=True)
+        os.makedirs(pm_folder_path, exist_ok=True)
+        os.makedirs(task_folder_path, exist_ok=True)
+
+    @staticmethod
+    def firefoxdriver():
         driver = webdriver.Firefox(executable_path='/usr/bin/geckodriver')
 
         return driver
 
-
-    def chromedriver(self):
+    @staticmethod
+    def chromedriver():
         options = webdriver.ChromeOptions()
         prefs = {'profile.default_content_settings.popups': 0, 'download.default_directory': self.download_path}
         options.add_experimental_option('prefs', prefs)
         driver = webdriver.Chrome(chrome_options=options,executable_path='/usr/bin/chromedriver')
         return driver
 
-    def phantomjsdriver(self):
+    @staticmethod
+    def phantomjsdriver():
 
         driver = webdriver.PhantomJS()
 
@@ -110,10 +123,12 @@ class SomaxSpider:
         current_url = self.driver.current_url
         if current_url == self.somax_login_url:
             self.login()
-
+        print(1)
         before = os.listdir(self.download_path)
         self.get_and_ready(self.somax_equipment_url)
+        print(2)
         self.driver.find_element_by_id('MainContent_uicSearchHeader_dxBtnExport').click()
+        print(3)
         after = os.listdir(self.download_path)
         self.driver.execute_script("window.stop();")
         filename = self.get_download_file_name(before, after, self.download_path)
@@ -127,11 +142,11 @@ class SomaxSpider:
 
             shutil.move(os.path.join(self.download_path, filename),
                         os.path.join(target_path, filename))
-
+        print(4)
         self.driver.quit()
         if not self.DISPLAY:
             self.display.stop()
-
+        print(5)
         file_path = os.path.join(target_path, filename)
         EquipmentLoadProcessor.equipment_load_processor([file_path])
 
