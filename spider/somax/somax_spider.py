@@ -61,12 +61,15 @@ class SomaxSpider:
     download_path = os.path.join(BASE_DIR, MEDIA_ROOT, 'spider', 'somax')
 
     def __init__(self, account=None, password=None):
-
+        print('a')
         self.init_folder()
+        print('b')
         if not self.DISPLAY:
             self.display = Display(visible=0, size=(800, 600))
             self.display.start()
+        print('c')
         self.driver = self.chromedriver()
+        print('d')
         # self.login(account, password)
         # self.cookies = self.driver.get_cookies()
 
