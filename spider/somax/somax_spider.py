@@ -116,8 +116,11 @@ class SomaxSpider:
         return True
 
     def equipment_spider(self):
+        print(0)
         self.driver.get(self.somax_equipment_url)
+        print(0.5)
         current_url = self.driver.current_url
+        print(0.7)
         if current_url == self.somax_login_url:
             self.login()
         print(1)
