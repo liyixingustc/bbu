@@ -34,7 +34,7 @@ from WorkSchedule.WorkTasks.models.models import *
 
 class SomaxSpider:
 
-    DISPLAY = True
+    DISPLAY = False
 
     account = 'BBUGRNATU'
     password = 'ARTHUR'
@@ -135,8 +135,8 @@ class SomaxSpider:
             print(self.driver.page_source)
             element_export = WebDriverWait(self.driver, 60).until(
                 EC.element_to_be_clickable((By.ID, self.somax_table_export_div_id)))
-            print(element_export)
-            element_export.click()
+            self.driver.execute_script("arguments[0].click();", element_export)
+            # element_export.click()
             # self.driver.find_element_by_id('MainContent_uicSearchHeader_dxBtnExport').click()
             print(3)
             after = os.listdir(self.download_path)
