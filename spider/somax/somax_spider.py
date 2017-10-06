@@ -131,6 +131,7 @@ class SomaxSpider:
             before = os.listdir(self.download_path)
             self.get_and_ready(self.somax_equipment_url)
             print(2)
+            print(self.driver.page_source)
             self.driver.find_element_by_id('MainContent_uicSearchHeader_dxBtnExport').click()
             print(3)
             after = os.listdir(self.download_path)
