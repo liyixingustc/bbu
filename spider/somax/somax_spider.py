@@ -50,7 +50,7 @@ class SomaxSpider:
 
     somax_logo_id = 'imgLogo'
     somax_page_title_id = 'ctlPageDetails_lblPageTitle'
-    somax_table_export_div_id = 'MainContent_uicSearchHeader_dxBtnExport_CD'
+    somax_table_export_div_id = 'MainContent_uicSearchHeader_dxBtnExport'
     somax_task_filter_work_order_id = 'MainContent_grdResults_DXFREditorcol0_I'
     somax_task_first_row_work_order_a_id = 'MainContent_grdResults_cell0_0_ColClientLookUpId_0'
     somax_task_first_row_work_order_td_id = 'MainContent_grdResults_tccell0_0'
@@ -135,6 +135,7 @@ class SomaxSpider:
             print(self.driver.page_source)
             element_export = WebDriverWait(self.driver, 60).until(
                 EC.element_to_be_clickable((By.ID, self.somax_table_export_div_id)))
+            print(element_export)
             element_export.click()
             # self.driver.find_element_by_id('MainContent_uicSearchHeader_dxBtnExport').click()
             print(3)
