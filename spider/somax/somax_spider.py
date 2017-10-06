@@ -34,7 +34,7 @@ from WorkSchedule.WorkTasks.models.models import *
 
 class SomaxSpider:
 
-    DISPLAY = False
+    DISPLAY = True
 
     account = 'BBUGRNATU'
     password = 'ARTHUR'
