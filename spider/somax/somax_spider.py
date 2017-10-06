@@ -58,7 +58,6 @@ class SomaxSpider:
     somax_task_detail_actual_tab_a_id = 'MainContent_cpcActuals_ctl00_ASPxPageControlActuals_T1'
     somax_task_detail_actual_table_id = 'MainContent_cpcActuals_ctl00_ASPxPageControlActuals_grdWorkOrderLabor_DXMainTable'
 
-
     download_path = os.path.join(BASE_DIR, MEDIA_ROOT, 'spider', 'somax')
 
     def __init__(self, account=None, password=None):
@@ -130,9 +129,10 @@ class SomaxSpider:
                 self.login()
             print(1)
             before = os.listdir(self.download_path)
+            print(before)
             self.get_and_ready(self.somax_equipment_url)
             print(2)
-            print(self.driver.page_source)
+            # print(self.driver.page_source)
             element_export = WebDriverWait(self.driver, 60).until(
                 EC.element_to_be_clickable((By.ID, self.somax_table_export_div_id)))
             self.driver.execute_script("arguments[0].click();", element_export)
@@ -140,6 +140,7 @@ class SomaxSpider:
             # self.driver.find_element_by_id('MainContent_uicSearchHeader_dxBtnExport').click()
             print(3)
             after = os.listdir(self.download_path)
+            print(after)
             print(4)
             self.driver.execute_script("window.stop();")
             print(5)
