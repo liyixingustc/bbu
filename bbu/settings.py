@@ -28,7 +28,7 @@ if 'EC2_HOME' in os.environ:
 else:
     DEBUG = True
 
-ALLOWED_HOSTS = ['54.89.201.18', 'bbu.tlinvestmentllc.com', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['52.91.40.99', 'bbu.tlinvestmentllc.com', '127.0.0.1', 'localhost']
 
 
 # Application definition
