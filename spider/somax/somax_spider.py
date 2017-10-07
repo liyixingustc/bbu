@@ -443,8 +443,8 @@ if __name__ == '__main__':
     # SomaxSpider().task_edit_spider([{'work_order': '17037018',
     #                                  'current_status': 'Scheduled',
     #                                  'current_status_somax': 'Scheduled'}])
-    # SomaxSpider().equipment_spider()
-    SomaxSpider().pm_spider()
+    SomaxSpider().equipment_spider()
+    # SomaxSpider().pm_spider()
     # SomaxSpider().task_spider()
     # start = input('start:')
     # end = input('end:')
