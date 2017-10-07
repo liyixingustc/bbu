@@ -139,6 +139,7 @@ class SomaxSpider:
             # element_export.click()
             # self.driver.find_element_by_id('MainContent_uicSearchHeader_dxBtnExport').click()
             print(3)
+            time.sleep(5)
             after = os.listdir(self.download_path)
             print(after)
             print(4)
