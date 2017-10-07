@@ -178,7 +178,10 @@ class SomaxSpider:
 
         before = os.listdir(self.download_path)
         self.get_and_ready(self.somax_pm_url)
-        self.driver.find_element_by_id('MainContent_uicSearchHeader_dxBtnExport').click()
+        element_export = WebDriverWait(self.driver, 60).until(
+            EC.element_to_be_clickable((By.ID, self.somax_table_export_div_id)))
+        self.driver.execute_script("arguments[0].click();", element_export)
+        self.download_finished(file_name='PreventiveMaintenance.csv')
         after = os.listdir(self.download_path)
         self.driver.execute_script("window.stop();")
         filename = self.get_download_file_name(before, after, self.download_path)
@@ -452,7 +455,8 @@ if __name__ == '__main__':
     # SomaxSpider().task_edit_spider([{'work_order': '17037018',
     #                                  'current_status': 'Scheduled',
     #                                  'current_status_somax': 'Scheduled'}])
-    SomaxSpider().equipment_spider()
+    # SomaxSpider().equipment_spider()
+    SomaxSpider().pm_spider()
     # SomaxSpider().task_spider()
     # start = input('start:')
     # end = input('end:')
