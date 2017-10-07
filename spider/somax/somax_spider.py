@@ -139,7 +139,7 @@ class SomaxSpider:
             # element_export.click()
             # self.driver.find_element_by_id('MainContent_uicSearchHeader_dxBtnExport').click()
             print(3)
-            time.sleep(5)
+            self.download_finished(file_name='EquipmentSearch.csv')
             after = os.listdir(self.download_path)
             print(after)
             print(4)
@@ -393,6 +393,26 @@ class SomaxSpider:
             if self.driver.current_url == url:
                 break
             time.sleep(1)
+        return True
+
+    def download_finished(self, time_out=60, file_name=None, file_type=None):
+
+        t0 = time.time()
+        while True:
+
+            if file_name:
+                file_path = os.path.join(self.download_path, file_name)
+            elif file_type:
+                file_path = os.path.join(self.download_path, '*.{file_type}'.format(file_type=file_type))
+            else:
+                return False
+            if os.path.exists(file_path):
+                break
+
+            t1 = time.time()
+            if (t1 - t0) >= time_out:
+                break
+
         return True
 
     @staticmethod
