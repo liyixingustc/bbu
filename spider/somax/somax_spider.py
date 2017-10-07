@@ -152,69 +152,76 @@ class SomaxSpider:
         return True
 
     def pm_spider(self):
-        self.driver.get(self.somax_pm_url)
-        current_url = self.driver.current_url
-        if current_url == self.somax_login_url:
-            self.login()
+        try:
+            self.driver.get(self.somax_pm_url)
+            current_url = self.driver.current_url
+            if current_url == self.somax_login_url:
+                self.login()
 
-        before = os.listdir(self.download_path)
-        self.get_and_ready(self.somax_pm_url)
-        element_export = WebDriverWait(self.driver, 60).until(
-            EC.element_to_be_clickable((By.ID, self.somax_table_export_div_id)))
-        self.driver.execute_script("arguments[0].click();", element_export)
-        self.download_finished(file_name='PreventiveMaintenance.csv')
-        after = os.listdir(self.download_path)
-        self.driver.execute_script("window.stop();")
-        filename = self.get_download_file_name(before, after, self.download_path)
-        if not filename:
-            return None
-        else:
-            target_path = os.path.join(self.download_path, 'pm')
-            r = glob.glob(os.path.join(target_path, '*'))
-            for i in r:
-                    os.remove(i)
+            before = os.listdir(self.download_path)
+            self.get_and_ready(self.somax_pm_url)
+            element_export = WebDriverWait(self.driver, 60).until(
+                EC.element_to_be_clickable((By.ID, self.somax_table_export_div_id)))
+            self.driver.execute_script("arguments[0].click();", element_export)
+            self.download_finished(file_name='PreventiveMaintenance.csv')
+            after = os.listdir(self.download_path)
+            self.driver.execute_script("window.stop();")
+            filename = self.get_download_file_name(before, after, self.download_path)
+            if not filename:
+                return None
+            else:
+                target_path = os.path.join(self.download_path, 'pm')
+                r = glob.glob(os.path.join(target_path, '*'))
+                for i in r:
+                        os.remove(i)
 
-            shutil.move(os.path.join(self.download_path, filename),
-                        os.path.join(target_path, filename))
+                shutil.move(os.path.join(self.download_path, filename),
+                            os.path.join(target_path, filename))
 
-        self.driver.quit()
-        if not self.DISPLAY:
-            self.display.stop()
+            self.driver.quit()
+            if not self.DISPLAY:
+                self.display.stop()
 
-        file_path = os.path.join(target_path, filename)
-        PMsLoadProcessor.pms_load_processor([file_path])
-        print(1)
+            file_path = os.path.join(target_path, filename)
+            PMsLoadProcessor.pms_load_processor([file_path])
+        except Exception as e:
+            self.driver.quit()
+            print(e)
         return True
 
     def task_spider(self):
-        self.driver.get(self.somax_task_url)
-        current_url = self.driver.current_url
-        if current_url == self.somax_login_url:
-            self.login()
+        try:
+            self.driver.get(self.somax_task_url)
+            current_url = self.driver.current_url
+            if current_url == self.somax_login_url:
+                self.login()
 
-        before = os.listdir(self.download_path)
-        self.get_and_ready(self.somax_task_url)
-        self.driver.find_element_by_id('MainContent_uicSearchHeader_dxBtnExport').click()
-        after = os.listdir(self.download_path)
-        self.driver.execute_script("window.stop();")
-        filename = self.get_download_file_name(before, after, self.download_path)
-        if not filename:
-            return None
-        else:
-            target_path = os.path.join(self.download_path, 'task')
-            r = glob.glob(os.path.join(target_path, '*'))
-            for i in r:
-                    os.remove(i)
+            before = os.listdir(self.download_path)
+            self.get_and_ready(self.somax_task_url)
+            self.driver.find_element_by_id('MainContent_uicSearchHeader_dxBtnExport').click()
+            after = os.listdir(self.download_path)
+            self.driver.execute_script("window.stop();")
+            filename = self.get_download_file_name(before, after, self.download_path)
+            if not filename:
+                return None
+            else:
+                target_path = os.path.join(self.download_path, 'task')
+                r = glob.glob(os.path.join(target_path, '*'))
+                for i in r:
+                        os.remove(i)
 
-            shutil.move(os.path.join(self.download_path, filename),
-                        os.path.join(target_path, filename))
+                shutil.move(os.path.join(self.download_path, filename),
+                            os.path.join(target_path, filename))
 
-        self.driver.quit()
-        if not self.DISPLAY:
-            self.display.stop()
+            self.driver.quit()
+            if not self.DISPLAY:
+                self.display.stop()
 
-        file_path = os.path.join(target_path, filename)
-        TasksLoadProcessor.tasks_load_processor([file_path])
+            file_path = os.path.join(target_path, filename)
+            TasksLoadProcessor.tasks_load_processor([file_path])
+        except Exception as e:
+            self.driver.quit()
+            print(e)
 
         return True
 
