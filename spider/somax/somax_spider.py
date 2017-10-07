@@ -61,15 +61,11 @@ class SomaxSpider:
     download_path = os.path.join(BASE_DIR, MEDIA_ROOT, 'spider', 'somax')
 
     def __init__(self, account=None, password=None):
-        print('a')
         self.init_folder()
-        print('b')
         if not self.DISPLAY:
             self.display = Display(visible=0, size=(800, 600))
             self.display.start()
-        print('c')
         self.driver = self.chromedriver()
-        print('d')
         # self.login(account, password)
         # self.cookies = self.driver.get_cookies()
 
@@ -120,33 +116,19 @@ class SomaxSpider:
 
     def equipment_spider(self):
         try:
-            print(0)
             self.driver.get(self.somax_equipment_url)
-            print(0.5)
             current_url = self.driver.current_url
-            print(0.7)
             if current_url == self.somax_login_url:
                 self.login()
-            print(1)
             before = os.listdir(self.download_path)
-            print(before)
             self.get_and_ready(self.somax_equipment_url)
-            print(2)
-            # print(self.driver.page_source)
             element_export = WebDriverWait(self.driver, 60).until(
                 EC.element_to_be_clickable((By.ID, self.somax_table_export_div_id)))
             self.driver.execute_script("arguments[0].click();", element_export)
-            # element_export.click()
-            # self.driver.find_element_by_id('MainContent_uicSearchHeader_dxBtnExport').click()
-            print(3)
             self.download_finished(file_name='EquipmentSearch.csv')
             after = os.listdir(self.download_path)
-            print(after)
-            print(4)
             self.driver.execute_script("window.stop();")
-            print(5)
             filename = self.get_download_file_name(before, after, self.download_path)
-            print(6)
             if not filename:
                 return None
             else:
@@ -157,11 +139,10 @@ class SomaxSpider:
 
                 shutil.move(os.path.join(self.download_path, filename),
                             os.path.join(target_path, filename))
-            print(7)
+
             self.driver.quit()
             if not self.DISPLAY:
                 self.display.stop()
-            print(8)
             file_path = os.path.join(target_path, filename)
             EquipmentLoadProcessor.equipment_load_processor([file_path])
         except Exception as e:
@@ -202,7 +183,7 @@ class SomaxSpider:
 
         file_path = os.path.join(target_path, filename)
         PMsLoadProcessor.pms_load_processor([file_path])
-
+        print(1)
         return True
 
     def task_spider(self):
