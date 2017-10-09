@@ -1,5 +1,6 @@
 //circus
 circusd --daemon circus_local.ini
+circusd --daemon circus.ini
 
 //circusctl
 circusctl

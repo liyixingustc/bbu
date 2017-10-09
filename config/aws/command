@@ -83,6 +83,22 @@ cp /home/apache/bbu/config/apache/server/tlinvestment.conf /etc/httpd/conf.d
 cp /home/arthurtu/projects/bbu/config/apache/home/tlinvestment.conf /etc/httpd/conf.d
 httpd -k restart
 
+// daily
+sudo su apache
+cd ~
+source /home/apache/.bash_profile
+pyenv activate bbu
+cd bbu
+git pull
+
+python manage.py collectstatic
+python manage.py makemigrations
+python manage.py migrate
+
+cd /etc/httpd/logs
+cat error_log
+httpd -k restart
+
 
 
 
