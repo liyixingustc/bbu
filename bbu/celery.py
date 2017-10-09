@@ -29,18 +29,17 @@ def debug_task(self):
 app.conf.beat_schedule = {
     'sync_equipment': {
         'task': 'spider.somax.tasks.sync_equipment',
-        'schedule': crontab(minute='*'),
-        # 'schedule': crontab(minute='*'),
+        'schedule': crontab(minute=0, hour='*/3'),
         'args': (),
     },
     'sync_pm': {
         'task': 'spider.somax.tasks.sync_pm',
-        'schedule': crontab(minute=0, hour=0),
+        'schedule': crontab(minute=0, hour='*/3'),
         'args': (),
     },
     'sync_task': {
         'task': 'spider.somax.tasks.sync_task',
-        'schedule': crontab(minute=0, hour='*/12'),
+        'schedule': crontab(minute=0, hour='*/3'),
         'args': (),
     },
 }
