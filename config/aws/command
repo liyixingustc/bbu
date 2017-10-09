@@ -71,8 +71,16 @@ Tsh19920328
 robert.sarmiento@bbumail.com
 Test1234$
 
+cd /home/apache
+chmod 755 
+cd /bbu
+chmod 755 db.sqlite3
+chmod 755 -R media
+
 // http config
 cp /home/apache/bbu/config/apache/server/tlinvestment.conf /etc/httpd/conf.d
+//home
+cp /home/arthurtu/projects/bbu/config/apache/home/tlinvestment.conf /etc/httpd/conf.d
 httpd -k restart
 
 
