@@ -1,0 +1,82 @@
+//root
+sudo su root
+//add usr 
+adduser apache
+// install epel
+yum install epel-release
+// update yum
+yum update
+// set-up package
+yum install -y  gcc gcc-c++ make git patch openssl-devel zlib-devel readline-devel sqlite-devel bzip2-devel nano wget libffi-devel
+// install mysql
+yum install python-devel mysql-devel
+// install http
+yum install httpd httpd-devel
+//install mod_wsgi
+wget https://centos7.iuscommunity.org/ius-release.rpm
+sudo rpm -Uvh ius-release*.rpm
+rm ius-release*.rpm
+yum install python36u-mod_wsgi
+// install chromedriver xvfb
+yum install chromedriver
+yum install xorg-x11-server-Xvfb
+
+nano /etc/yum.repos.d/google-chrome.repo
+
+[google-chrome]
+name=google-chrome
+baseurl=http://dl.google.com/linux/chrome/rpm/stable/$basearch
+enabled=1
+gpgcheck=1
+gpgkey=https://dl-ssl.google.com/linux/linux_signing_key.pub
+
+yum install google-chrome-stable
+
+// redis
+yum install redis
+service redis start
+redis-cli ping
+
+// install pyenv
+cd /home/apache
+curl -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
+
+nano /home/apache/.bash_profile
+
+export PATH="~/.pyenv/bin:$PATH"
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
+
+source /home/apache/.bash_profile
+pyenv update
+
+pyenv install 3.6.3
+pyenv global 3.6.3
+pyenv virtualenv bbu
+pyenv activate bbu
+
+// install bbu
+sudo su apache
+cd /home/apache
+pyenv activate bbu
+git clone https://github.com/tianni4104/bbu.git
+cd bbu
+pip install -r requirements.txt
+python manage.py collectstatic
+python manage.py makemigrations
+python manage.py migrate
+python manage.py createsuperuser
+arthur@tlinvestmentllc.com
+Tsh19920328
+robert.sarmiento@bbumail.com
+Test1234$
+
+// http config
+cp /home/apache/bbu/config/apache/server/tlinvestment.conf /etc/httpd/conf.d
+httpd -k restart
+
+
+
+
+
+
