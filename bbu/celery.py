@@ -27,10 +27,9 @@ def debug_task(self):
     print('Request: {0!r}'.format(self.request))
 
 app.conf.beat_schedule = {
-    # Executes every Monday morning at 7:30 a.m.
     'sync_equipment': {
         'task': 'spider.somax.tasks.sync_equipment',
-        'schedule': crontab(minute=0, hour=0),
+        'schedule': crontab(minute='*'),
         # 'schedule': crontab(minute='*'),
         'args': (),
     },
