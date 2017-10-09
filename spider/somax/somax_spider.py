@@ -444,7 +444,13 @@ if __name__ == '__main__':
     #                                  'current_status': 'Scheduled',
     #                                  'current_status_somax': 'Scheduled'}])
     # SomaxSpider().equipment_spider()
-    SomaxSpider().pm_spider()
+    spider_type = input('please choose spider type: equip or 1 | pm or 2 | task or 3:')
+    if spider_type == 'equip' or '1':
+        SomaxSpider().equipment_spider()
+    elif spider_type == 'pm' or '2':
+        SomaxSpider().equipment_spider()
+    elif spider_type == 'task' or '3':
+        SomaxSpider().task_spider()
     # SomaxSpider().task_spider()
     # start = input('start:')
     # end = input('end:')
