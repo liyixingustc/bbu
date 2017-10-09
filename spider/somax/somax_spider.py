@@ -34,7 +34,7 @@ from WorkSchedule.WorkTasks.models.models import *
 
 class SomaxSpider:
 
-    DISPLAY = False
+    DISPLAY = True
 
     account = 'BBUGRNATU'
     password = 'ARTHUR'
@@ -198,7 +198,10 @@ class SomaxSpider:
 
             before = os.listdir(self.download_path)
             self.get_and_ready(self.somax_task_url)
-            self.driver.find_element_by_id('MainContent_uicSearchHeader_dxBtnExport').click()
+            element_export = WebDriverWait(self.driver, 60).until(
+                EC.element_to_be_clickable((By.ID, self.somax_table_export_div_id)))
+            self.driver.execute_script("arguments[0].click();", element_export)
+            self.download_finished(file_name='WorkOrderSearch.csv')
             after = os.listdir(self.download_path)
             self.driver.execute_script("window.stop();")
             filename = self.get_download_file_name(before, after, self.download_path)
@@ -386,7 +389,7 @@ class SomaxSpider:
             time.sleep(1)
         return True
 
-    def download_finished(self, time_out=60, file_name=None, file_type=None):
+    def download_finished(self, time_out=120, file_name=None, file_type=None):
 
         t0 = time.time()
         while True:
@@ -437,21 +440,18 @@ class SomaxSpider:
         wb.save('/home/arthurtu/projects/bbu/spider/somax/Work hour result.xlsx')
 
 
-
-
 if __name__ == '__main__':
     # SomaxSpider().task_edit_spider([{'work_order': '17037018',
     #                                  'current_status': 'Scheduled',
     #                                  'current_status_somax': 'Scheduled'}])
-    # SomaxSpider().equipment_spider()
-    spider_type = input('please choose spider type: equip or 1 | pm or 2 | task or 3:')
-    if spider_type == 'equip' or '1':
-        SomaxSpider().equipment_spider()
-    elif spider_type == 'pm' or '2':
-        SomaxSpider().equipment_spider()
-    elif spider_type == 'task' or '3':
-        SomaxSpider().task_spider()
-    # SomaxSpider().task_spider()
     # start = input('start:')
     # end = input('end:')
     # SomaxSpider().task_actual_hour_spider(start, end)
+
+    spider_type = input('please choose spider type: equip or 1 | pm or 2 | task or 3:')
+    if spider_type in ['equip', '1']:
+        SomaxSpider().equipment_spider()
+    elif spider_type in ['pm', '2']:
+        SomaxSpider().equipment_spider()
+    elif spider_type in ['task', '3']:
+        SomaxSpider().task_spider()
