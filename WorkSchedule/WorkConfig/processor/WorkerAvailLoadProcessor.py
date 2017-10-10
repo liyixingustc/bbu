@@ -22,6 +22,9 @@ EST = pytz.timezone(TIME_ZONE)
 
 
 class WorkerAvailLoadProcessor:
+
+    Default_Tasks = pd.DataFrame()
+
     @classmethod
     def worker_avail_load_processor(cls, request):
 
