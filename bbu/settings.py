@@ -23,10 +23,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'g09)et^$8rjua)2^tsgv!l=9c!u#=170cv8kqb!p%90mvcn!=b'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-if 'EC2_HOME' in os.environ:
-    DEBUG = False
-else:
+if 'localhost' in os.environ['HOSTNAME']:
     DEBUG = True
+else:
+    DEBUG = False
 
 ALLOWED_HOSTS = ['52.91.40.99', 'bbu.tlinvestmentllc.com', '127.0.0.1', 'localhost']
 

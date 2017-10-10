@@ -34,12 +34,12 @@ app.conf.beat_schedule = {
     },
     'sync_pm': {
         'task': 'spider.somax.tasks.sync_pm',
-        'schedule': crontab(minute=0, hour='*/3'),
+        'schedule': crontab(minute=10, hour='*/3'),
         'args': (),
     },
     'sync_task': {
         'task': 'spider.somax.tasks.sync_task',
-        'schedule': crontab(minute=0, hour='*/3'),
+        'schedule': crontab(minute=30, hour='*/3'),
         'args': (),
     },
 }
