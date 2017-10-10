@@ -31,7 +31,7 @@ def login(request):
                 if user.is_active:
                     auth.login(request, user)
                     # Redirect to a success page.
-                    return Response({'status':1,'message':'OK', 'url': 'WorkSchedule/1/WorkConfig/index'})
+                    return Response({'status':1,'message':'OK', 'url': '/WorkSchedule/1/WorkConfig/index'})
                 else:
                     # Return a 'disabled account' error message
                     return Response({'status':0,'message':'Disabled account'})

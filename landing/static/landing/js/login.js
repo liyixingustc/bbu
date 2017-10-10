@@ -8,7 +8,8 @@ define(function (require) {
 
     var $checkbox = $('#checkbox1'),
         $username = $('#username'),
-        $password = $('#password');
+        $password = $('#password'),
+        $submit = $('#login-submit');
 
     var remember = Cookies.get('remember');
     if ( remember === 'true' ) {
@@ -30,13 +31,14 @@ define(function (require) {
 
     $("#login-form").submit(function (e) {
         set_cookies();
+        $submit.val('Log In...');
         $.post('/login/',$(this).serialize(),function (data) {
             if(data.status === 1){
                 window.location.href = data.url
              }
              else{
-                console.log(data.message);
-
+                $submit.val('Log In');
+                alert(data.message);
             }
         });
 
