@@ -471,7 +471,6 @@ class PageManager:
                         'total': num,
                         'rows': data_response
                     }
-                    print(response)
                     return JsonResponse(response, safe=False)
                 else:
                     return JsonResponse({})
