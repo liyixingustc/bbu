@@ -190,6 +190,9 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 # timezone = TIME_ZONE
 
+CELERYD_CONCURRENCY = 1
+CELERYD_MAX_TASKS_PER_CHILD = 1
+
 # Celery import tasks
 CELERY_IMPORTS = ('spider.somax.tasks', )
 

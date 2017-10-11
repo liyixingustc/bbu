@@ -28,5 +28,13 @@ def sync_task():
     # TasksLoadProcessor.tasks_load_processor([file_path])
     return
 
+@app.task
+def test_task():
+    time.sleep(1)
+    return
+
 if __name__ == '__main__':
-    sync_task.delay()
+    # sync_task.delay()
+    import sys
+    sys.path.append('/home/arthurtu/projects/bbu')
+    test_task.delay()
