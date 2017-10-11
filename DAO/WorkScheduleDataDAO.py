@@ -23,6 +23,13 @@ class WorkScheduleDataDAO:
     ready_for_schedule_tasks_status = ['Approved', 'Scheduled']
 
     @classmethod
+    def get_all_tasks_open_num(cls):
+        num = tasks = Tasks.objects.filter(current_status__in=cls.ready_for_schedule_tasks_status) \
+            .exclude(priority__in=['T', 'O']).count()
+
+        return num
+
+    @classmethod
     def get_all_tasks_open(cls, pagination=False, page_size=None, offset=None):
 
         tasks = Tasks.objects.filter(current_status__in=cls.ready_for_schedule_tasks_status)\

@@ -465,12 +465,13 @@ class PageManager:
                 offset = int(request.GET.get('offset'))
                 data = WorkSchedulerPanel2Table1Manager.set_data(pagination=True, page_size=page_size, offset=offset)
                 if not data.empty:
+                    num = WorkScheduleDataDAO.get_all_tasks_open_num()
                     data_response = data.to_dict(orient='records')
-                    num = len(data)
                     response = {
                         'total': num,
                         'rows': data_response
                     }
+                    print(response)
                     return JsonResponse(response, safe=False)
                 else:
                     return JsonResponse({})
