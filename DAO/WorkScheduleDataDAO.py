@@ -6,6 +6,7 @@ from dateutil.parser import parse
 from dateutil.tz import tzlocal
 from django.db.models import Q, Count, Min, Sum, Avg
 from django.db.models.functions import Concat
+from django.core.paginator import Paginator
 from bbu.settings import TIME_ZONE
 
 from WorkSchedule.WorkConfig.models.models import *
@@ -22,22 +23,30 @@ class WorkScheduleDataDAO:
     ready_for_schedule_tasks_status = ['Approved', 'Scheduled']
 
     @classmethod
-    def get_all_tasks_open(cls):
+    def get_all_tasks_open(cls, pagination=False, page_size=None, offset=None):
 
         tasks = Tasks.objects.filter(current_status__in=cls.ready_for_schedule_tasks_status)\
-            .exclude(priority__in=['T', 'O'])\
-            .values('line',
-                    'work_order',
-                    'description',
-                    'AOR__worker__name',
-                    'estimate_hour',
-                    'work_type',
-                    'priority',
-                    'create_date',
-                    'current_status'
-                    )\
-            .annotate(schedule_hour=Sum('workerscheduled__duration'))
-        tasks_record = pd.DataFrame.from_records(tasks)
+            .exclude(priority__in=['T', 'O']) \
+            .annotate(schedule_hour=Sum('workerscheduled__duration')) \
+            .order_by('work_order')
+
+        if pagination:
+            paginator = Paginator(tasks, page_size,)
+            current_page = int(offset/page_size) + 1
+            tasks = paginator.page(current_page).object_list
+
+        tasks_record = pd.DataFrame.from_records(tasks
+                                                 .values('line',
+                                                         'work_order',
+                                                         'description',
+                                                         'AOR__worker__name',
+                                                         'estimate_hour',
+                                                         'work_type',
+                                                         'priority',
+                                                         'create_date',
+                                                         'current_status',
+                                                         'schedule_hour'
+                                                         ))
         tasks_record.rename_axis({'AOR__worker__name': 'AOR'}, axis=1, inplace=True)
 
         if tasks_record.empty:

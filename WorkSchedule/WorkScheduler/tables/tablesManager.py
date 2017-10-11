@@ -16,7 +16,7 @@ class WorkSchedulerPanel2Table1Manager:
     now = dt.now(tz=pytz.timezone('America/New_York'))
 
     @classmethod
-    def set_data(cls):
-        tasks = WorkScheduleDataDAO.get_all_tasks_open()
+    def set_data(cls, pagination=False, page_size=None, offset=None):
+        tasks = WorkScheduleDataDAO.get_all_tasks_open(pagination, page_size, offset)
 
         return tasks

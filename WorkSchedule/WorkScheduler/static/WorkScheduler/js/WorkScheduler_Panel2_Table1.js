@@ -53,6 +53,8 @@ define(function (require) {
             minimumCountColumns:2,
             showFooter:false,
             pagination:true,
+            paginationLoop: true,
+            sidePagination: 'server',
             // filterControl:true,
             url:"Panel2/Table1/create/",
             columns:[
