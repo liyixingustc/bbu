@@ -7,7 +7,7 @@ yum install epel-release
 // update yum
 yum update
 // set-up package
-yum install -y  gcc gcc-c++ make git patch openssl-devel zlib-devel readline-devel sqlite-devel bzip2-devel nano wget libffi-devel
+yum install -y  gcc gcc-c++ make git patch openssl-devel zlib-devel readline-devel sqlite-devel bzip2-devel nano wget libffi-devel htop
 // install mysql
 yum install python-devel mysql-devel
 // install http
@@ -38,6 +38,7 @@ service redis start
 redis-cli ping
 
 // install pyenv
+sudo su apache
 cd /home/apache
 curl -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
 
@@ -72,8 +73,8 @@ robert.sarmiento@bbumail.com
 Test1234$
 
 cd /home/apache
-chmod 755 
-cd /bbu
+chmod 755 bbu
+cd /home/apache/bbu
 chmod 755 db.sqlite3
 chmod 755 -R media
 
@@ -98,6 +99,10 @@ python manage.py migrate
 cd /etc/httpd/logs
 cat error_log
 httpd -k restart
+
+// cp aws sqlite
+cp /home/apache/bbu/db.sqlite3 /home/centos
+scp -i /home/arthurtu/projects/bbu/config/aws/tlinvestment.pem centos@54.242.48.0:/home/centos/db.sqlite3 .
 
 
 

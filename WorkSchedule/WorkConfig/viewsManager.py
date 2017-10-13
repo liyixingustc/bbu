@@ -39,26 +39,26 @@ class PageManager:
             @classmethod
             def submit(cls, request, *args, **kwargs):
                 file_type = request.GET.get('FileType')
-                try:
-                    if file_type == 'Tasks':
-                        TasksLoadProcessor.tasks_load_processor()
-                    elif file_type == 'WorkerAvail':
-                        WorkerAvailLoadProcessor.worker_avail_load_processor(request)
-                    elif file_type == 'AOR':
-                        AORLoadProcessor.aor_load_processor()
-                    elif file_type == 'Company':
-                        CompanyLoadProcessor.company_load_processor()
-                    elif file_type == 'Equipment':
-                        EquipmentLoadProcessor.equipment_load_processor()
-                    elif file_type == 'PMs':
-                        PMsLoadProcessor.pms_load_processor()
-                    elif file_type == 'SomaxAccount':
-                        SomaxAccountLoadProcessor.somax_account_load_processor()
-                    elif file_type == 'Worker':
-                        WorkerLoadProcessor.worker_load_processor()
-                except Exception as e:
-                    msg = ExceptionCustom.get_client_message(e)
-                    return JsonResponse({'status': 0, 'msg': msg})
+                # try:
+                if file_type == 'Tasks':
+                    TasksLoadProcessor.tasks_load_processor()
+                elif file_type == 'WorkerAvail':
+                    WorkerAvailLoadProcessor.worker_avail_load_processor(request)
+                elif file_type == 'AOR':
+                    AORLoadProcessor.aor_load_processor()
+                elif file_type == 'Company':
+                    CompanyLoadProcessor.company_load_processor()
+                elif file_type == 'Equipment':
+                    EquipmentLoadProcessor.equipment_load_processor()
+                elif file_type == 'PMs':
+                    PMsLoadProcessor.pms_load_processor()
+                elif file_type == 'SomaxAccount':
+                    SomaxAccountLoadProcessor.somax_account_load_processor()
+                elif file_type == 'Worker':
+                    WorkerLoadProcessor.worker_load_processor()
+                # except Exception as e:
+                #     msg = ExceptionCustom.get_client_message(e)
+                #     return JsonResponse({'status': 0, 'msg': msg})
 
                 return JsonResponse({'status': 1, 'msg': ''})
 

@@ -18,12 +18,14 @@ from DAO.WorkScheduleReviseDAO import WorkScheduleReviseDAO
 from configuration.WorkScheduleConstants import WorkAvailSheet
 from utils.UDatetime import UDatetime
 
+from ..tasks import *
+
 EST = pytz.timezone(TIME_ZONE)
 
 
 class WorkerAvailLoadProcessor:
 
-    Default_Tasks = pd.DataFrame()
+    Default_Tasks = []
 
     @classmethod
     def worker_avail_load_processor(cls, request):
@@ -77,8 +79,9 @@ class WorkerAvailLoadProcessor:
                     cls.worker_avail_shift_processor(request, intern3, 'shift1', file, 'intern3')
                     cls.worker_avail_shift_processor(request, intern4, 'shift1', file, 'intern4')
 
+                    cls.add_default_tasks(cls.Default_Tasks)
                     # update documents
-                    Documents.objects.filter(id=file.id).update(status='loaded')
+                    # Documents.objects.filter(id=file.id).update(status='loaded')
 
                 else:
                     pass
@@ -138,15 +141,32 @@ class WorkerAvailLoadProcessor:
             #                                                      })
 
             # additional tasks
-            cls.add_default_tasks(request, worker, date, start, end, duration, file, available,
-                                  is_union_bus)
+            default_task = {'request': request,
+                            'worker': worker,
+                            'date': date,
+                            'start': start,
+                            'end': end,
+                            'duration': duration,
+                            'file': file,
+                            'available': available,
+                            'is_union_bus': is_union_bus
+                            }
+
+            cls.Default_Tasks.append(default_task.copy())
+            # cls.add_default_task(request, worker, date, start, end, duration, file, available,
+            #                       is_union_bus)
 
             # else:
             #     return False
         return True
 
     @classmethod
-    def add_default_tasks(cls, request, worker, date, start, end, duration, file, available_id, is_union_bus):
+    def add_default_tasks(cls, data):
+        WorkScheduleWorkerAvailLoadProcessorAddDefaultTasks.delay(data)
+        return
+
+    @classmethod
+    def add_default_task(cls, request, worker, date, start, end, duration, file, available_id, is_union_bus):
 
         lunch_task = None
         lunch_schedule = None
