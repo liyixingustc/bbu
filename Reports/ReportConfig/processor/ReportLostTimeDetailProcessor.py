@@ -125,7 +125,7 @@ class ReportLostTimeDetailProcessor:
                                 i = 0
 
                     # update documents
-                    # Documents.objects.filter(id=file.id).update(status='loaded')
+                    Documents.objects.filter(id=file.id).update(status='loaded')
 
         cls.percent = 1
         cls.update_process(cls.percent)
