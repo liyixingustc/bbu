@@ -88,3 +88,21 @@ class PageManager:
                                                                          'created_by': request.user})
 
                 return JsonResponse({})
+
+            @classmethod
+            def process(cls, request, *args, **kwargs):
+
+                file_type = request.GET.get('FileType')
+
+                result_path = os.path.join(BASE_DIR, 'WorkSchedule/WorkConfig/processor/result/result.csv')
+                if os.path.exists(result_path):
+                    result_df = pd.read_csv(result_path)
+                    result_bytype = result_df[result_df['filetype'] == file_type]
+                    if result_bytype.empty:
+                        result = None
+                    else:
+                        result = result_bytype['result'][0]
+                else:
+                    result = None
+
+                return JsonResponse({'result': float(result)})
