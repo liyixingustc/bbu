@@ -26,6 +26,7 @@ from .processor.PMsLoadProcessor import PMsLoadProcessor
 from .processor.SomaxAccountLoadProcessor import SomaxAccountLoadProcessor
 from .processor.WorkerLoadProcessor import WorkerLoadProcessor
 
+from bbu.celery import is_available_workers
 from .tasks import *
 
 
@@ -37,6 +38,7 @@ class PageManager:
         class FormManager:
 
             media_input_filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'media/input.xlsx')
+            result_path = os.path.join(BASE_DIR, 'WorkSchedule/WorkConfig/processor/result/result.csv')
 
             @classmethod
             def submit(cls, request, *args, **kwargs):
@@ -45,9 +47,12 @@ class PageManager:
                 if file_type == 'Tasks':
                     TasksLoadProcessor.tasks_load_processor()
                 elif file_type == 'WorkerAvail':
-                    # WorkerAvailLoadProcessor.worker_avail_load_processor(request)
                     usr_id = request.user.id
-                    WorkerAvailLoadProcessorTask.delay(usr_id)
+                    is_workers = is_available_workers()
+                    if not is_workers:
+                        WorkerAvailLoadProcessor.worker_avail_load_processor(usr_id)
+                    else:
+                        WorkerAvailLoadProcessorTask.delay(usr_id)
                 elif file_type == 'AOR':
                     AORLoadProcessor.aor_load_processor()
                 elif file_type == 'Company':
@@ -94,15 +99,16 @@ class PageManager:
 
                 file_type = request.GET.get('FileType')
 
-                result_path = os.path.join(BASE_DIR, 'WorkSchedule/WorkConfig/processor/result/result.csv')
-                if os.path.exists(result_path):
-                    result_df = pd.read_csv(result_path)
+                if os.path.exists(cls.result_path):
+                    result_df = pd.read_csv(cls.result_path)
                     result_bytype = result_df[result_df['filetype'] == file_type]
                     if result_bytype.empty:
                         result = None
                     else:
-                        result = result_bytype['result'][0]
+                        result = float(result_bytype['result'][0])
+                        if pd.isnull(result):
+                            result = None
                 else:
                     result = None
 
-                return JsonResponse({'result': float(result)})
+                return JsonResponse({'result': result})

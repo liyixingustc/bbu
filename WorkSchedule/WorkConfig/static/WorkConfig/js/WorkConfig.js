@@ -82,6 +82,7 @@ define(function (require) {
         $("#WorkConfigDataUpload-form").submit(function (e) {
 
             var data = $(this).serialize();
+
             $("#WorkConfigDataUploadSubmit").html("Loading...");
             $.get('Panel1/Form1/Submit/',data,function (res) {
                 var status = res['status'],
@@ -102,7 +103,9 @@ define(function (require) {
     function process_result(file_type) {
 
         $.get('Panel1/Form1/Process/', {'FileType': file_type}, function (result) {
+
             result = result['result'];
+
             if (interval !== null){
                 clearInterval(interval);
             }

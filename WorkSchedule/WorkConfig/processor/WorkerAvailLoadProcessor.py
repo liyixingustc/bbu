@@ -27,11 +27,15 @@ EST = pytz.timezone(TIME_ZONE)
 class WorkerAvailLoadProcessor:
 
     default_tasks = []
+    result_path = os.path.join(BASE_DIR, 'WorkSchedule/WorkConfig/processor/result/result.csv')
+    percent = 0
+    file_num = 0
 
     @classmethod
     def worker_avail_load_processor(cls, usr_id):
         user = User.objects.get(id=usr_id)
         files = Documents.objects.filter(status__exact='new', file_type__exact='WorkerAvail')
+        cls.file_num = files.count()
         if files.exists():
             for file in files:
                 path = BASE_DIR + file.document.url
@@ -63,12 +67,19 @@ class WorkerAvailLoadProcessor:
                     # data init
                     shift3 = data[worker_range_df['part'] == 1]
                     cls.worker_avail_shift_processor(user, shift3, 'shift3', file)
+                    cls.percent += 0.1/cls.file_num
+                    cls.update_process(cls.percent)
 
                     shift1 = data[worker_range_df['part'] == 2]
                     cls.worker_avail_shift_processor(user, shift1, 'shift1', file)
+                    cls.percent += 0.1 / cls.file_num
+                    cls.update_process(cls.percent)
 
                     shift2 = data[worker_range_df['part'] == 5]
                     cls.worker_avail_shift_processor(user, shift2, 'shift2', file)
+                    cls.percent += 0.1 / cls.file_num
+                    cls.update_process(cls.percent)
+
                     print(file.name)
                     intern1 = data[worker_range_df['part'] == 3].iloc[[0]]
                     intern2 = data[worker_range_df['part'] == 3].iloc[[1]]
@@ -79,6 +90,8 @@ class WorkerAvailLoadProcessor:
                     cls.worker_avail_shift_processor(user, intern2, 'shift3', file, 'intern2')
                     cls.worker_avail_shift_processor(user, intern3, 'shift1', file, 'intern3')
                     cls.worker_avail_shift_processor(user, intern4, 'shift1', file, 'intern4')
+                    cls.percent += 0.1 / cls.file_num
+                    cls.update_process(cls.percent)
 
                     cls.add_default_tasks(cls.default_tasks)
                     # update documents
@@ -86,6 +99,9 @@ class WorkerAvailLoadProcessor:
 
                 else:
                     pass
+
+        cls.percent = 1
+        cls.update_process(cls.percent)
 
         return JsonResponse({})
 
@@ -164,6 +180,10 @@ class WorkerAvailLoadProcessor:
 
     @classmethod
     def add_default_tasks(cls, data):
+
+        count = len(data)
+        i = 0
+
         if data:
             for task in data:
                 WorkerAvailLoadProcessor.add_default_task(
@@ -177,6 +197,17 @@ class WorkerAvailLoadProcessor:
                     task['available'],
                     task['is_union_bus'],
                 )
+
+                i += 1
+                cls.percent += 0.6/(cls.file_num*count)
+
+                if i == 20:
+                    cls.update_process(cls.percent)
+                    i = 0
+
+        cls.percent = 1/cls.file_num
+        cls.update_process(cls.percent)
+
         return
 
     @classmethod
@@ -509,3 +540,22 @@ class WorkerAvailLoadProcessor:
         else:
             string = 0
         return string
+
+    @classmethod
+    def update_process(cls, percent):
+        percent = round(float(percent), 2)
+        if os.path.exists(cls.result_path):
+            data = pd.read_csv(cls.result_path)
+            data_bytype = data[data['filetype'] == 'WorkerAvail']
+            if data_bytype.empty:
+                data_series = pd.Series({'filetype': 'WorkerAvail', 'result': percent})
+                data = data.append(data_series, ignore_index=True)
+            else:
+                data.loc[data['filetype'] == 'WorkerAvail', ['result']] = percent
+        else:
+            data = pd.DataFrame({'filetype': 'WorkerAvail', 'result': percent},
+                                index=[0], columns=['filetype', 'result'])
+        print(data)
+        data.to_csv(cls.result_path, index=False)
+
+        return True

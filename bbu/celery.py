@@ -52,3 +52,19 @@ app.conf.beat_schedule = {
     #     'args': (),
     # },
 }
+
+
+def is_available_workers():
+    result = app.control.inspect().ping()
+    if result:
+        count = 0
+        for key, value in result.items():
+            if value['ok'] == 'pong':
+                count += 1
+        if count >= 1:
+            result = True
+        else:
+            result = False
+    else:
+        result = False
+    return result
