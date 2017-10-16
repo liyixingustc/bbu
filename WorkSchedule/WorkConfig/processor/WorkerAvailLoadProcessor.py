@@ -97,7 +97,7 @@ class WorkerAvailLoadProcessor:
 
                     cls.add_default_tasks(cls.default_tasks)
                     # update documents
-                    # Documents.objects.filter(id=file.id).update(status='loaded')
+                    Documents.objects.filter(id=file.id).update(status='loaded')
 
                 else:
                     pass
