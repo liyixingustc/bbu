@@ -9,6 +9,7 @@ import time
 from bbu.settings import TIME_ZONE, BASE_DIR
 from django.http import JsonResponse
 
+from accounts.models import User
 from ...WorkConfig.models.models import *
 from ...WorkWorkers.models.models import *
 from ...WorkTasks.models.models import *
@@ -18,18 +19,18 @@ from DAO.WorkScheduleReviseDAO import WorkScheduleReviseDAO
 from configuration.WorkScheduleConstants import WorkAvailSheet
 from utils.UDatetime import UDatetime
 
-from ..tasks import *
+from WorkSchedule.WorkConfig.tasks import *
 
 EST = pytz.timezone(TIME_ZONE)
 
 
 class WorkerAvailLoadProcessor:
 
-    Default_Tasks = []
+    default_tasks = []
 
     @classmethod
-    def worker_avail_load_processor(cls, request):
-
+    def worker_avail_load_processor(cls, usr_id):
+        user = User.objects.get(id=usr_id)
         files = Documents.objects.filter(status__exact='new', file_type__exact='WorkerAvail')
         if files.exists():
             for file in files:
@@ -61,25 +62,25 @@ class WorkerAvailLoadProcessor:
 
                     # data init
                     shift3 = data[worker_range_df['part'] == 1]
-                    cls.worker_avail_shift_processor(request, shift3, 'shift3', file)
+                    cls.worker_avail_shift_processor(user, shift3, 'shift3', file)
 
                     shift1 = data[worker_range_df['part'] == 2]
-                    cls.worker_avail_shift_processor(request, shift1, 'shift1', file)
+                    cls.worker_avail_shift_processor(user, shift1, 'shift1', file)
 
                     shift2 = data[worker_range_df['part'] == 5]
-                    cls.worker_avail_shift_processor(request, shift2, 'shift2', file)
+                    cls.worker_avail_shift_processor(user, shift2, 'shift2', file)
                     print(file.name)
                     intern1 = data[worker_range_df['part'] == 3].iloc[[0]]
                     intern2 = data[worker_range_df['part'] == 3].iloc[[1]]
                     intern3 = data[worker_range_df['part'] == 3].iloc[[2]]
                     intern4 = data[worker_range_df['part'] == 3].iloc[[3]]
 
-                    cls.worker_avail_shift_processor(request, intern1, 'shift2', file, 'intern1')
-                    cls.worker_avail_shift_processor(request, intern2, 'shift3', file, 'intern2')
-                    cls.worker_avail_shift_processor(request, intern3, 'shift1', file, 'intern3')
-                    cls.worker_avail_shift_processor(request, intern4, 'shift1', file, 'intern4')
+                    cls.worker_avail_shift_processor(user, intern1, 'shift2', file, 'intern1')
+                    cls.worker_avail_shift_processor(user, intern2, 'shift3', file, 'intern2')
+                    cls.worker_avail_shift_processor(user, intern3, 'shift1', file, 'intern3')
+                    cls.worker_avail_shift_processor(user, intern4, 'shift1', file, 'intern4')
 
-                    cls.add_default_tasks(cls.Default_Tasks)
+                    cls.add_default_tasks(cls.default_tasks)
                     # update documents
                     # Documents.objects.filter(id=file.id).update(status='loaded')
 
@@ -89,7 +90,7 @@ class WorkerAvailLoadProcessor:
         return JsonResponse({})
 
     @classmethod
-    def worker_avail_shift_processor(cls, request, data, shift, file, worker_type=None):
+    def worker_avail_shift_processor(cls, user, data, shift, file, worker_type=None):
 
         data = data.dropna(how='all')
         data_melt = pd.melt(data, id_vars=["worker"],
@@ -121,7 +122,7 @@ class WorkerAvailLoadProcessor:
 
             # if parsed_time:
                 # update db
-            available = WorkScheduleReviseDAO.update_or_create_available(request.user,
+            available = WorkScheduleReviseDAO.update_or_create_available(user,
                                                                          start,
                                                                          end,
                                                                          date,
@@ -141,7 +142,8 @@ class WorkerAvailLoadProcessor:
             #                                                      })
 
             # additional tasks
-            default_task = {'request': request,
+            default_task = {
+                            'user': user,
                             'worker': worker,
                             'date': date,
                             'start': start,
@@ -152,7 +154,7 @@ class WorkerAvailLoadProcessor:
                             'is_union_bus': is_union_bus
                             }
 
-            cls.Default_Tasks.append(default_task.copy())
+            cls.default_tasks.append(default_task.copy())
             # cls.add_default_task(request, worker, date, start, end, duration, file, available,
             #                       is_union_bus)
 
@@ -162,11 +164,29 @@ class WorkerAvailLoadProcessor:
 
     @classmethod
     def add_default_tasks(cls, data):
-        WorkScheduleWorkerAvailLoadProcessorAddDefaultTasks.delay(data)
+        if data:
+            for task in data:
+                WorkerAvailLoadProcessor.add_default_task(
+                    task['user'],
+                    task['worker'],
+                    task['date'],
+                    task['start'],
+                    task['end'],
+                    task['duration'],
+                    task['file'],
+                    task['available'],
+                    task['is_union_bus'],
+                )
         return
 
     @classmethod
-    def add_default_task(cls, request, worker, date, start, end, duration, file, available_id, is_union_bus):
+    def add_default_task(cls, user, worker, date, start, end, duration, file, available_id, is_union_bus):
+
+        # user = User.objects.get(id=user)
+        # worker = Workers.objects.get(id=worker)
+        # file = Documents.objects.get(id=file)
+        # available_id = WorkerAvailable.objects.get(id=available_id)
+        # duration = timedelta(seconds=duration)
 
         lunch_task = None
         lunch_schedule = None
@@ -183,8 +203,8 @@ class WorkerAvailLoadProcessor:
             lunch_start = end - timedelta(minutes=60)
             lunch_end = end - timedelta(minutes=30)
             lunch_duration = lunch_end - lunch_start
-            lunch_task = WorkScheduleReviseDAO.create_or_update_timeoff_lunch_task(request.user, source='manual')
-            lunch_schedule = WorkScheduleReviseDAO.update_or_create_schedule(request.user,
+            lunch_task = WorkScheduleReviseDAO.create_or_update_timeoff_lunch_task(user, source='manual')
+            lunch_schedule = WorkScheduleReviseDAO.update_or_create_schedule(user,
                                                                              lunch_start,
                                                                              lunch_end,
                                                                              date,
@@ -203,9 +223,9 @@ class WorkerAvailLoadProcessor:
         break2_end = end - timedelta(minutes=0)
         break2_duration = break2_end - break2_start
         if not break_obj.exists():
-            break1_task = WorkScheduleReviseDAO.create_or_update_timeoff_breaks_task(request.user, source='manual')
-            break2_task = WorkScheduleReviseDAO.create_or_update_timeoff_breaks_task(request.user, source='manual')
-            break1_schedule = WorkScheduleReviseDAO.update_or_create_schedule(request.user,
+            break1_task = WorkScheduleReviseDAO.create_or_update_timeoff_breaks_task(user, source='manual')
+            break2_task = WorkScheduleReviseDAO.create_or_update_timeoff_breaks_task(user, source='manual')
+            break1_schedule = WorkScheduleReviseDAO.update_or_create_schedule(user,
                                                                               break1_start,
                                                                               break1_end,
                                                                               date,
@@ -215,7 +235,7 @@ class WorkerAvailLoadProcessor:
                                                                               break1_task,
                                                                               source='file',
                                                                               document=file)
-            break2_schedule = WorkScheduleReviseDAO.update_or_create_schedule(request.user,
+            break2_schedule = WorkScheduleReviseDAO.update_or_create_schedule(user,
                                                                               break2_start,
                                                                               break2_end,
                                                                               date,
@@ -228,8 +248,8 @@ class WorkerAvailLoadProcessor:
         if break_obj.count() == 1:
             break_obj_exist = break_obj[0]
             if break_obj_exist.time_start == break1_start and break_obj_exist.time_end == break1_end:
-                break2_task = WorkScheduleReviseDAO.create_or_update_timeoff_breaks_task(request.user, source='manual')
-                break2_schedule = WorkScheduleReviseDAO.update_or_create_schedule(request.user,
+                break2_task = WorkScheduleReviseDAO.create_or_update_timeoff_breaks_task(user, source='manual')
+                break2_schedule = WorkScheduleReviseDAO.update_or_create_schedule(user,
                                                                                   break2_start,
                                                                                   break2_end,
                                                                                   date,
@@ -240,8 +260,8 @@ class WorkerAvailLoadProcessor:
                                                                                   source='file',
                                                                                   document=file)
             elif break_obj_exist.time_start == break2_start and break_obj_exist.time_end == break2_end:
-                break1_task = WorkScheduleReviseDAO.create_or_update_timeoff_breaks_task(request.user, source='manual')
-                break1_schedule = WorkScheduleReviseDAO.update_or_create_schedule(request.user,
+                break1_task = WorkScheduleReviseDAO.create_or_update_timeoff_breaks_task(user, source='manual')
+                break1_schedule = WorkScheduleReviseDAO.update_or_create_schedule(user,
                                                                                   break1_start,
                                                                                   break1_end,
                                                                                   date,
@@ -252,8 +272,8 @@ class WorkerAvailLoadProcessor:
                                                                                   source='file',
                                                                                   document=file)
             else:
-                break2_task = WorkScheduleReviseDAO.create_or_update_timeoff_breaks_task(request.user, source='manual')
-                break2_schedule = WorkScheduleReviseDAO.update_or_create_schedule(request.user,
+                break2_task = WorkScheduleReviseDAO.create_or_update_timeoff_breaks_task(user, source='manual')
+                break2_schedule = WorkScheduleReviseDAO.update_or_create_schedule(user,
                                                                                   break2_start,
                                                                                   break2_end,
                                                                                   date,
@@ -274,9 +294,9 @@ class WorkerAvailLoadProcessor:
                 union_bus_end = end - timedelta(minutes=60)
                 union_bus_duration = union_bus_end - union_bus_start
 
-                union_bus_task = WorkScheduleReviseDAO.create_or_update_union_bus_task(request.user, duration,
+                union_bus_task = WorkScheduleReviseDAO.create_or_update_union_bus_task(user, duration,
                                                                                        source='file', document=file)
-                union_bus_schedule = WorkScheduleReviseDAO.update_or_create_schedule(request.user,
+                union_bus_schedule = WorkScheduleReviseDAO.update_or_create_schedule(user,
                                                                                      union_bus_start,
                                                                                      union_bus_end,
                                                                                      date,
