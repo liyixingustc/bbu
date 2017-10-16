@@ -560,7 +560,6 @@ class WorkerAvailLoadProcessor:
             data = pd.DataFrame({'filetype': 'WorkerAvail', 'result': percent},
                                 index=[0], columns=['filetype', 'result'])
 
-        print(data)
         data.to_csv(cls.result_path, index=False)
 
         return True
