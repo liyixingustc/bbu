@@ -18,13 +18,15 @@ from utils.UDatetime import UDatetime
 
 # import processor
 from .processor.TasksLoadProcessor import TasksLoadProcessor
-from .processor.WorkerAvailLoadProcessor import WorkerAvailLoadProcessor
+# from .processor.WorkerAvailLoadProcessor import WorkerAvailLoadProcessor
 from .processor.AORLoadProcessor import AORLoadProcessor
 from .processor.CompanyLoadProcessor import CompanyLoadProcessor
 from .processor.EquipmentLoadProcessor import EquipmentLoadProcessor
 from .processor.PMsLoadProcessor import PMsLoadProcessor
 from .processor.SomaxAccountLoadProcessor import SomaxAccountLoadProcessor
 from .processor.WorkerLoadProcessor import WorkerLoadProcessor
+
+from .tasks import *
 
 
 EST = pytz.timezone(TIME_ZONE)
@@ -43,7 +45,9 @@ class PageManager:
                 if file_type == 'Tasks':
                     TasksLoadProcessor.tasks_load_processor()
                 elif file_type == 'WorkerAvail':
-                    WorkerAvailLoadProcessor.worker_avail_load_processor(request)
+                    # WorkerAvailLoadProcessor.worker_avail_load_processor(request)
+                    usr_id = request.user.id
+                    WorkerAvailLoadProcessorTask.delay(usr_id)
                 elif file_type == 'AOR':
                     AORLoadProcessor.aor_load_processor()
                 elif file_type == 'Company':
