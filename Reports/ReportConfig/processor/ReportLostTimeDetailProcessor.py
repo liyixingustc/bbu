@@ -96,7 +96,8 @@ class ReportLostTimeDetailProcessor:
                         data['SalesDate'] = pd.to_datetime(data['SalesDate'], format='%m/%d/%y')
                         data['SalesDate'] = data['SalesDate'].apply(lambda x: UDatetime.localize(x))
 
-                        data_count = data.count()
+                        data_count = len(data)
+                        i = 0
                         for index, row in data.iterrows():
                             ReportLostTimeDetail.objects \
                             .update_or_create(SalesDate=row['SalesDate'],
@@ -117,10 +118,14 @@ class ReportLostTimeDetailProcessor:
                                                         })
 
                             cls.percent += 1/(data_count*cls.file_num)
-                            cls.update_process(cls.percent)
+                            i += 1
+
+                            if i == 20:
+                                cls.update_process(cls.percent)
+                                i = 0
 
                     # update documents
-                    Documents.objects.filter(id=file.id).update(status='loaded')
+                    # Documents.objects.filter(id=file.id).update(status='loaded')
 
         cls.percent = 1
         cls.update_process(cls.percent)
