@@ -19,10 +19,17 @@ EST = pytz.timezone(TIME_ZONE)
 
 class ReportLostTimeDetailProcessor:
 
+    result_path = os.path.join(BASE_DIR, 'Reports/ReportConfig/processor/result/result.csv')
+    percent = 0
+    file_num = 0
+
     @classmethod
     def report_lost_time_detail_processor(cls):
 
         files = Documents.objects.filter(status__exact='new', file_type__exact='ReportLostTimeDetail')
+        cls.file_num = files.count()
+        cls.percent = 0
+
         if files.exists():
             for file in files:
                 path = BASE_DIR + file.document.url
@@ -89,6 +96,7 @@ class ReportLostTimeDetailProcessor:
                         data['SalesDate'] = pd.to_datetime(data['SalesDate'], format='%m/%d/%y')
                         data['SalesDate'] = data['SalesDate'].apply(lambda x: UDatetime.localize(x))
 
+                        data_count = data.count()
                         for index, row in data.iterrows():
                             ReportLostTimeDetail.objects \
                             .update_or_create(SalesDate=row['SalesDate'],
@@ -108,10 +116,33 @@ class ReportLostTimeDetailProcessor:
                                                          'Init': row['Init'],
                                                         })
 
+                            cls.percent += 1/(data_count*cls.file_num)
+                            cls.update_process(cls.percent)
+
                     # update documents
                     Documents.objects.filter(id=file.id).update(status='loaded')
 
-                    return JsonResponse({})
+        cls.percent = 1
+        cls.update_process(cls.percent)
+
+        return JsonResponse({})
+
+    @classmethod
+    def update_process(cls, percent):
+        percent = round(float(percent), 2)
+        if os.path.exists(cls.result_path):
+            data = pd.read_csv(cls.result_path)
+            data_bytype = data[data['filetype'] == 'ReportLostTimeDetail']
+            if data_bytype.empty:
+                data_series = pd.Series({'filetype': 'ReportLostTimeDetail', 'result': percent})
+                data = data.append(data_series, ignore_index=True)
+            else:
+                data.loc[data['filetype'] == 'ReportLostTimeDetail', ['result']] = percent
         else:
-            return JsonResponse({})
+            data = pd.DataFrame({'filetype': 'ReportLostTimeDetail', 'result': percent},
+                                index=[0], columns=['filetype', 'result'])
+
+        data.to_csv(cls.result_path, index=False)
+
+        return True
 

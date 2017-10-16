@@ -28,6 +28,11 @@ class Page:
                 return response
 
             @staticmethod
+            def process(request, *args, **kwargs):
+                response = PageManager.PanelManager.FormManager.process(request, *args, **kwargs)
+                return response
+
+            @staticmethod
             def fileupload(request, *args, **kwargs):
                 response = PageManager.PanelManager.FormManager.fileupload(request, *args, **kwargs)
                 return response
@@ -37,6 +42,7 @@ mapping = pd.DataFrame([
     {'page': 'ReportConfig', 'panel': 'None', 'widget': 'None', 'func': 'index', 'register': Page.index},
     {'page': 'ReportConfig', 'panel': 'Panel1', 'widget': 'Form1', 'func': 'Submit', 'register': Page.Panel.Form.submit},
     {'page': 'ReportConfig', 'panel': 'Panel1', 'widget': 'Form1', 'func': 'FileUpload', 'register': Page.Panel.Form.fileupload},
+    {'page': 'ReportConfig', 'panel': 'Panel1', 'widget': 'Form1', 'func': 'Process', 'register': Page.Panel.Form.process},
 ])
 
 
