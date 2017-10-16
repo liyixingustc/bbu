@@ -36,6 +36,8 @@ class WorkerAvailLoadProcessor:
         user = User.objects.get(id=usr_id)
         files = Documents.objects.filter(status__exact='new', file_type__exact='WorkerAvail')
         cls.file_num = files.count()
+        cls.percent = 0
+
         if files.exists():
             for file in files:
                 path = BASE_DIR + file.document.url
@@ -184,6 +186,8 @@ class WorkerAvailLoadProcessor:
         count = len(data)
         i = 0
 
+        start_percent = cls.percent
+
         if data:
             for task in data:
                 WorkerAvailLoadProcessor.add_default_task(
@@ -205,7 +209,7 @@ class WorkerAvailLoadProcessor:
                     cls.update_process(cls.percent)
                     i = 0
 
-        cls.percent = 1/cls.file_num
+        cls.percent = start_percent + 0.6/cls.file_num
         cls.update_process(cls.percent)
 
         return
@@ -555,6 +559,7 @@ class WorkerAvailLoadProcessor:
         else:
             data = pd.DataFrame({'filetype': 'WorkerAvail', 'result': percent},
                                 index=[0], columns=['filetype', 'result'])
+
         print(data)
         data.to_csv(cls.result_path, index=False)
 

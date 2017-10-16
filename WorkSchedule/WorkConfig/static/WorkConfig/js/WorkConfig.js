@@ -102,47 +102,28 @@ define(function (require) {
 
     function process_result(file_type) {
 
-        $.get('Panel1/Form1/Process/', {'FileType': file_type}, function (result) {
+        if (interval !== null){
+            clearInterval(interval);
+        }
 
-            result = result['result'];
-
-            if (interval !== null){
-                clearInterval(interval);
-            }
-
-            if (result === null){
-                $SubmitButton.prop('disabled', false);
-                $SubmitButton.html("Submit");
-            }
-            else if (result === 1){
-                $SubmitButton.prop('disabled', false);
-                $SubmitButton.html("Loaded");
-            }
-            else if (result >=0 && result<1){
-
-                $SubmitButton.prop('disabled', true);
-                $SubmitButton.html(Math.round(result*100)+"%");
-
-                interval = setInterval(function () {
-                    $.get('Panel1/Form1/Process/', {'FileType': file_type}, function (result) {
-                        result = result['result'];
-                        if (result === null){
-                            clearInterval(interval);
-                            $SubmitButton.prop('disabled', false);
-                            $SubmitButton.html("Submit");
-                        }
-                        else if (result===1){
-                            clearInterval(interval);
-                            $SubmitButton.prop('disabled', false);
-                            $SubmitButton.html("Loaded");
-                        }
-                        else if (result >=0 && result<1){
-                            $SubmitButton.prop('disabled', true);
-                            $SubmitButton.html(Math.round(result*100)+"%");
-                        }
-                    })
-                }, 5000)
-            }
-        });
+        interval = setInterval(function () {
+            $.get('Panel1/Form1/Process/', {'FileType': file_type}, function (result) {
+                result = result['result'];
+                if (result === null){
+                    clearInterval(interval);
+                    $SubmitButton.prop('disabled', false);
+                    $SubmitButton.html("Submit");
+                }
+                else if (result===1){
+                    clearInterval(interval);
+                    $SubmitButton.prop('disabled', false);
+                    $SubmitButton.html("Loaded");
+                }
+                else if (result >=0 && result<1){
+                    $SubmitButton.prop('disabled', true);
+                    $SubmitButton.html(Math.round(result*100)+"%");
+                }
+            })
+        }, 1000)
     }
 });
