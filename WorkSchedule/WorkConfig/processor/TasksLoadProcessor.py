@@ -58,12 +58,22 @@ class TasksLoadProcessor:
         if data.empty:
             return
 
-        data['Created'] = pd.to_datetime(data['Created'], format='%Y/%m/%d')
+        try:
+            data['Created'] = pd.to_datetime(data['Created'], format='%Y/%m/%d')
+        except:
+            data['Created'] = pd.to_datetime(data['Created'], format='%m/%d/%Y')
         data['Created'] = data['Created'].apply(lambda x: UDatetime.localize(x))
 
-        data['Scheduled'] = pd.to_datetime(data['Scheduled'], format='%Y/%m/%d')
+        try:
+            data['Scheduled'] = pd.to_datetime(data['Scheduled'], format='%Y/%m/%d')
+        except:
+            data['Scheduled'] = pd.to_datetime(data['Scheduled'], format='%m/%d/%Y')
         data['Scheduled'] = data['Scheduled'].apply(lambda x: UDatetime.localize(x))
 
+        try:
+            data['Actual Finish'] = pd.to_datetime(data['Actual Finish'], format='%Y/%m/%d')
+        except:
+            data['Actual Finish'] = pd.to_datetime(data['Actual Finish'], format='%m/%d/%Y')
         data['Actual Finish'] = pd.to_datetime(data['Actual Finish'], format='%Y/%m/%d')
         data['Actual Finish'] = data['Actual Finish'].apply(lambda x: UDatetime.localize(x))
 
