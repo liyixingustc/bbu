@@ -28,8 +28,8 @@ if 'localhost' in os.environ.get('HOSTNAME', ''):
 else:
     DEBUG = False
 
-ALLOWED_HOSTS = ['52.91.40.99', 'bbu.tlinvestmentllc.com', '127.0.0.1', 'localhost',
-                 '54.242.48.0']
+ALLOWED_HOSTS = ['bbu.tlinvestmentllc.com', '127.0.0.1', 'localhost',
+                 '54.146.21.16']
 
 
 # Application definition
