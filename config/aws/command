@@ -104,6 +104,9 @@ httpd -k restart
 cp /home/apache/bbu/db.sqlite3 /home/centos
 scp -i /home/arthurtu/projects/bbu/config/aws/tlinvestment.pem centos@54.242.48.0:/home/centos/db.sqlite3 .
 
+//upload file
+scp -i tlinvestment.pem dist.zip centos@54.146.21.16:./
+
 
 
 
