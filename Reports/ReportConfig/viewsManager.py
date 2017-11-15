@@ -34,7 +34,8 @@ class PageManager:
                 file_type = request.GET.get('FileType')
                 try:
                     if file_type == 'ReportLostTimeDetail':
-                        is_workers = is_available_workers()
+                        # is_workers = is_available_workers()
+                        is_workers = False
                         if not is_workers:
                             ReportLostTimeDetailProcessor.report_lost_time_detail_processor()
                         else:
