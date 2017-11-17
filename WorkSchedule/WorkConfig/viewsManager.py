@@ -48,11 +48,11 @@ class PageManager:
                         TasksLoadProcessor.tasks_load_processor()
                     elif file_type == 'WorkerAvail':
                         usr_id = request.user.id
-                        is_workers = is_available_workers()
-                        if not is_workers:
-                            WorkerAvailLoadProcessor.worker_avail_load_processor(usr_id)
-                        else:
-                            WorkerAvailLoadProcessorTask.delay(usr_id)
+                        # is_workers = is_available_workers()
+                        # if not is_workers:
+                        WorkerAvailLoadProcessor.worker_avail_load_processor(usr_id)
+                        # else:
+                        #     WorkerAvailLoadProcessorTask.delay(usr_id)
                     elif file_type == 'AOR':
                         AORLoadProcessor.aor_load_processor()
                     elif file_type == 'Company':
