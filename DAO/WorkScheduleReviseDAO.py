@@ -55,7 +55,8 @@ class WorkScheduleReviseDAO:
 
             schedule_obj.delete()
             if task_priority not in ['O', 'T']:
-                cls.sync_task_by_id(task_id, 'Work Request')
+                cls.sync_task_by_id(task_id, 'Approved')
+                pass
             cls.sync_avail_by_id(available_id)
         return True
 
