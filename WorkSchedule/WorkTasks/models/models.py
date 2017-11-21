@@ -13,6 +13,7 @@ status_choice = (('Approved', 'Approved'),
                  ('Denied', 'Denied'),
                  ('Scheduled', 'Scheduled'),
                  ('Work Request', 'Work Request'),
+                 ('Wait For Parts', 'Wait For Parts'),
                  )
 
 working_type_choice = (('CM', 'CM'),
