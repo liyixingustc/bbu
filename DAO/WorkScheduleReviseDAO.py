@@ -98,18 +98,17 @@ class WorkScheduleReviseDAO:
                                                                          'available_id': avail_id
                                                                      })
         else:
-            schedule_obj = WorkerScheduled.objects.update_or_create(name=worker,
-                                                                    date=date,
-                                                                    task_id=task,
-                                                                    available_id=avail_id,
-                                                                    defaults={
-                                                                         'created_by': user,
-                                                                         'duration': duration,
-                                                                         'time_start': start,
-                                                                         'time_end': end,
-                                                                         'source': source,
-                                                                         'document': document
-                                                                    })
+            schedule_obj = [WorkerScheduled.objects.create(name=worker,
+                                                           date=date,
+                                                           task_id=task,
+                                                           available_id=avail_id,
+                                                           created_by=user,
+                                                           duration=duration,
+                                                           time_start=start,
+                                                           time_end=end,
+                                                           source=source,
+                                                           document=document
+                                                           )]
 
         task_priority = task.priority
         if task_priority in ['O', 'T']:
