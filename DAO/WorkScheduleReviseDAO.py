@@ -50,8 +50,8 @@ class WorkScheduleReviseDAO:
             available_id = schedule_obj[0].available_id.id
             schedule_obj = WorkerScheduled.objects.filter(id__exact=schedule_id)
 
-            if task_priority in ['O', 'T']:
-                cls.remove_task_by_id(task_id)
+            # if task_priority in ['O', 'T']:
+            #     cls.remove_task_by_id(task_id)
 
             schedule_obj.delete()
             if task_priority not in ['O', 'T']:

@@ -66,6 +66,7 @@ class PageManager:
                     elif file_type == 'Worker':
                         WorkerLoadProcessor.worker_load_processor()
                 except Exception as e:
+                    WorkerAvailLoadProcessor.update_process(None)
                     msg = ExceptionCustom.get_client_message(e)
                     return JsonResponse({'status': 0, 'msg': msg})
 

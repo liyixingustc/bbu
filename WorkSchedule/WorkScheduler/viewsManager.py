@@ -121,6 +121,9 @@ class PageManager:
                     event_records['end'] = event_records['end'].apply(lambda x: x.astimezone(EST))
                     event_records['duration'] = event_records['duration'].apply(lambda x: np.round(x.total_seconds()/3600, 2))
 
+                    # revise time off event percent
+                    event_records[event_records['priority'] == 'T']['percent'] = 1
+
                     event_records = event_records.to_dict(orient='records')
                 else:
                     event_records = []
@@ -324,9 +327,11 @@ class PageManager:
 
                 elif command_type in ['Lunch', 'Breaks', 'UnionBus']:
                     if command_type == 'Lunch':
-                        task = WorkScheduleReviseDAO.create_or_update_timeoff_lunch_task(request.user, source='manual')
+                        # task = WorkScheduleReviseDAO.create_or_update_timeoff_lunch_task(request.user, source='manual')
+                        task = Tasks.objects.get(work_order__exact='TLUNCH')
                     elif command_type == 'Breaks':
-                        task = WorkScheduleReviseDAO.create_or_update_timeoff_breaks_task(request.user, source='manual')
+                        # task = WorkScheduleReviseDAO.create_or_update_timeoff_breaks_task(request.user, source='manual')
+                        task = Tasks.objects.get(work_order__exact='TBREAK')
                     elif command_type == 'UnionBus':
                         task = WorkScheduleReviseDAO.create_or_update_union_bus_task(request.user, duration, source='manual')
                     else:

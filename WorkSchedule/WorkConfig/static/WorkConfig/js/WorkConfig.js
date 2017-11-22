@@ -84,11 +84,12 @@ define(function (require) {
             var data = $(this).serialize();
 
             $("#WorkConfigDataUploadSubmit").html("Loading...");
+            process_result(FileType);
             $.get('Panel1/Form1/Submit/',data,function (res) {
                 var status = res['status'],
                     msg = res['msg'];
                 if (status === 1){
-                    process_result(FileType)
+                    // process_result(FileType)
                     // $("#WorkConfigDataUploadSubmit").html("Loaded");
                 }else {
                     $("#WorkConfigDataUploadSubmit").html("Try Again");

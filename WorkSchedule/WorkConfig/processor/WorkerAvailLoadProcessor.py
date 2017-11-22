@@ -238,7 +238,8 @@ class WorkerAvailLoadProcessor:
             lunch_start = end - timedelta(minutes=60)
             lunch_end = end - timedelta(minutes=30)
             lunch_duration = lunch_end - lunch_start
-            lunch_task = WorkScheduleReviseDAO.create_or_update_timeoff_lunch_task(user, source='manual')
+            # lunch_task = WorkScheduleReviseDAO.create_or_update_timeoff_lunch_task(user, source='manual')
+            lunch_task = Tasks.objects.get(work_order__exact='TLUNCH')
             lunch_schedule = WorkScheduleReviseDAO.update_or_create_schedule(user,
                                                                              lunch_start,
                                                                              lunch_end,
@@ -258,8 +259,10 @@ class WorkerAvailLoadProcessor:
         break2_end = end - timedelta(minutes=0)
         break2_duration = break2_end - break2_start
         if not break_obj.exists():
-            break1_task = WorkScheduleReviseDAO.create_or_update_timeoff_breaks_task(user, source='manual')
-            break2_task = WorkScheduleReviseDAO.create_or_update_timeoff_breaks_task(user, source='manual')
+            # break1_task = WorkScheduleReviseDAO.create_or_update_timeoff_breaks_task(user, source='manual')
+            # break2_task = WorkScheduleReviseDAO.create_or_update_timeoff_breaks_task(user, source='manual')
+            break1_task = Tasks.objects.get(work_order__exact='TBREAK')
+            break2_task = Tasks.objects.get(work_order__exact='TBREAK')
             break1_schedule = WorkScheduleReviseDAO.update_or_create_schedule(user,
                                                                               break1_start,
                                                                               break1_end,
@@ -283,7 +286,8 @@ class WorkerAvailLoadProcessor:
         if break_obj.count() == 1:
             break_obj_exist = break_obj[0]
             if break_obj_exist.time_start == break1_start and break_obj_exist.time_end == break1_end:
-                break2_task = WorkScheduleReviseDAO.create_or_update_timeoff_breaks_task(user, source='manual')
+                # break2_task = WorkScheduleReviseDAO.create_or_update_timeoff_breaks_task(user, source='manual')
+                break2_task = Tasks.objects.get(work_order__exact='TBREAK')
                 break2_schedule = WorkScheduleReviseDAO.update_or_create_schedule(user,
                                                                                   break2_start,
                                                                                   break2_end,
@@ -295,7 +299,8 @@ class WorkerAvailLoadProcessor:
                                                                                   source='file',
                                                                                   document=file)
             elif break_obj_exist.time_start == break2_start and break_obj_exist.time_end == break2_end:
-                break1_task = WorkScheduleReviseDAO.create_or_update_timeoff_breaks_task(user, source='manual')
+                # break1_task = WorkScheduleReviseDAO.create_or_update_timeoff_breaks_task(user, source='manual')
+                break1_task = Tasks.objects.get(work_order__exact='TBREAK')
                 break1_schedule = WorkScheduleReviseDAO.update_or_create_schedule(user,
                                                                                   break1_start,
                                                                                   break1_end,
@@ -307,7 +312,8 @@ class WorkerAvailLoadProcessor:
                                                                                   source='file',
                                                                                   document=file)
             else:
-                break2_task = WorkScheduleReviseDAO.create_or_update_timeoff_breaks_task(user, source='manual')
+                # break2_task = WorkScheduleReviseDAO.create_or_update_timeoff_breaks_task(user, source='manual')
+                break2_task = Tasks.objects.get(work_order__exact='TBREAK')
                 break2_schedule = WorkScheduleReviseDAO.update_or_create_schedule(user,
                                                                                   break2_start,
                                                                                   break2_end,
@@ -547,7 +553,8 @@ class WorkerAvailLoadProcessor:
 
     @classmethod
     def update_process(cls, percent):
-        percent = round(float(percent), 2)
+        if percent:
+            percent = round(float(percent), 2)
         if os.path.exists(cls.result_path):
             data = pd.read_csv(cls.result_path)
             data_bytype = data[data['filetype'] == 'WorkerAvail']

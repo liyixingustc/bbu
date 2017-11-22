@@ -141,6 +141,14 @@ class TasksLoadProcessor:
         # auto schedule
         work_orders = data['Work Order'].tolist()
         tasks.auto_schedule.delay(work_orders=work_orders)
+    #
+    # @classmethod
+    # def filter_parts_status(cls, data):
+    #
+    #     data[data['description'].str.contains('{{parts open}}') & data['Status'] == 'Approved']['Status'] = 'Wait For Parts'
+    #     data[data['description'].str.contains('{{parts complete}}') & data['Status'] == 'Wait For Parts']['Status'] = 'Approved'
+    #
+    #     return data
 
     @classmethod
     def get_new_and_update_data(cls, old, new):
@@ -160,7 +168,7 @@ class TasksLoadProcessor:
         return data
 
     close_status = ['Canceled', 'Complete', 'Denied']
-    open_status = ['Approved', 'Scheduled', 'Work Request']
+    open_status = ['Approved', 'Scheduled', 'Work Request', 'Wait For Parts']
 
     @classmethod
     def smart_status_choice(cls, work_order, somax_status, due_days, create_date):
