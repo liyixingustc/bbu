@@ -93,7 +93,14 @@ class ReportLostTimeDetailProcessor:
                         data['LostTimeValue'] = data['LostTimeValue'].str.replace(',', '')
                         data['LostTimeValue'] = data['LostTimeValue'].astype('float64')
 
-                        data['SalesDate'] = pd.to_datetime(data['SalesDate'], format='%m/%d/%y')
+                        try:
+                            data['SalesDate'] = pd.to_datetime(data['SalesDate'], format='%m/%d/%y')
+                        except:
+                            try:
+                                data['SalesDate'] = pd.to_datetime(data['SalesDate'], format='%m/%d/%Y')
+                            except Exception as e:
+                                raise Exception
+
                         data['SalesDate'] = data['SalesDate'].apply(lambda x: UDatetime.localize(x))
 
                         data_count = len(data)
