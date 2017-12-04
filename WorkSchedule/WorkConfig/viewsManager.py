@@ -25,6 +25,7 @@ from .processor.EquipmentLoadProcessor import EquipmentLoadProcessor
 from .processor.PMsLoadProcessor import PMsLoadProcessor
 from .processor.SomaxAccountLoadProcessor import SomaxAccountLoadProcessor
 from .processor.WorkerLoadProcessor import WorkerLoadProcessor
+from .processor.PartsOpenProcessor import PartsOpenProcessor
 
 from bbu.celery import is_available_workers
 from .tasks import *
@@ -65,6 +66,8 @@ class PageManager:
                         SomaxAccountLoadProcessor.somax_account_load_processor()
                     elif file_type == 'Worker':
                         WorkerLoadProcessor.worker_load_processor()
+                    elif file_type == 'PartsOpen':
+                        PartsOpenProcessor.parts_open_processor()
                 except Exception as e:
                     WorkerAvailLoadProcessor.update_process(None)
                     msg = ExceptionCustom.get_client_message(e)
