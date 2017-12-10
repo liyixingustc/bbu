@@ -129,7 +129,13 @@ class WorkerAvailLoadProcessor:
                 is_union_bus = True
             date = row['date']
             deduction = timedelta(hours=1)
-            worker = Workers.objects.get(name=row['worker'])
+
+            worker = Workers.objects.filter(name=row['worker'])
+            if worker.exists():
+                worker = worker[0]
+            else:
+                continue
+
             parsed_time = cls.time_parser(row['time'], row['worker'], date, shift, worker_type)
             if not parsed_time:
                 continue
