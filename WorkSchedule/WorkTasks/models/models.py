@@ -64,6 +64,8 @@ class Tasks(models.Model):
     scheduled_hour = models.DurationField(default=timedelta(hours=0))
     actual_hour = models.DurationField(default=timedelta(hours=0))
 
+    parts_location = models.CharField(max_length=50, null=True, blank=True)
+
     fail_code = models.CharField(max_length=50, null=True, blank=True)
     completion_comments = models.CharField(max_length=150, null=True, blank=True)
 
