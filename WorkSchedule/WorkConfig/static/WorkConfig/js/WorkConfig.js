@@ -37,7 +37,9 @@ define(function (require) {
             case 'AOR': Processor = 'AORLoadProcessor';break;
         }
 
-        process_result(FileType);
+        if (FileType === 'WorkerAvailProcessor') {
+            process_result(FileType);
+        }
 
         $FileUpload.fileinput({
             uploadUrl: 'Panel1/Form1/FileUpload/',
@@ -61,7 +63,9 @@ define(function (require) {
             $FileUpload.fileinput('clear');
             FileType = $(this).val();
 
-            process_result(FileType);
+            if (FileType === 'WorkerAvailProcessor') {
+                process_result(FileType);
+            }
 
             switch (FileType){
                 case 'Tasks': Processor = 'TasksLoadProcessor';break;
