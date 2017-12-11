@@ -72,7 +72,7 @@ class PageManager:
                     WorkerAvailLoadProcessor.update_process(None)
                     msg = ExceptionCustom.get_client_message(e)
                     print(e)
-                    return JsonResponse({'status': 0, 'msg': msg})
+                    return JsonResponse({'status': 0, 'msg': msg + ' ' + str(e)})
 
                 return JsonResponse({'status': 1, 'msg': ''})
 
