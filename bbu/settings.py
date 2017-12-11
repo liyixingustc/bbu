@@ -97,24 +97,24 @@ WSGI_APPLICATION = 'bbu.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 # if 'EC2_HOME' in os.environ:
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'bbu',
-#         'USER': 'tlinvestment',
-#         'PASSWORD': 'Tsh19920328',
-#         'HOST': 'tlinvestment.comop3eprq5n.us-east-1.rds.amazonaws.com',
-#         'PORT': '3306',
-#     }
-# }
-
-# else:
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+if 'localhost' in os.environ.get('HOSTNAME', ''):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'bbu',
+            'USER': 'tlinvestment',
+            'PASSWORD': 'Tsh19920328',
+            'HOST': 'tlinvestment.comop3eprq5n.us-east-1.rds.amazonaws.com',
+            'PORT': '3306',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
+    }
 
 
 # Password validation
