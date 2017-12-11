@@ -92,7 +92,6 @@ define(function (require) {
                 process_result(FileType);
             }
             $.get('Panel1/Form1/Submit/',data,function (res) {
-                console.log(res)
                 var status = res['status'],
                     msg = res['msg'];
                 if (status === 1){
