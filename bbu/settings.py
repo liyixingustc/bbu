@@ -97,7 +97,7 @@ WSGI_APPLICATION = 'bbu.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 # if 'EC2_HOME' in os.environ:
-if 'localhost' in os.environ.get('HOSTNAME', ''):
+if 'localhost' not in os.environ.get('HOSTNAME', ''):
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
