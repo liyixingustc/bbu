@@ -37,7 +37,7 @@ class PMsLoadProcessor:
                 for file in files:
                     path = BASE_DIR + file.document.url
                     if os.path.exists(path):
-                        data = pd.read_excel(path)
+                        data = pd.read_csv(path)
                         cls.pms_data_processor(data)
                         # update documents
                         Documents.objects.filter(id=file.id).update(status='loaded')

@@ -29,6 +29,7 @@ class TasksLoadProcessor:
             for file_path in files_path:
                 if os.path.exists(file_path):
                     data = pd.read_csv(file_path, encoding='iso-8859-1')
+                    # data = pd.read_csv(file_path)
                     cls.tasks_data_processor(data)
             else:
                 return JsonResponse({})
@@ -39,6 +40,7 @@ class TasksLoadProcessor:
                     path = BASE_DIR + file.document.url
                     if os.path.exists(path):
                         data = pd.read_csv(path, encoding='iso-8859-1')
+                        # data = pd.read_csv(path)
                         cls.tasks_data_processor(data)
 
                         # update documents
@@ -135,12 +137,13 @@ class TasksLoadProcessor:
                                                'AOR': aor,
                                                'creator': creator,
                                                'assigned': assigned,
-                                               'PMs': pms
+                                               'PMs': pms,
+                                               'parts_location': None
                                            })
 
         # auto schedule
-        work_orders = data['Work Order'].tolist()
-        tasks.auto_schedule.delay(work_orders=work_orders)
+        # work_orders = data['Work Order'].tolist()
+        # tasks.auto_schedule.delay(work_orders=work_orders)
     #
     # @classmethod
     # def filter_parts_status(cls, data):
