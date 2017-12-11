@@ -45,7 +45,8 @@ class DataInit:
                 'assigned': None,
                 'PMs': None,
                 'source': 'auto',
-                'document': None
+                'document': None,
+                'parts_location': None
             })
 
         # init break
@@ -73,7 +74,8 @@ class DataInit:
                 'assigned': None,
                 'PMs': None,
                 'source': 'auto',
-                'document': None
+                'document': None,
+                'parts_location': None
             })
 
         # init union business
@@ -101,7 +103,8 @@ class DataInit:
                 'assigned': None,
                 'PMs': None,
                 'source': 'auto',
-                'document': None
+                'document': None,
+                'parts_location': None
             })
 
     @classmethod
