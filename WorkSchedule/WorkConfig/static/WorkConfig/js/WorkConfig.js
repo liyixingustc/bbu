@@ -37,7 +37,7 @@ define(function (require) {
             case 'AOR': Processor = 'AORLoadProcessor';break;
         }
 
-        if (FileType === 'WorkerAvailProcessor') {
+        if (FileType === 'WorkerAvail') {
             process_result(FileType);
         }
 
@@ -63,7 +63,7 @@ define(function (require) {
             $FileUpload.fileinput('clear');
             FileType = $(this).val();
 
-            if (FileType === 'WorkerAvailProcessor') {
+            if (FileType === 'WorkerAvail') {
                 process_result(FileType);
             }
 
@@ -88,7 +88,7 @@ define(function (require) {
             var data = $(this).serialize();
 
             $("#WorkConfigDataUploadSubmit").html("Loading...");
-            if (FileType === 'WorkerAvailProcessor') {
+            if (FileType === 'WorkerAvail') {
                 process_result(FileType);
             }
             $.get('Panel1/Form1/Submit/',data,function (res) {
