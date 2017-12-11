@@ -84,7 +84,9 @@ define(function (require) {
             var data = $(this).serialize();
 
             $("#WorkConfigDataUploadSubmit").html("Loading...");
-            process_result(FileType);
+            if (FileType === 'WorkerAvailProcessor') {
+                process_result(FileType);
+            }
             $.get('Panel1/Form1/Submit/',data,function (res) {
                 var status = res['status'],
                     msg = res['msg'];
