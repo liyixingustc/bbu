@@ -23,7 +23,8 @@ define(function (require) {
         x_editable = require('x-editable'),
         flat_json = require('flat-json'),
         multiple_sort = require('multiple-sort'),
-        filter_control = require('filter-control');
+        // filter_control = require('filter-control'),
+        select2_filter = require('select2-filter');
 
     var $table_container_id = $("#WorkSchedulerPanel2Table1ContainerId"),
         $table_id = $("#WorkSchedulerPanel2Table1TableId");
@@ -56,6 +57,7 @@ define(function (require) {
             paginationLoop: true,
             sidePagination: 'server',
             // filterControl:true,
+            filter:true,
             url:"Panel2/Table1/create/",
             columns:[
                 // {
@@ -72,63 +74,105 @@ define(function (require) {
                     title: 'WO',
                     sortable: true,
                     // editable: true,
-                    align: 'center'
+                    align: 'center',
+                    filter:{
+                        type:'input'
+                    }
                 },
                 {
                     field: 'description',
                     title: 'description',
                     sortable: true,
                     // editable: true,
-                    align: 'center'
+                    align: 'center',
+                    filter:{
+                        type:'input'
+                    }
                 },
                 {
                     field: 'balance_hour',
                     title: 'BAL',
-                    sortable: true,
+                    sortable: false,
                     // editable: true,
-                    align: 'center'
+                    align: 'center',
+                    filter:{
+                        type:'input'
+                    }
                 },
                 {
                     field: 'estimate_hour',
                     title: 'EST',
                     sortable: true,
                     editable: true,
-                    align: 'center'
+                    align: 'center',
+                    filter:{
+                        type:'input'
+                    }
                 },
                 {
                     field: 'AOR',
                     title: 'AOR',
                     sortable: true,
                     // editable: true,
-                    align: 'center'
+                    align: 'center',
+                    filter:{
+                        type:'input'
+                    }
                 },
                 {
                     field: 'work_type',
                     title: 'type',
                     sortable: true,
                     // editable: true,
-                    align: 'center'
+                    align: 'center',
+                    filter:{
+                        type:'select',
+                        data:[
+                              'CM', 'PM', 'EM', 'EV'
+                        ]
+                    }
                 },
                 {
                     field: 'priority',
                     title: 'priority',
                     sortable: true,
                     // editable: true,
-                    align: 'center'
+                    align: 'center',
+                    filter:{
+                        type:'select',
+                        data:[
+                              'S','U','1','2','3','4'
+                        ]
+                    }
                 },
                 {
                     field: 'OLD',
                     title: 'OLD',
                     sortable: true,
                     // editable: true,
-                    align: 'center'
+                    align: 'center',
+                    filter:{
+                        type:'input'
+                    }
                 },
                 {
                     field: 'current_status',
                     title: 'status',
                     sortable: true,
                     // editable: true,
-                    align: 'center'
+                    align: 'center',
+                    filter:{
+                        type:'select',
+                        data:[
+                              'Work Request',
+                              'Approved',
+                              'Wait For Parts',
+                              'Scheduled',
+                              'Complete',
+                              'Canceled',
+                              'Denied'
+                        ]
+                    }
                 },
             ],
             rowStyle: function (row, index) {
@@ -197,6 +241,7 @@ define(function (require) {
         });
         $table_id.on('editable-hidden.bs.table',function (field, row, $el, reason) {
         });
+
     }
 
     function external_drag_init() {

@@ -44,6 +44,7 @@ require.config({
         'filter-control' : ['/static/bootstrap-table/dist/extensions/filter-control/bootstrap-table-filter-control.min'],
         'flat-json' : ['/static/bootstrap-table/dist/extensions/flat-json/bootstrap-table-flat-json.min'],
         'multiple-sort' : ['/static/bootstrap-table/dist/extensions/multiple-sort/bootstrap-table-multiple-sort.min'],
+        'select2-filter' : ['/static/bootstrap-table/dist/extensions/select2-filter/bootstrap-table-select2-filter'],
         // Highcharts
         'Highcharts': ['/static/Highcharts/code/js/highcharts'],
         'Highcharts-more': ['/static/Highcharts/code/js/highcharts-more'],
@@ -126,6 +127,9 @@ require.config({
             deps:['jquery','bootstrap','bootstrap-table']
         },
         'multiple-sort':{
+            deps:['jquery','bootstrap','bootstrap-table']
+        },
+        'select2-filter':{
             deps:['jquery','bootstrap','bootstrap-table']
         },
         // Highcharts

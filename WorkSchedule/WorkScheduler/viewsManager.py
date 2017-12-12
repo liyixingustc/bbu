@@ -468,7 +468,17 @@ class PageManager:
             def create(request, *args, **kwargs):
                 page_size = int(request.GET.get('limit'))
                 offset = int(request.GET.get('offset'))
-                data = WorkSchedulerPanel2Table1Manager.set_data(pagination=True, page_size=page_size, offset=offset)
+                filter = request.GET.get('filter')
+                sort = request.GET.get('sort')
+                order = request.GET.get('order')
+
+                data = WorkSchedulerPanel2Table1Manager.set_data(pagination=True,
+                                                                 page_size=page_size,
+                                                                 offset=offset,
+                                                                 filter=filter,
+                                                                 sort=sort,
+                                                                 order=order
+                                                                 )
                 if not data.empty:
                     num = WorkScheduleDataDAO.get_all_tasks_open_num()
                     data_response = data.to_dict(orient='records')

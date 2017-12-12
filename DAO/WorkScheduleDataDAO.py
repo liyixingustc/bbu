@@ -30,12 +30,22 @@ class WorkScheduleDataDAO:
         return num
 
     @classmethod
-    def get_all_tasks_open(cls, pagination=False, page_size=None, offset=None):
+    def get_all_tasks_open(cls, pagination=False, page_size=None, offset=None, filter=None, sort=None, order=None):
+
+        if sort and order:
+            if sort == 'OLD':
+                sort = 'create_date'
+            elif sort == 'balance_hour':
+                sort = 'estimate_hour'
+            if order == 'desc':
+                sort = '-'+sort
+        else:
+            sort = 'work_order'
 
         tasks = Tasks.objects.filter(current_status__in=cls.ready_for_schedule_tasks_status)\
             .exclude(priority__in=['T', 'O']) \
             .annotate(schedule_hour=Sum('workerscheduled__duration')) \
-            .order_by('work_order')
+            .order_by(sort)
 
         if pagination:
             paginator = Paginator(tasks, page_size,)
