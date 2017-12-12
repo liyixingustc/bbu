@@ -79,6 +79,8 @@ class TasksLoadProcessor:
         data['Actual Finish'] = pd.to_datetime(data['Actual Finish'], format='%Y/%m/%d')
         data['Actual Finish'] = data['Actual Finish'].apply(lambda x: UDatetime.localize(x))
 
+        data['Description'] = data['Description'].apply(lambda x: x.encode('ascii', errors="ignore").decode())
+
         for index, row in data.iterrows():
             # if index in list(np.arange(0,40000, 100)):
             #     print(index)

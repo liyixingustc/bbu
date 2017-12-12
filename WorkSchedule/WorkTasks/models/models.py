@@ -49,24 +49,24 @@ class Tasks(models.Model):
 
     # model fields
     work_order = models.CharField(max_length=30)
-    description = models.CharField(max_length=150, null=True, blank=True)
+    description = models.CharField(max_length=500, null=True, blank=True)
     work_type = models.CharField(max_length=10, choices=working_type_choice, null=True, blank=True)
-    current_status = models.CharField(max_length=10, choices=status_choice, default='Work Request')
+    current_status = models.CharField(max_length=30, choices=status_choice, default='Work Request')
     line = models.CharField(max_length=10, choices=BaseConstants.line_choice, null=True, blank=True)
     shift = models.CharField(max_length=10, choices=BaseConstants.shift_choice, null=True, blank=True)
     priority = models.CharField(max_length=10, choices=priority_choice, null=True, blank=True)
     create_date = models.DateTimeField(null=True, blank=True)
 
-    current_status_somax = models.CharField(max_length=10, choices=status_choice, default='Work Request')
+    current_status_somax = models.CharField(max_length=30, choices=status_choice, default='Work Request')
     schedule_date_somax = models.DateTimeField(null=True, blank=True)
     actual_date_somax = models.DateTimeField(null=True, blank=True)
     estimate_hour = models.DurationField(default=timedelta(hours=0))
     scheduled_hour = models.DurationField(default=timedelta(hours=0))
     actual_hour = models.DurationField(default=timedelta(hours=0))
 
-    parts_location = models.CharField(max_length=50, null=True, blank=True)
+    parts_location = models.CharField(max_length=100, null=True, blank=True)
 
-    fail_code = models.CharField(max_length=50, null=True, blank=True)
+    fail_code = models.CharField(max_length=100, null=True, blank=True)
     completion_comments = models.CharField(max_length=150, null=True, blank=True)
 
     equipment = models.ForeignKey(Equipment, db_column='equipment', null=True, blank=True)
