@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 import pytz
+import ast
+
 from datetime import datetime as dt
 from dateutil.parser import parse
 from dateutil.tz import tzlocal
@@ -24,13 +26,13 @@ class WorkScheduleDataDAO:
 
     @classmethod
     def get_all_tasks_open_num(cls):
-        num = tasks = Tasks.objects.filter(current_status__in=cls.ready_for_schedule_tasks_status) \
+        num = Tasks.objects.filter(current_status__in=cls.ready_for_schedule_tasks_status) \
             .exclude(priority__in=['T', 'O']).count()
 
         return num
 
     @classmethod
-    def get_all_tasks_open(cls, pagination=False, page_size=None, offset=None, filter=None, sort=None, order=None):
+    def get_all_tasks_open(cls, pagination=False, page_size=None, offset=None, filters=None, sort=None, order=None):
 
         if sort and order:
             if sort == 'OLD':
@@ -46,6 +48,29 @@ class WorkScheduleDataDAO:
             .exclude(priority__in=['T', 'O']) \
             .annotate(schedule_hour=Sum('workerscheduled__duration')) \
             .order_by(sort)
+
+        if filters:
+            filters = ast.literal_eval(filters)
+            if filters.get('work_order'):
+                tasks = tasks.filter(work_order__contains=filters['work_order'])
+            if filters.get('description'):
+                tasks = tasks.filter(description__contains=filters['description'])
+            if filters.get('estimate_hour'):
+                try:
+                    est = float(filters['estimate_hour'])
+                    tasks = tasks.filter(estimate_hour__exact=timedelta(hours=est))
+                except Exception as e:
+                    pass
+            if filters.get('AOR'):
+                tasks = tasks.filter(AOR__worker__name__contains=filters['AOR'])
+            if filters.get('work_type'):
+                tasks = tasks.filter(work_type__exact=filters['work_type'])
+            if filters.get('priority'):
+                tasks = tasks.filter(priority__exact=filters['priority'])
+            if filters.get('current_status'):
+                tasks = tasks.filter(current_status__exact=filters['current_status'])
+
+        num = tasks.count()
 
         if pagination:
             paginator = Paginator(tasks, page_size,)
@@ -67,9 +92,9 @@ class WorkScheduleDataDAO:
         tasks_record.rename_axis({'AOR__worker__name': 'AOR'}, axis=1, inplace=True)
 
         if tasks_record.empty:
-            return pd.DataFrame()
+            return pd.DataFrame(), 0
 
-        tasks_record['schedule_hour'].fillna(timedelta(hours=0),inplace=True)
+        tasks_record['schedule_hour'].fillna(timedelta(hours=0), inplace=True)
         tasks_record['balance_hour'] = tasks_record['estimate_hour'] - tasks_record['schedule_hour']
 
         tasks_record['schedule_hour'] = tasks_record['schedule_hour'].apply(lambda x: x.total_seconds()/3600)
@@ -79,7 +104,7 @@ class WorkScheduleDataDAO:
         tasks_record['OLD'] = tasks_record['create_date'].apply(lambda x: int((now_date - x.date()).total_seconds()/(3600*24)))
         tasks_record.drop('create_date', axis=1, inplace=True)
 
-        return tasks_record
+        return tasks_record, num
 
     @classmethod
     def get_all_tasks_scheduled(cls):

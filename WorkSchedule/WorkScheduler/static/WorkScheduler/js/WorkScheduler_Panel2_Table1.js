@@ -95,9 +95,9 @@ define(function (require) {
                     sortable: false,
                     // editable: true,
                     align: 'center',
-                    filter:{
-                        type:'input'
-                    }
+                    // filter:{
+                    //     type:'input'
+                    // }
                 },
                 {
                     field: 'estimate_hour',
@@ -151,9 +151,9 @@ define(function (require) {
                     sortable: true,
                     // editable: true,
                     align: 'center',
-                    filter:{
-                        type:'input'
-                    }
+                    // filter:{
+                    //     type:'input'
+                    // }
                 },
                 {
                     field: 'current_status',

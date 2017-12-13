@@ -468,27 +468,33 @@ class PageManager:
             def create(request, *args, **kwargs):
                 page_size = int(request.GET.get('limit'))
                 offset = int(request.GET.get('offset'))
-                filter = request.GET.get('filter')
+                filters = request.GET.get('filter')
                 sort = request.GET.get('sort')
                 order = request.GET.get('order')
 
-                data = WorkSchedulerPanel2Table1Manager.set_data(pagination=True,
-                                                                 page_size=page_size,
-                                                                 offset=offset,
-                                                                 filter=filter,
-                                                                 sort=sort,
-                                                                 order=order
-                                                                 )
+                response = WorkSchedulerPanel2Table1Manager.set_data(pagination=True,
+                                                                     page_size=page_size,
+                                                                     offset=offset,
+                                                                     filters=filters,
+                                                                     sort=sort,
+                                                                     order=order
+                                                                     )
+                # print(response)
+                data = response[0]
+                num = response[1]
+
                 if not data.empty:
-                    num = WorkScheduleDataDAO.get_all_tasks_open_num()
                     data_response = data.to_dict(orient='records')
                     response = {
                         'total': num,
                         'rows': data_response
                     }
-                    return JsonResponse(response, safe=False)
                 else:
-                    return JsonResponse({})
+                    response = {
+                        'total': 0,
+                        'rows': []
+                    }
+                return JsonResponse(response, safe=False)
 
             @staticmethod
             def edit(request, *args, **kwargs):
@@ -522,7 +528,7 @@ class PageManager:
                 worker_scheduled_others = WorkerScheduled.objects.filter(date__range=[start_date, end_date],
                                                                          task_id__priority__in=['0', 'T'])
 
-                tasks = WorkScheduleDataDAO.get_all_tasks_open()
+                tasks = WorkScheduleDataDAO.get_all_tasks_open()[0]
 
                 if worker_avail.exists():
                     worker_avail_df = pd.DataFrame.from_records(worker_avail.values('duration', 'deduction'))
