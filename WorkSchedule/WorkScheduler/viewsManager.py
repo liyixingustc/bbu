@@ -199,6 +199,16 @@ class PageManager:
 
                 return JsonResponse(response,safe=False)
 
+            @staticmethod
+            def syc_tasks_from_somax(request, *args, **kwargs):
+                response = []
+                return JsonResponse(response, safe=False)
+
+            @staticmethod
+            def syc_tasks_to_somax(request, *args, **kwargs):
+                response = []
+                return JsonResponse(response, safe=False)
+
         class ModalManager:
             @staticmethod
             def select_submit(request, *args, **kwargs):

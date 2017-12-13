@@ -30,8 +30,9 @@ class SomaxAccountLoadProcessor:
                 if os.path.exists(path):
                     data = pd.read_excel(path)
                     for index, row in data.iterrows():
-                        SomaxAccount.objects.update_or_create(user_name=row['User Name'],
+                        SomaxAccount.objects.update_or_create(id=row['id'],
                                                               defaults={
+                                                                  'user_name': row['User Name'],
                                                                   'full_name': row['Full Name'],
                                                                   'first_name': row['First Name'],
                                                                   'last_name': row['Last Name'],

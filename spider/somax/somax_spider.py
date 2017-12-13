@@ -58,6 +58,9 @@ class SomaxSpider:
     somax_task_detail_actual_tab_a_id = 'MainContent_cpcActuals_ctl00_ASPxPageControlActuals_T1'
     somax_task_detail_actual_table_id = 'MainContent_cpcActuals_ctl00_ASPxPageControlActuals_grdWorkOrderLabor_DXMainTable'
 
+    somax_label_scheduling_url = 'https://somaxonline.somax.com/UpdatedLaborScheduling.aspx'
+
+
     download_path = os.path.join(BASE_DIR, MEDIA_ROOT, 'spider', 'somax')
 
     def __init__(self, account=None, password=None):

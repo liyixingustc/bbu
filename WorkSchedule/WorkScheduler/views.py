@@ -40,6 +40,16 @@ class Page:
                 response = PageManager.PanelManager.TimeLineManager.event_create(request, *args, **kwargs)
                 return response
 
+            @staticmethod
+            def syc_tasks_from_somax(request, *args, **kwargs):
+                response = PageManager.PanelManager.TimeLineManager.syc_tasks_from_somax(request, *args, **kwargs)
+                return response
+
+            @staticmethod
+            def syc_tasks_to_somax(request, *args, **kwargs):
+                response = PageManager.PanelManager.TimeLineManager.syc_tasks_to_somax(request, *args, **kwargs)
+                return response
+
         class Modal:
             @staticmethod
             def select_submit(request, *args, **kwargs):
@@ -97,6 +107,8 @@ mapping = pd.DataFrame([
     {'page': 'WorkScheduler', 'panel': 'Panel1', 'widget': 'TimeLine1', 'func': 'events', 'register': Page.Panel.TimeLine.events},
     {'page': 'WorkScheduler', 'panel': 'Panel1', 'widget': 'TimeLine1', 'func': 'event_update', 'register': Page.Panel.TimeLine.event_update},
     {'page': 'WorkScheduler', 'panel': 'Panel1', 'widget': 'TimeLine1', 'func': 'event_create', 'register': Page.Panel.TimeLine.event_create},
+    {'page': 'WorkScheduler', 'panel': 'Panel1', 'widget': 'TimeLine1', 'func': 'syc_tasks_from_somax', 'register': Page.Panel.TimeLine.syc_tasks_from_somax},
+    {'page': 'WorkScheduler', 'panel': 'Panel1', 'widget': 'TimeLine1', 'func': 'syc_tasks_to_somax', 'register': Page.Panel.TimeLine.syc_tasks_to_somax},
 
     {'page': 'WorkScheduler', 'panel': 'Panel2', 'widget': 'Table1', 'func': 'create', 'register': Page.Panel.Table.create},
     {'page': 'WorkScheduler', 'panel': 'Panel2', 'widget': 'Table1', 'func': 'edit', 'register': Page.Panel.Table.edit},
