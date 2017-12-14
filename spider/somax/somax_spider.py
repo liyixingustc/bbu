@@ -34,7 +34,7 @@ from WorkSchedule.WorkTasks.models.models import *
 
 class SomaxSpider:
 
-    DISPLAY = False
+    DISPLAY = True
 
     account = 'BBUGRNATU'
     password = 'ARTHUR'
@@ -59,7 +59,16 @@ class SomaxSpider:
     somax_task_detail_actual_table_id = 'MainContent_cpcActuals_ctl00_ASPxPageControlActuals_grdWorkOrderLabor_DXMainTable'
 
     somax_label_scheduling_url = 'https://somaxonline.somax.com/UpdatedLaborScheduling.aspx'
-
+    somax_label_scheduling_date_input_id = 'MainContent_uicSchuduledDate_datetimeControl_I'
+    somax_label_scheduling_assigned_input_id = 'MainContent_ddlPersonnel_ddldxControl_I'
+    somax_label_scheduling_add_input_id = 'MainContent_ASPxCallbackPanel1_btnAvailableWork'
+    somax_label_scheduling_loading_id = 'MainContent_ASPxCallbackPanel1_LPV'
+    somax_label_scheduling_modal_include_all_input_id = 'MainContent_ASPxCallbackPanel1_pcLogin_Panel1_chk_Order'
+    somax_label_scheduling_modal_filter_work_order_id = 'MainContent_ASPxCallbackPanel1_pcLogin_Panel1_gridAvailable_DXFREditorcol1_I'
+    somax_label_scheduling_modal_first_row_check_id = 'MainContent_ASPxCallbackPanel1_pcLogin_Panel1_gridAvailable_DXSelBtn0'
+    somax_label_scheduling_modal_first_row_empty_id = 'MainContent_ASPxCallbackPanel1_pcLogin_Panel1_gridAvailable_DXEmptyRow'
+    somax_label_scheduling_modal_first_row_id = 'MainContent_ASPxCallbackPanel1_pcLogin_Panel1_gridAvailable_DXDataRow0'
+    somax_label_scheduling_modal_add_input_id = 'MainContent_ASPxCallbackPanel1_pcLogin_Panel1_btnAdd'
 
     download_path = os.path.join(BASE_DIR, MEDIA_ROOT, 'spider', 'somax')
 
@@ -361,6 +370,58 @@ class SomaxSpider:
 
         return True
 
+    def sync_schedules_to_somax_spider(self):
+
+        # dummy data
+        date = '2017/12/10'
+        assigned = 'BBUGRNATU'
+
+        self.driver.get(self.somax_label_scheduling_url)
+        current_url = self.driver.current_url
+        if current_url == self.somax_login_url:
+            self.login()
+
+        self.get_and_ready(self.somax_label_scheduling_url)
+
+        # revise assigned
+        element_assigned = WebDriverWait(self.driver, 60).until(
+            EC.presence_of_element_located((By.ID, self.somax_label_scheduling_assigned_input_id)))
+        element_assigned.clear()
+        element_assigned.send_keys(assigned)
+        element_assigned.send_keys(Keys.ENTER)
+        # self.driver.execute_script("arguments[0].setAttribute('value', '{assigned}')".format(assigned=assigned),
+        #                            element_assigned)
+
+        # revise date
+        remove_date_readonly_script = 'document.getElementById("{id}").removeAttribute("readonly")'\
+            .format(id=self.somax_label_scheduling_date_input_id)
+        self.driver.execute_script(remove_date_readonly_script)
+
+        element_date = WebDriverWait(self.driver, 60).until(
+            EC.presence_of_element_located((By.ID, self.somax_label_scheduling_date_input_id)))
+
+        element_date.clear()
+        element_date.send_keys(date)
+        element_date.send_keys(Keys.ENTER)
+        # self.driver.execute_script("arguments[0].setAttribute('value', '{date}')".format(date=date),
+        #                            element_date)
+
+        # click add modal
+        element_loading = WebDriverWait(self.driver, 60).until(
+            EC.staleness_of((By.ID, self.somax_label_scheduling_loading_id)))
+        print(1)
+        element_add = WebDriverWait(self.driver, 60).until(
+            EC.presence_of_element_located((By.ID, self.somax_label_scheduling_add_input_id)))
+        print(2)
+        time.sleep(10)
+        # element_add.click()
+        self.driver.execute_script("arguments[0].click();", element_add)
+
+        time.sleep(50)
+
+        return True
+
+
     def get_work_order_detail(self, work_order):
 
         try:
@@ -451,10 +512,12 @@ if __name__ == '__main__':
     # end = input('end:')
     # SomaxSpider().task_actual_hour_spider(start, end)
 
-    spider_type = input('please choose spider type: equip or 1 | pm or 2 | task or 3:')
-    if spider_type in ['equip', '1']:
-        SomaxSpider().equipment_spider()
-    elif spider_type in ['pm', '2']:
-        SomaxSpider().equipment_spider()
-    elif spider_type in ['task', '3']:
-        SomaxSpider().task_spider()
+    # spider_type = input('please choose spider type: equip or 1 | pm or 2 | task or 3:')
+    # if spider_type in ['equip', '1']:
+    #     SomaxSpider().equipment_spider()
+    # elif spider_type in ['pm', '2']:
+    #     SomaxSpider().equipment_spider()
+    # elif spider_type in ['task', '3']:
+    #     SomaxSpider().task_spider()
+    SomaxSpider().sync_schedules_to_somax_spider()
+
