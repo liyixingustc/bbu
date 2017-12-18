@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from pyvirtualdisplay import Display
@@ -59,16 +60,30 @@ class SomaxSpider:
     somax_task_detail_actual_table_id = 'MainContent_cpcActuals_ctl00_ASPxPageControlActuals_grdWorkOrderLabor_DXMainTable'
 
     somax_label_scheduling_url = 'https://somaxonline.somax.com/UpdatedLaborScheduling.aspx'
+    somax_label_scheduling_table_id = 'MainContent_ASPxCallbackPanel1_gridScheduled_DXMainTable'
+    somax_label_scheduling_table_first_row_id = 'MainContent_ASPxCallbackPanel1_gridScheduled_DXDataRow0'
+    somax_label_scheduling_table_edit_input_id = 'MainContent_ASPxCallbackPanel1_gridScheduled_DXEditor4_I'
     somax_label_scheduling_date_input_id = 'MainContent_uicSchuduledDate_datetimeControl_I'
     somax_label_scheduling_assigned_input_id = 'MainContent_ddlPersonnel_ddldxControl_I'
     somax_label_scheduling_add_input_id = 'MainContent_ASPxCallbackPanel1_btnAvailableWork'
     somax_label_scheduling_loading_id = 'MainContent_ASPxCallbackPanel1_LPV'
     somax_label_scheduling_modal_include_all_input_id = 'MainContent_ASPxCallbackPanel1_pcLogin_Panel1_chk_Order'
+    somax_label_scheduling_modal_select_all_input_id = 'MainContent_ASPxCallbackPanel1_pcLogin_Panel1_gridAvailable_DXSelAllBtn0_D'
+    somax_label_scheduling_modal_select_all_input_class_unchecked = 'dxWeb_edtCheckBoxUnchecked_GridTheme dxICheckBox_GridTheme dxichSys'
+    somax_label_scheduling_modal_select_all_input_class_checked = 'dxWeb_edtCheckBoxChecked_GridTheme dxICheckBox_GridTheme dxichSys'
+    somax_label_scheduling_modal_select_all_input_class_partial_checked = 'dxWeb_edtCheckBoxGrayed_GridTheme dxICheckBox_GridTheme dxichSys'
     somax_label_scheduling_modal_filter_work_order_id = 'MainContent_ASPxCallbackPanel1_pcLogin_Panel1_gridAvailable_DXFREditorcol1_I'
+    somax_label_scheduling_modal_table = 'MainContent_ASPxCallbackPanel1_pcLogin_Panel1_gridAvailable_DXMainTable'
+    somax_label_scheduling_modal_first_row_id = 'MainContent_ASPxCallbackPanel1_pcLogin_Panel1_gridAvailable_DXDataRow0'
     somax_label_scheduling_modal_first_row_check_id = 'MainContent_ASPxCallbackPanel1_pcLogin_Panel1_gridAvailable_DXSelBtn0'
     somax_label_scheduling_modal_first_row_empty_id = 'MainContent_ASPxCallbackPanel1_pcLogin_Panel1_gridAvailable_DXEmptyRow'
-    somax_label_scheduling_modal_first_row_id = 'MainContent_ASPxCallbackPanel1_pcLogin_Panel1_gridAvailable_DXDataRow0'
+    somax_label_scheduling_modal_loading_id = 'MainContent_ASPxCallbackPanel1_pcLogin_Panel1_gridAvailable_TL'
     somax_label_scheduling_modal_add_input_id = 'MainContent_ASPxCallbackPanel1_pcLogin_Panel1_btnAdd'
+    somax_label_scheduling_modal_close_id = 'MainContent_ASPxCallbackPanel1_pcLogin_Panel1_dxImgPopUpClose'
+    somax_label_scheduling_modal_repeat_id = 'MainContent_ASPxCallbackPanel1_PopupMessage_PW-1'
+    somax_label_scheduling_modal_repeat_ok_id = 'MainContent_ASPxCallbackPanel1_PopupMessage_btnOk'
+
+
 
     download_path = os.path.join(BASE_DIR, MEDIA_ROOT, 'spider', 'somax')
 
@@ -375,6 +390,7 @@ class SomaxSpider:
         # dummy data
         date = '2017/12/10'
         assigned = 'BBUGRNATU'
+        work_orders = ['17001030', '17003808']
 
         self.driver.get(self.somax_label_scheduling_url)
         current_url = self.driver.current_url
@@ -382,6 +398,11 @@ class SomaxSpider:
             self.login()
 
         self.get_and_ready(self.somax_label_scheduling_url)
+
+        self.sync_schedule_to_somax_spider('BBUGRNATU', '2017/12/10', ['17001030', '17003808'])
+        return True
+
+    def sync_schedule_to_somax_spider(self, assigned, date, work_orders):
 
         # revise assigned
         element_assigned = WebDriverWait(self.driver, 60).until(
@@ -391,6 +412,7 @@ class SomaxSpider:
         element_assigned.send_keys(Keys.ENTER)
         # self.driver.execute_script("arguments[0].setAttribute('value', '{assigned}')".format(assigned=assigned),
         #                            element_assigned)
+        self.wait_loading(self.somax_label_scheduling_loading_id)
 
         # revise date
         remove_date_readonly_script = 'document.getElementById("{id}").removeAttribute("readonly")'\
@@ -405,22 +427,134 @@ class SomaxSpider:
         element_date.send_keys(Keys.ENTER)
         # self.driver.execute_script("arguments[0].setAttribute('value', '{date}')".format(date=date),
         #                            element_date)
+        self.wait_loading(self.somax_label_scheduling_loading_id)
 
-        # click add modal
-        element_loading = WebDriverWait(self.driver, 60).until(
-            EC.staleness_of((By.ID, self.somax_label_scheduling_loading_id)))
-        print(1)
-        element_add = WebDriverWait(self.driver, 60).until(
-            EC.presence_of_element_located((By.ID, self.somax_label_scheduling_add_input_id)))
-        print(2)
-        time.sleep(10)
-        # element_add.click()
-        self.driver.execute_script("arguments[0].click();", element_add)
+        # # click available modal
+        # element_add = WebDriverWait(self.driver, 60).until(
+        #     EC.presence_of_element_located((By.ID, self.somax_label_scheduling_add_input_id)))
+        # self.driver.execute_script("arguments[0].click();", element_add)
+        # self.wait_loading(self.somax_label_scheduling_loading_id)
+        #
+        # # clear filter
+        # element_modal_filter_work_order = WebDriverWait(self.driver, 60).until(
+        #     EC.presence_of_element_located((By.ID, self.somax_label_scheduling_modal_filter_work_order_id)))
+        # if element_modal_filter_work_order.text:
+        #     self.driver.execute_script("arguments[0].setAttribute('value', '')",
+        #                                element_modal_filter_work_order)
+        #     element_modal_filter_work_order.send_keys(Keys.ENTER)
+        #
+        # # click include all
+        # element_modal_include_all = WebDriverWait(self.driver, 60).until(
+        #     EC.presence_of_element_located((By.ID, self.somax_label_scheduling_modal_include_all_input_id)))
+        # element_modal_include_all_is_selected = element_modal_include_all.is_selected()
+        # if not element_modal_include_all_is_selected:
+        #     self.driver.execute_script("arguments[0].click();", element_modal_include_all)
+        #     self.wait_loading(self.somax_label_scheduling_loading_id)
+        #
+        # # clear select all
+        # element_modal_select_all = WebDriverWait(self.driver, 60).until(
+        #     EC.presence_of_element_located((By.ID, self.somax_label_scheduling_modal_select_all_input_id)))
+        # element_modal_select_all_class = element_modal_select_all.get_attribute('class')
+        # if element_modal_select_all_class == self.somax_label_scheduling_modal_select_all_input_class_checked:
+        #     self.driver.execute_script("arguments[0].click();", element_modal_select_all)
+        # elif element_modal_select_all_class == self.somax_label_scheduling_modal_select_all_input_class_partial_checked:
+        #     self.driver.execute_script("arguments[0].click();", element_modal_select_all)
+        #     self.driver.execute_script("arguments[0].click();", element_modal_select_all)
+        #
+        # # select work orders
+        # # work_order = work_orders[0]
+        # for work_order in work_orders:
+        #
+        #     # click include all
+        #     element_modal_include_all = WebDriverWait(self.driver, 60).until(
+        #         EC.presence_of_element_located((By.ID, self.somax_label_scheduling_modal_include_all_input_id)))
+        #     element_modal_include_all_is_selected = element_modal_include_all.is_selected()
+        #     if not element_modal_include_all_is_selected:
+        #         self.driver.execute_script("arguments[0].click();", element_modal_include_all)
+        #         self.wait_loading(self.somax_label_scheduling_loading_id)
+        #
+        #     element_modal_filter_work_order = WebDriverWait(self.driver, 60).until(
+        #         EC.presence_of_element_located((By.ID, self.somax_label_scheduling_modal_filter_work_order_id)))
+        #     self.driver.execute_script("arguments[0].setAttribute('value', '{work_order}')".format(work_order=work_order),
+        #                                element_modal_filter_work_order)
+        #     element_modal_filter_work_order.send_keys(Keys.ENTER)
+        #
+        #     element_modal_last_row_first_cell_xpath = "//table[@id='{table_id}']/tbody/tr[last()]/td[2]"\
+        #         .format(table_id=self.somax_label_scheduling_modal_table)
+        #     WebDriverWait(self.driver, 20).until(
+        #         EC.text_to_be_present_in_element((By.XPATH, element_modal_last_row_first_cell_xpath), str(work_order)))
+        #
+        #     element_modal_first_row_check = WebDriverWait(self.driver, 60).until(
+        #         EC.presence_of_element_located((By.ID, self.somax_label_scheduling_modal_first_row_check_id)))
+        #     self.driver.execute_script("arguments[0].click();", element_modal_first_row_check)
+        #
+        # # click modal add
+        # element_modal_add = WebDriverWait(self.driver, 60).until(
+        #     EC.presence_of_element_located((By.ID, self.somax_label_scheduling_modal_add_input_id)))
+        # self.driver.execute_script("arguments[0].click();", element_modal_add)
+        #
+        # # click modal close
+        # element_modal_close = WebDriverWait(self.driver, 60).until(
+        #     EC.presence_of_element_located((By.ID, self.somax_label_scheduling_modal_close_id)))
+        # self.driver.execute_script("arguments[0].click();", element_modal_close)
+        #
+        # self.wait_loading(self.somax_label_scheduling_loading_id)
+        #
+        # # close repeat window
+        # element_modal_repeat = self.driver.find_element_by_id(self.somax_label_scheduling_modal_repeat_id)
+        # if element_modal_repeat:
+        #     element_modal_close = WebDriverWait(self.driver, 60).until(
+        #         EC.presence_of_element_located((By.ID, self.somax_label_scheduling_modal_repeat_ok_id)))
+        #     self.driver.execute_script("arguments[0].click();", element_modal_close)
 
-        time.sleep(50)
+        # sync schedule hours
+        self.sync_schedule_hour_to_somax_spider(work_orders)
+
+        # time.sleep(60)
 
         return True
 
+    def sync_schedule_hour_to_somax_spider(self, work_orders=None, hours=1):
+
+        work_order = work_orders[0]
+        element_table_first_row = WebDriverWait(self.driver, 60).until(
+            EC.presence_of_element_located((By.ID, self.somax_label_scheduling_table_first_row_id)))
+        element_table_first_row = self.driver.find_elements_by_id(self.somax_label_scheduling_table_first_row_id)
+        if not element_table_first_row:
+            return False
+
+        element_table_rows_xpath = "//table[@id='{table_id}']/tbody/tr" \
+            .format(table_id=self.somax_label_scheduling_table_id)
+        element_table_rows_counts = len(self.driver.find_elements_by_xpath(element_table_rows_xpath)[3:-1])
+
+        for row_num in range(1, element_table_rows_counts+1):
+
+            element_table_row = self.driver.find_elements_by_xpath(element_table_rows_xpath)[row_num+2]
+            table_work_order = element_table_row.find_elements_by_tag_name('td')[1].text
+            print(table_work_order)
+            element_table_hour = element_table_row.find_elements_by_tag_name('td')[4]
+
+            element_table_hour.click()
+            actionChains = ActionChains(self.driver)
+            actionChains.double_click(element_table_hour).perform()
+            element_table_cell_edit = self.driver.find_element_by_id(self.somax_label_scheduling_table_edit_input_id)
+
+            element_table_cell_edit.clear()
+            element_table_cell_edit.send_keys('0')
+            element_table_cell_edit.send_keys(Keys.ENTER)
+            # print(element_table_row)
+            # print(element_table_row.find_elements_by_tag_name('td')[1].text)
+            time.sleep(3)
+        print('finish')
+        time.sleep(60)
+
+    def wait_loading(self, loading_id):
+
+        WebDriverWait(self.driver, 60).until(
+        EC.presence_of_element_located((By.ID, loading_id)))
+        WebDriverWait(self.driver, 60).until_not(
+            EC.presence_of_element_located((By.ID, loading_id)))
+        return True
 
     def get_work_order_detail(self, work_order):
 

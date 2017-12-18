@@ -34,6 +34,11 @@ priority_choice = (('s', 's'),
                    (None, None),
                    )
 
+sync_to_somax_choice = (('yes', 'yes'),
+                        ('no', 'no'),
+                        ('error', 'error'),
+                        )
+
 
 class PMs(models.Model):
 
@@ -79,3 +84,5 @@ class Tasks(models.Model):
     created_on = models.DateTimeField(default=timezone.now)
     source = models.CharField(max_length=100, choices=BaseConstants.source_choice, default='manual')
     document = models.ForeignKey(Documents, db_column='document', to_field='name', null=True, blank=True)
+
+    sync_to_somax = models.CharField(max_length=20, choices=sync_to_somax_choice, null=True, blank=True)
