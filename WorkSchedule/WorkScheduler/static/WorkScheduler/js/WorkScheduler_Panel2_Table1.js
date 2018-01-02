@@ -174,6 +174,21 @@ define(function (require) {
                         ]
                     }
                 },
+                {
+                    field: 'sync_to_somax',
+                    title: 'sync',
+                    sortable: true,
+                    // editable: true,
+                    align: 'center',
+                    filter:{
+                        type:'select',
+                        data:[
+                              'yes',
+                              'no',
+                              'error',
+                        ]
+                    }
+                },
             ],
             rowStyle: function (row, index) {
                 var color = null,

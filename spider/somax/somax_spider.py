@@ -32,6 +32,8 @@ from WorkSchedule.WorkConfig.models.models import *
 from WorkSchedule.WorkWorkers.models.models import *
 from WorkSchedule.WorkTasks.models.models import *
 
+from DAO.WorkScheduleDataDAO import WorkScheduleDataDAO
+
 
 class SomaxSpider:
 
@@ -385,7 +387,44 @@ class SomaxSpider:
 
         return True
 
+    @classmethod
+    def get_schedules_to_somax_spider(cls):
+        tasks_records = WorkScheduleDataDAO.get_all_schedules_sync_to_somax()
+        tasks_records.sort_values(['worker', 'date'], inplace=True)
+        tasks_records['group'] = 0
+
+        if tasks_records.empty:
+            return None
+
+        group = 0
+        worker_last = None
+        date_last = None
+        for index, row in tasks_records.iterrows():
+            worker = row['worker']
+            date = row['date']
+            if worker_last and date_last:
+                if worker == worker_last and date ==date_last:
+                    tasks_records.set_value(index, ['group'], group)
+                else:
+                    group += 1
+                    worker_last = worker
+                    date_last = date
+                    tasks_records.set_value(index, ['group'], group)
+            else:
+                worker_last = worker
+                date_last = date
+                tasks_records.set_value(index, ['group'], group)
+
+
+        print(tasks_records)
+
+        return tasks_records
+
     def sync_schedules_to_somax_spider(self):
+
+        tasks_records = self.get_schedules_to_somax_spider()
+        if not tasks_records:
+            return None
 
         # dummy data
         date = '2017/12/10'
@@ -399,10 +438,19 @@ class SomaxSpider:
 
         self.get_and_ready(self.somax_label_scheduling_url)
 
-        self.sync_schedule_to_somax_spider('BBUGRNATU', '2017/12/10', ['17001030', '17003808'])
+        groups = tasks_records['group'].unique()
+        for group in groups:
+            tasks_group = tasks_records[tasks_records['group'] == group]
+            self.sync_schedule_to_somax_spider(tasks_group)
+            # self.sync_schedule_to_somax_spider('BBUGRNATU', '2017/12/10', ['17001030', '17003808'])
+
         return True
 
-    def sync_schedule_to_somax_spider(self, assigned, date, work_orders):
+    def sync_schedule_to_somax_spider(self, tasks_group):
+
+        assigned = tasks_group['worker'].unique()[0]
+        date = tasks_group['date'].unique()[0]
+
 
         # revise assigned
         element_assigned = WebDriverWait(self.driver, 60).until(
@@ -508,15 +556,19 @@ class SomaxSpider:
         #     self.driver.execute_script("arguments[0].click();", element_modal_close)
 
         # sync schedule hours
-        self.sync_schedule_hour_to_somax_spider(work_orders)
+
+        for index, row in tasks_group.iterrows():
+            work_order = row['work_order']
+            hours = row['schedule_hour']
+            self.sync_schedule_hour_to_somax_spider(work_order, hours)
 
         # time.sleep(60)
 
         return True
 
-    def sync_schedule_hour_to_somax_spider(self, work_orders=None, hours=1):
+    def sync_schedule_hour_to_somax_spider(self, work_order=None, hours=None):
 
-        work_order = work_orders[0]
+        # work_order = work_orders[0]
         element_table_first_row = WebDriverWait(self.driver, 60).until(
             EC.presence_of_element_located((By.ID, self.somax_label_scheduling_table_first_row_id)))
         element_table_first_row = self.driver.find_elements_by_id(self.somax_label_scheduling_table_first_row_id)
@@ -653,5 +705,5 @@ if __name__ == '__main__':
     #     SomaxSpider().equipment_spider()
     # elif spider_type in ['task', '3']:
     #     SomaxSpider().task_spider()
-    SomaxSpider().sync_schedules_to_somax_spider()
-
+    # SomaxSpider().sync_schedules_to_somax_spider()
+    SomaxSpider.get_schedules_to_somax_spider()

@@ -26,9 +26,13 @@ class WorkScheduleReviseDAO:
         scheduled_hour_by_task_id = WorkScheduleDataDAO.get_schedule_hour_by_task_id(task_id)
         if current_status:
             Tasks.objects.filter(id=task_id).update(current_status=current_status,
-                                                    scheduled_hour=scheduled_hour_by_task_id)
+                                                    scheduled_hour=scheduled_hour_by_task_id,
+                                                    sync_to_somax='no'
+                                                    )
         else:
-            Tasks.objects.filter(id=task_id).update(scheduled_hour=scheduled_hour_by_task_id)
+            Tasks.objects.filter(id=task_id).update(scheduled_hour=scheduled_hour_by_task_id,
+                                                    sync_to_somax='no'
+                                                    )
         return True
 
     @classmethod

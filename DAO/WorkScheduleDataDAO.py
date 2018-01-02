@@ -32,6 +32,47 @@ class WorkScheduleDataDAO:
         return num
 
     @classmethod
+    def get_all_schedules_sync_to_somax(cls):
+
+        tasks = Tasks.objects.filter(current_status__in=cls.ready_for_schedule_tasks_status,
+                                     sync_to_somax__in = ['no', 'error'])\
+            .exclude(priority__in=['T', 'O']) \
+            .annotate(schedule_hour=Sum('workerscheduled__duration')) \
+
+        tasks_record = pd.DataFrame.from_records(tasks
+                                                 .values('line',
+                                                         'work_order',
+                                                         'description',
+                                                         'AOR__worker__name',
+                                                         'estimate_hour',
+                                                         'work_type',
+                                                         'priority',
+                                                         'create_date',
+                                                         'current_status',
+                                                         'workerscheduled__duration',
+                                                         'workerscheduled__date',
+                                                         'workerscheduled__name__somax_account',
+                                                         'sync_to_somax'
+                                                         ))
+        tasks_record.rename_axis({'AOR__worker__name': 'AOR'}, axis=1, inplace=True)
+        tasks_record.rename_axis({'workerscheduled__duration': 'schedule_hour'}, axis=1, inplace=True)
+        tasks_record.rename_axis({'workerscheduled__date': 'date'}, axis=1, inplace=True)
+        tasks_record.rename_axis({'workerscheduled__name__somax_account': 'worker'}, axis=1, inplace=True)
+
+        if tasks_record.empty:
+            return pd.DataFrame(), 0
+
+        tasks_record['schedule_hour'].fillna(timedelta(hours=0), inplace=True)
+        tasks_record['schedule_hour'] = tasks_record['schedule_hour'].apply(lambda x: x.total_seconds() / 3600)
+
+        now_date = UDatetime.now_local().date()
+        tasks_record['OLD'] = tasks_record['create_date'].apply(
+            lambda x: int((now_date - x.date()).total_seconds() / (3600 * 24)))
+        tasks_record.drop('create_date', axis=1, inplace=True)
+
+        return tasks_record
+
+    @classmethod
     def get_all_tasks_open(cls, pagination=False, page_size=None, offset=None, filters=None, sort=None, order=None):
 
         if sort and order:
@@ -69,6 +110,8 @@ class WorkScheduleDataDAO:
                 tasks = tasks.filter(priority__exact=filters['priority'])
             if filters.get('current_status'):
                 tasks = tasks.filter(current_status__exact=filters['current_status'])
+            if filters.get('sync_to_somax'):
+                tasks = tasks.filter(sync_to_somax__exact=filters['sync_to_somax'])
 
         num = tasks.count()
 
@@ -87,7 +130,8 @@ class WorkScheduleDataDAO:
                                                          'priority',
                                                          'create_date',
                                                          'current_status',
-                                                         'schedule_hour'
+                                                         'schedule_hour',
+                                                         'sync_to_somax'
                                                          ))
         tasks_record.rename_axis({'AOR__worker__name': 'AOR'}, axis=1, inplace=True)
 

@@ -756,13 +756,13 @@ define(function (require) {
         });
 
 		$('#WorkSchedulerPanel1Button1').click(function () {
-			$.get('Panel1/TimeLine1/syc_tasks_from_somax/',eventData,function () {
+			$.get('Panel1/TimeLine1/syc_tasks_from_somax/',function () {
 
             })
         });
 
 		$('#WorkSchedulerPanel1Button2').click(function () {
-			$.get('Panel1/TimeLine1/syc_tasks_to_somax/',eventData,function () {
+			$.get('Panel1/TimeLine1/syc_tasks_to_somax/',function () {
 
             })
         })

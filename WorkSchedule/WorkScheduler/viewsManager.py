@@ -20,6 +20,7 @@ from DAO.WorkScheduleDataDAO import WorkScheduleDataDAO
 from DAO.WorkScheduleReviseDAO import WorkScheduleReviseDAO
 
 from .utils.SmartScheduler import SmartScheduler
+from spider.somax.somax_spider import SomaxSpider
 
 EST = pytz.timezone(TIME_ZONE)
 
@@ -207,6 +208,7 @@ class PageManager:
             @staticmethod
             def syc_tasks_to_somax(request, *args, **kwargs):
                 response = []
+                SomaxSpider().sync_schedules_to_somax_spider()
                 return JsonResponse(response, safe=False)
 
         class ModalManager:
