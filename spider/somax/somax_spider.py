@@ -90,8 +90,6 @@ class SomaxSpider:
     somax_label_scheduling_modal_repeat_id = 'MainContent_ASPxCallbackPanel1_PopupMessage_PW-1'
     somax_label_scheduling_modal_repeat_ok_id = 'MainContent_ASPxCallbackPanel1_PopupMessage_btnOk'
 
-
-
     download_path = os.path.join(BASE_DIR, MEDIA_ROOT, 'spider', 'somax')
 
     def __init__(self, account=None, password=None):
@@ -395,11 +393,12 @@ class SomaxSpider:
     @classmethod
     def get_schedules_to_somax_spider(cls):
         tasks_records = WorkScheduleDataDAO.get_all_schedules_sync_to_somax()
-        tasks_records.sort_values(['worker', 'date'], inplace=True)
-        tasks_records['group'] = 0
 
         if tasks_records.empty:
             return pd.DataFrame()
+
+        tasks_records.sort_values(['worker', 'date'], inplace=True)
+        tasks_records['group'] = 0
 
         group = 0
         worker_last = None
@@ -617,17 +616,17 @@ class SomaxSpider:
             element_table_cell_edit.send_keys(hours)
             time.sleep(0.5)
             # element_table_cell_edit.send_keys(Keys.ENTER)
-            logo_id_element = self.driver.find_element_by_id(self.somax_logo_id)
-            logo_id_element.click()
+            somax_logo_id_element = self.driver.find_element_by_id(self.somax_logo_id)
+            # somax_logo_id_element.click()
+            self.driver.execute_script("arguments[0].click();", somax_logo_id_element)
 
             self.wait_loading(self.somax_label_scheduling_loading_grey_table_id, timeout=3)
 
             # time.sleep(5)
             # print(element_table_row)
             # print(element_table_row.find_elements_by_tag_name('td')[1].text)
-        print('finish')
+        print('finish-WO:{work_order}-hrs:{hours}'.format(work_order=work_order, hours=hours))
         WorkScheduleReviseDAO.update_tasks_sync_to_somax(work_order, mode='yes')
-
 
     def wait_loading(self, loading_id, timeout=10):
 

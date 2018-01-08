@@ -30,28 +30,28 @@ def debug_task(self):
 
 
 # time in UTC
-app.conf.beat_schedule = {
-    'sync_equipment': {
-        'task': 'spider.somax.tasks.sync_equipment',
-        'schedule': crontab(minute=0, hour=0),
-        'args': (),
-    },
-    'sync_pm': {
-        'task': 'spider.somax.tasks.sync_pm',
-        'schedule': crontab(minute=0, hour=2),
-        'args': (),
-    },
-    'sync_task': {
-        'task': 'spider.somax.tasks.sync_task',
-        'schedule': crontab(minute=0, hour=3),
-        'args': (),
-    },
-    # 'test': {
-    #     'task': 'spider.somax.tasks.test_task',
-    #     'schedule': crontab(minute='*', hour='*'),
-    #     'args': (),
-    # },
-}
+# app.conf.beat_schedule = {
+#     'sync_equipment': {
+#         'task': 'spider.somax.tasks.sync_equipment',
+#         'schedule': crontab(minute=0, hour=0),
+#         'args': (),
+#     },
+#     'sync_pm': {
+#         'task': 'spider.somax.tasks.sync_pm',
+#         'schedule': crontab(minute=0, hour=2),
+#         'args': (),
+#     },
+#     'sync_task': {
+#         'task': 'spider.somax.tasks.sync_task',
+#         'schedule': crontab(minute=0, hour=3),
+#         'args': (),
+#     },
+#     # 'test': {
+#     #     'task': 'spider.somax.tasks.test_task',
+#     #     'schedule': crontab(minute='*', hour='*'),
+#     #     'args': (),
+#     # },
+# }
 
 
 def is_available_workers():

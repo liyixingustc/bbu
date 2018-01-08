@@ -60,7 +60,7 @@ class WorkScheduleDataDAO:
         tasks_record.rename_axis({'workerscheduled__name__somax_account': 'worker'}, axis=1, inplace=True)
 
         if tasks_record.empty:
-            return pd.DataFrame(), 0
+            return pd.DataFrame()
 
         tasks_record['schedule_hour'].fillna(timedelta(hours=0), inplace=True)
         tasks_record['schedule_hour'] = tasks_record['schedule_hour'].apply(lambda x: x.total_seconds() / 3600)
