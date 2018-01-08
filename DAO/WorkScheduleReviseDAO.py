@@ -370,3 +370,12 @@ class WorkScheduleReviseDAO:
             pass
 
         return work_order
+
+    @classmethod
+    def update_tasks_sync_to_somax(cls, work_order, mode='yes'):
+        if mode == 'yes':
+            Tasks.objects.filter(work_order__exact=work_order).update(sync_to_somax='yes')
+        elif mode == 'no':
+            Tasks.objects.filter(work_order__exact=work_order).update(sync_to_somax='no')
+        elif mode == 'error':
+            Tasks.objects.filter(work_order__exact=work_order).update(sync_to_somax='error')
