@@ -29,6 +29,12 @@ def sync_task():
     return
 
 @app.task
+def sync_schedules_to_somax():
+    SomaxSpider().sync_schedules_to_somax_spider()
+
+    return
+
+@app.task
 def test_task():
     time.sleep(1)
     return
