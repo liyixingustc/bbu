@@ -182,9 +182,10 @@ REST_FRAMEWORK = {
 from kombu import Exchange, Queue
 
 if 'localhost' not in os.environ.get('HOSTNAME', ''):
-    CELERY_BROKER_URL = 'redis://34.227.173.99:6379/0'
+    CELERY_BROKER_URL = 'redis://54.237.230.87:6379/0'
 else:
-    CELERY_BROKER_URL = 'redis://localhost:6379/0'
+    CELERY_BROKER_URL = 'redis://54.237.230.87:6379/0'
+    # CELERY_BROKER_URL = 'redis://localhost:6379/0'
 
 #: Only add pickle to this list if your broker is secured
 #: from unwanted access (see userguide/security.html)
