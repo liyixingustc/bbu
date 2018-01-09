@@ -38,7 +38,7 @@ from DAO.WorkScheduleReviseDAO import WorkScheduleReviseDAO
 
 class SomaxSpider:
 
-    DISPLAY = False
+    DISPLAY = True
 
     account = 'BBUGRNATU'
     password = 'ARTHUR'
@@ -429,7 +429,7 @@ class SomaxSpider:
         tasks_records = self.get_schedules_to_somax_spider()
         if tasks_records.empty:
             return None
-        print(tasks_records)
+
         # dummy data
         # date = '2017/12/10'
         # assigned = 'BBUGRNATU'
@@ -477,6 +477,7 @@ class SomaxSpider:
         element_date = WebDriverWait(self.driver, 60).until(
             EC.presence_of_element_located((By.ID, self.somax_label_scheduling_date_input_id)))
         print('step2')
+        print(date)
         element_date.clear()
         element_date.send_keys(date)
         element_date.send_keys(Keys.ENTER)
