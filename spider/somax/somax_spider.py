@@ -542,7 +542,7 @@ class SomaxSpider:
             WebDriverWait(self.driver, 20).until(
                 EC.text_to_be_present_in_element((By.XPATH, element_modal_last_row_first_cell_xpath), str(work_order)))
 
-            element_modal_last_row_first_cell_element = self.driver.find_elements_by_xpath(element_modal_last_row_first_cell_xpath)
+            element_modal_last_row_first_cell_element = self.driver.find_element_by_xpath(element_modal_last_row_first_cell_xpath)
             print(element_modal_last_row_first_cell_element.get_attribute('innerHTML'))
 
             element_modal_first_row_check = WebDriverWait(self.driver, 60).until(
