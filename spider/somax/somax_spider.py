@@ -555,13 +555,14 @@ class SomaxSpider:
         element_modal_add = WebDriverWait(self.driver, 60).until(
             EC.presence_of_element_located((By.ID, self.somax_label_scheduling_modal_add_input_id)))
         self.driver.execute_script("arguments[0].click();", element_modal_add)
+        self.wait_loading(self.somax_label_scheduling_loading_id)
         print('step9')
         # click modal close
         element_modal_close = WebDriverWait(self.driver, 60).until(
             EC.presence_of_element_located((By.ID, self.somax_label_scheduling_modal_close_id)))
         self.driver.execute_script("arguments[0].click();", element_modal_close)
         print('step10')
-        self.wait_loading(self.somax_label_scheduling_loading_id)
+        self.wait_loading(self.somax_label_scheduling_loading_grey_table_id)
 
         # close repeat window
         # element_modal_repeat = self.driver.find_element_by_id(self.somax_label_scheduling_modal_repeat_id)
