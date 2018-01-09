@@ -38,7 +38,7 @@ from DAO.WorkScheduleReviseDAO import WorkScheduleReviseDAO
 
 class SomaxSpider:
 
-    DISPLAY = True
+    DISPLAY = False
 
     account = 'BBUGRNATU'
     password = 'ARTHUR'
