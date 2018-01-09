@@ -539,9 +539,9 @@ class SomaxSpider:
 
             element_modal_last_row_first_cell_xpath = "//table[@id='{table_id}']/tbody/tr[last()]/td[2]"\
                 .format(table_id=self.somax_label_scheduling_modal_table)
-            WebDriverWait(self.driver, 20).until(
+            element_modal_last_row_first_cell_element = WebDriverWait(self.driver, 20).until(
                 EC.text_to_be_present_in_element((By.XPATH, element_modal_last_row_first_cell_xpath), str(work_order)))
-
+            print(element_modal_last_row_first_cell_element.get_attribute('innerHTML'))
             element_modal_first_row_check = WebDriverWait(self.driver, 60).until(
                 EC.presence_of_element_located((By.ID, self.somax_label_scheduling_modal_first_row_check_id)))
             self.driver.execute_script("arguments[0].click();", element_modal_first_row_check)
