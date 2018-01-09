@@ -449,6 +449,8 @@ class SomaxSpider:
             self.sync_schedule_to_somax_spider(tasks_group)
             # self.sync_schedule_to_somax_spider('BBUGRNATU', '2017/12/10', ['17001030', '17003808'])
 
+        self.driver.quit()
+
         return True
 
     def sync_schedule_to_somax_spider(self, tasks_group):
@@ -565,10 +567,10 @@ class SomaxSpider:
 
         # sync schedule hours
         print('step11')
-        for index, row in tasks_group.iterrows():
-            work_order = row['work_order']
-            hours = row['schedule_hour']
-            self.sync_schedule_hour_to_somax_spider(work_order, hours)
+        # for index, row in tasks_group.iterrows():
+        #     work_order = row['work_order']
+        #     hours = row['schedule_hour']
+        #     self.sync_schedule_hour_to_somax_spider(work_order, hours)
 
         time.sleep(3)
 
