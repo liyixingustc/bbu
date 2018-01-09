@@ -429,7 +429,7 @@ class SomaxSpider:
         tasks_records = self.get_schedules_to_somax_spider()
         if tasks_records.empty:
             return None
-
+        print(tasks_records)
         # dummy data
         # date = '2017/12/10'
         # assigned = 'BBUGRNATU'
