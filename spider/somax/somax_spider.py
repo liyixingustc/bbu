@@ -456,7 +456,8 @@ class SomaxSpider:
     def sync_schedule_to_somax_spider(self, tasks_group):
 
         assigned = tasks_group['worker'].unique()[0]
-        date = tasks_group['date'].unique()[0].strftime('%Y/%m/%d')
+        date = tasks_group['date'].unique()[0]
+        date = '{dt.year}/{dt.month}/{dt.day}'.format(dt=date)
         work_orders = tasks_group['work_order'].tolist()
 
         # revise assigned
