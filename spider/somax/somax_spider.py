@@ -38,7 +38,7 @@ from DAO.WorkScheduleReviseDAO import WorkScheduleReviseDAO
 
 class SomaxSpider:
 
-    DISPLAY = False
+    DISPLAY = True
 
     account = 'BBUGRNATU'
     password = 'ARTHUR'
@@ -444,6 +444,7 @@ class SomaxSpider:
 
         groups = tasks_records['group'].unique()
         for group in groups:
+            print('step1')
             tasks_group = tasks_records[tasks_records['group'] == group]
             self.sync_schedule_to_somax_spider(tasks_group)
             # self.sync_schedule_to_somax_spider('BBUGRNATU', '2017/12/10', ['17001030', '17003808'])
@@ -473,20 +474,20 @@ class SomaxSpider:
 
         element_date = WebDriverWait(self.driver, 60).until(
             EC.presence_of_element_located((By.ID, self.somax_label_scheduling_date_input_id)))
-
+        print('step2')
         element_date.clear()
         element_date.send_keys(date)
         element_date.send_keys(Keys.ENTER)
         # self.driver.execute_script("arguments[0].setAttribute('value', '{date}')".format(date=date),
         #                            element_date)
         self.wait_loading(self.somax_label_scheduling_loading_id)
-
+        print('step3')
         # click available modal
         element_add = WebDriverWait(self.driver, 60).until(
             EC.presence_of_element_located((By.ID, self.somax_label_scheduling_add_input_id)))
         self.driver.execute_script("arguments[0].click();", element_add)
         self.wait_loading(self.somax_label_scheduling_loading_id)
-
+        print('step4')
         # clear filter
         element_modal_filter_work_order = WebDriverWait(self.driver, 60).until(
             EC.presence_of_element_located((By.ID, self.somax_label_scheduling_modal_filter_work_order_id)))
@@ -494,7 +495,7 @@ class SomaxSpider:
             self.driver.execute_script("arguments[0].setAttribute('value', '')",
                                        element_modal_filter_work_order)
             element_modal_filter_work_order.send_keys(Keys.ENTER)
-
+        print('step5')
         # click include all
         element_modal_include_all = WebDriverWait(self.driver, 60).until(
             EC.presence_of_element_located((By.ID, self.somax_label_scheduling_modal_include_all_input_id)))
@@ -502,7 +503,7 @@ class SomaxSpider:
         if not element_modal_include_all_is_selected:
             self.driver.execute_script("arguments[0].click();", element_modal_include_all)
             self.wait_loading(self.somax_label_scheduling_loading_id)
-
+        print('step6')
         # clear select all
         element_modal_select_all = WebDriverWait(self.driver, 60).until(
             EC.presence_of_element_located((By.ID, self.somax_label_scheduling_modal_select_all_input_id)))
@@ -512,7 +513,7 @@ class SomaxSpider:
         elif element_modal_select_all_class == self.somax_label_scheduling_modal_select_all_input_class_partial_checked:
             self.driver.execute_script("arguments[0].click();", element_modal_select_all)
             self.driver.execute_script("arguments[0].click();", element_modal_select_all)
-
+        print('step7')
         # select work orders
         # work_order = work_orders[0]
         for work_order in work_orders:
@@ -542,28 +543,28 @@ class SomaxSpider:
             element_modal_first_row_check = WebDriverWait(self.driver, 60).until(
                 EC.presence_of_element_located((By.ID, self.somax_label_scheduling_modal_first_row_check_id)))
             self.driver.execute_script("arguments[0].click();", element_modal_first_row_check)
-
+        print('step8')
         # click modal add
         element_modal_add = WebDriverWait(self.driver, 60).until(
             EC.presence_of_element_located((By.ID, self.somax_label_scheduling_modal_add_input_id)))
         self.driver.execute_script("arguments[0].click();", element_modal_add)
-
+        print('step9')
         # click modal close
         element_modal_close = WebDriverWait(self.driver, 60).until(
             EC.presence_of_element_located((By.ID, self.somax_label_scheduling_modal_close_id)))
         self.driver.execute_script("arguments[0].click();", element_modal_close)
-
+        print('step10')
         self.wait_loading(self.somax_label_scheduling_loading_id)
 
         # close repeat window
-        element_modal_repeat = self.driver.find_element_by_id(self.somax_label_scheduling_modal_repeat_id)
-        if element_modal_repeat:
-            element_modal_close = WebDriverWait(self.driver, 60).until(
-                EC.presence_of_element_located((By.ID, self.somax_label_scheduling_modal_repeat_ok_id)))
-            self.driver.execute_script("arguments[0].click();", element_modal_close)
+        # element_modal_repeat = self.driver.find_element_by_id(self.somax_label_scheduling_modal_repeat_id)
+        # if element_modal_repeat:
+        #     element_modal_close = WebDriverWait(self.driver, 60).until(
+        #         EC.presence_of_element_located((By.ID, self.somax_label_scheduling_modal_repeat_ok_id)))
+        #     self.driver.execute_script("arguments[0].click();", element_modal_close)
 
         # sync schedule hours
-
+        print('step11')
         for index, row in tasks_group.iterrows():
             work_order = row['work_order']
             hours = row['schedule_hour']
@@ -626,7 +627,7 @@ class SomaxSpider:
             # print(element_table_row)
             # print(element_table_row.find_elements_by_tag_name('td')[1].text)
         print('finish-WO:{work_order}-hrs:{hours}'.format(work_order=work_order, hours=hours))
-        WorkScheduleReviseDAO.update_tasks_sync_to_somax(work_order, mode='yes')
+        # WorkScheduleReviseDAO.update_tasks_sync_to_somax(work_order, mode='yes')
 
     def wait_loading(self, loading_id, timeout=10):
 

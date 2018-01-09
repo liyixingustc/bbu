@@ -34,6 +34,9 @@ yum install google-chrome-stable
 
 // redis
 yum install redis
+nano /etc/redis.conf
+bind 0.0.0.0
+Change protected-mode to no
 service redis start
 redis-cli ping
 
