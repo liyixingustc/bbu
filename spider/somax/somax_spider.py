@@ -478,6 +478,7 @@ class SomaxSpider:
         element_date = WebDriverWait(self.driver, 60).until(
             EC.presence_of_element_located((By.ID, self.somax_label_scheduling_date_input_id)))
         print(element_date.get_attribute('innerHTML'))
+        print('abc')
         element_date.clear()
         element_date.send_keys(date)
         element_date.send_keys(Keys.ENTER)
