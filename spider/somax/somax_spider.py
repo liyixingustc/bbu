@@ -456,7 +456,7 @@ class SomaxSpider:
 
         assigned = tasks_group['worker'].unique()[0]
         date = tasks_group['date'].unique()[0]
-        date = '{dt.year}/{dt.month}/{dt.day}'.format(dt=date)
+        date = '{dt.month}/{dt.day}/{dt.year}'.format(dt=date)
         work_orders = tasks_group['work_order'].tolist()
         print('step1')
         # revise assigned
@@ -482,12 +482,10 @@ class SomaxSpider:
         print(date)
         print(date_element.get_attribute('outerHTML'))
         element_date.clear()
-        self.driver.execute_script("arguments[0].setAttribute('value', '{date}')".format(date=date),
-                                   element_date)
+        # self.driver.execute_script("arguments[0].setAttribute('value', '{date}')".format(date=date),
+        #                            element_date)
         # element_date.send_keys(date)
         element_date.send_keys(Keys.ENTER)
-        self.driver.execute_script("arguments[0].setAttribute('value', '{date}')".format(date=date),
-                                   element_date)
 
         self.wait_loading(self.somax_label_scheduling_loading_id)
         print(date_element.get_attribute('outerHTML'))
