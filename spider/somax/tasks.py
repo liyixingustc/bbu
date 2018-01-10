@@ -27,8 +27,6 @@ def sync_task():
         somax_spider.task_spider()
     except Exception as e:
         print(e)
-    finally:
-        somax_spider.close()
 
     # from WorkSchedule.WorkConfig.processor.TasksLoadProcessor import TasksLoadProcessor
     # import os
