@@ -444,7 +444,6 @@ class SomaxSpider:
 
         groups = tasks_records['group'].unique()
         for group in groups:
-            print('step1')
             tasks_group = tasks_records[tasks_records['group'] == group]
             self.sync_schedule_to_somax_spider(tasks_group)
             # self.sync_schedule_to_somax_spider('BBUGRNATU', '2017/12/10', ['17001030', '17003808'])
@@ -459,7 +458,7 @@ class SomaxSpider:
         date = tasks_group['date'].unique()[0]
         date = '{dt.year}/{dt.month}/{dt.day}'.format(dt=date)
         work_orders = tasks_group['work_order'].tolist()
-
+        print('step1')
         # revise assigned
         element_assigned = WebDriverWait(self.driver, 60).until(
             EC.presence_of_element_located((By.ID, self.somax_label_scheduling_assigned_input_id)))
@@ -470,6 +469,7 @@ class SomaxSpider:
         #                            element_assigned)
         self.wait_loading(self.somax_label_scheduling_loading_id)
 
+        print('step2')
         # revise date
         remove_date_readonly_script = 'document.getElementById("{id}").removeAttribute("readonly")'\
             .format(id=self.somax_label_scheduling_date_input_id)
@@ -477,7 +477,7 @@ class SomaxSpider:
 
         element_date = WebDriverWait(self.driver, 60).until(
             EC.presence_of_element_located((By.ID, self.somax_label_scheduling_date_input_id)))
-        print('step2')
+        print(element_date.get_attribute('innerHTML'))
         element_date.clear()
         element_date.send_keys(date)
         element_date.send_keys(Keys.ENTER)
