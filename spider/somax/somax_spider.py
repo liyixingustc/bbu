@@ -483,11 +483,11 @@ class SomaxSpider:
         element_date.clear()
         element_date.send_keys(date)
         element_date.send_keys(Keys.ENTER)
-        print(element_date.get_attribute('innerHTML'))
+        print('abc'+ element_date.get_attribute('innerHTML'))
         # self.driver.execute_script("arguments[0].setAttribute('value', '{date}')".format(date=date),
         #                            element_date)
         self.wait_loading(self.somax_label_scheduling_loading_id)
-        print(element_date.get_attribute('innerHTML'))
+        print('abc'+ element_date.get_attribute('innerHTML'))
         print('step3')
         # click available modal
         element_add = WebDriverWait(self.driver, 60).until(
