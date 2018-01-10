@@ -484,7 +484,7 @@ class SomaxSpider:
         element_date.clear()
         # self.driver.execute_script("arguments[0].setAttribute('value', '{date}')".format(date=date),
         #                            element_date)
-        # element_date.send_keys(date)
+        element_date.send_keys(date)
         element_date.send_keys(Keys.ENTER)
 
         self.wait_loading(self.somax_label_scheduling_loading_id)
