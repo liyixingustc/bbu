@@ -95,7 +95,7 @@ class SomaxSpider:
     def __init__(self, account=None, password=None):
         self.init_folder()
         if not self.DISPLAY:
-            self.display = Display(visible=0, size=(800, 600))
+            self.display = Display(visible=0, size=(1440, 900))
             self.display.start()
         self.driver = self.chromedriver()
         # self.login(account, password)
