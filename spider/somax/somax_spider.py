@@ -448,9 +448,9 @@ class SomaxSpider:
             self.sync_schedule_to_somax_spider(tasks_group)
             # self.sync_schedule_to_somax_spider('BBUGRNATU', '2017/12/10', ['17001030', '17003808'])
 
-        self.driver.quit()
-        if not self.DISPLAY:
-            self.display.stop()
+        # self.driver.quit()
+        # if not self.DISPLAY:
+        #     self.display.stop()
 
         return True
 
