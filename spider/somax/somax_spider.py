@@ -247,10 +247,10 @@ class SomaxSpider:
 
                 shutil.move(os.path.join(self.download_path, filename),
                             os.path.join(target_path, filename))
-
-            self.driver.quit()
-            if not self.DISPLAY:
-                self.display.stop()
+            #
+            # self.driver.quit()
+            # if not self.DISPLAY:
+            #     self.display.stop()
 
             file_path = os.path.join(target_path, filename)
             TasksLoadProcessor.tasks_load_processor([file_path])

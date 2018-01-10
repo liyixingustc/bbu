@@ -204,6 +204,7 @@ class PageManager:
             @staticmethod
             def syc_tasks_from_somax(request, *args, **kwargs):
                 response = []
+                # SomaxSpider().task_spider()
                 sync_task.delay()
                 return JsonResponse(response, safe=False)
 
