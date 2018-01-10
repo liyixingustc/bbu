@@ -478,16 +478,17 @@ class SomaxSpider:
         element_date = WebDriverWait(self.driver, 60).until(
             EC.presence_of_element_located((By.ID, self.somax_label_scheduling_date_input_id)))
 
-        date_element = self.driver.find_element_by_id('MainContent_uicSchuduledDate_datetimeControl')
+        date_element = self.driver.find_element_by_id(self.somax_label_scheduling_date_input_id)
         print(date)
-        print(date_element.get_attribute('innerHTML'))
+        print(date_element.get_attribute('outerHTML'))
         element_date.clear()
+        self.driver.execute_script("arguments[0].setAttribute('value', '{date}')".format(date=date),
+                                   element_date)
         element_date.send_keys(date)
         element_date.send_keys(Keys.ENTER)
-        # self.driver.execute_script("arguments[0].setAttribute('value', '{date}')".format(date=date),
-        #                            element_date)
+
         self.wait_loading(self.somax_label_scheduling_loading_id)
-        print(date_element.get_attribute('innerHTML'))
+        print(date_element.get_attribute('outerHTML'))
         print('step3')
         # click available modal
         element_add = WebDriverWait(self.driver, 60).until(
