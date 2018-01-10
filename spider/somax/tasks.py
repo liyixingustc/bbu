@@ -20,7 +20,15 @@ def sync_pm():
 
 @app.task
 def sync_task():
-    SomaxSpider().task_spider()
+
+    somax_spider = SomaxSpider()
+
+    try:
+        somax_spider.task_spider()
+    except Exception as e:
+        print(e)
+    finally:
+        somax_spider.close()
 
     # from WorkSchedule.WorkConfig.processor.TasksLoadProcessor import TasksLoadProcessor
     # import os
@@ -28,11 +36,21 @@ def sync_task():
     # TasksLoadProcessor.tasks_load_processor([file_path])
     return
 
+
 @app.task
 def sync_schedules_to_somax():
-    SomaxSpider().sync_schedules_to_somax_spider()
+
+    somax_spider = SomaxSpider()
+
+    try:
+        somax_spider.sync_schedules_to_somax_spider()
+    except Exception as e:
+        print(e)
+    finally:
+        somax_spider.close()
 
     return
+
 
 @app.task
 def test_task():
