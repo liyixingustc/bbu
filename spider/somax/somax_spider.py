@@ -629,7 +629,7 @@ class SomaxSpider:
             # print(element_table_row)
             # print(element_table_row.find_elements_by_tag_name('td')[1].text)
         print('finish-WO:{work_order}-hrs:{hours}'.format(work_order=work_order, hours=hours))
-        # WorkScheduleReviseDAO.update_tasks_sync_to_somax(work_order, mode='yes')
+        WorkScheduleReviseDAO.update_tasks_sync_to_somax(work_order, mode='yes')
 
     def wait_loading(self, loading_id, timeout=10):
 
