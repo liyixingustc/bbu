@@ -471,8 +471,6 @@ class SomaxSpider:
 
         print('step2')
         # revise date
-        date_element = self.driver.find_element_by_id('MainContent_uicSchuduledDate_datetimeControl')
-        print('abc'+ date_element.get_attribute('innerHTML'))
         remove_date_readonly_script = 'document.getElementById("{id}").removeAttribute("readonly")'\
             .format(id=self.somax_label_scheduling_date_input_id)
         self.driver.execute_script(remove_date_readonly_script)
@@ -480,15 +478,16 @@ class SomaxSpider:
         element_date = WebDriverWait(self.driver, 60).until(
             EC.presence_of_element_located((By.ID, self.somax_label_scheduling_date_input_id)))
 
+        date_element = self.driver.find_element_by_id('MainContent_uicSchuduledDate_datetimeControl')
         print('abc'+ date_element.get_attribute('innerHTML'))
         element_date.clear()
         element_date.send_keys(date)
         element_date.send_keys(Keys.ENTER)
-        print('abc'+ element_date.get_attribute('innerHTML'))
+        print('abc'+ date_element.get_attribute('innerHTML'))
         # self.driver.execute_script("arguments[0].setAttribute('value', '{date}')".format(date=date),
         #                            element_date)
         self.wait_loading(self.somax_label_scheduling_loading_id)
-        print('abc'+ element_date.get_attribute('innerHTML'))
+        print('abc'+ date_element.get_attribute('innerHTML'))
         print('step3')
         # click available modal
         element_add = WebDriverWait(self.driver, 60).until(
