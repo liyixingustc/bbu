@@ -471,20 +471,21 @@ class SomaxSpider:
         self.wait_loading(self.somax_label_scheduling_loading_id)
 
         # revise date
-        # remove_date_readonly_script = 'document.getElementById("{id}").removeAttribute("readonly")'\
-        #     .format(id=self.somax_label_scheduling_date_input_id)
-        # self.driver.execute_script(remove_date_readonly_script)
-        #
-        # element_date = WebDriverWait(self.driver, 60).until(
-        #     EC.presence_of_element_located((By.ID, self.somax_label_scheduling_date_input_id)))
-        # print('step2')
-        # print(date)
-        # element_date.clear()
-        # element_date.send_keys(date)
-        # element_date.send_keys(Keys.ENTER)
-        # # self.driver.execute_script("arguments[0].setAttribute('value', '{date}')".format(date=date),
-        # #                            element_date)
-        # self.wait_loading(self.somax_label_scheduling_loading_id)
+        remove_date_readonly_script = 'document.getElementById("{id}").removeAttribute("readonly")'\
+            .format(id=self.somax_label_scheduling_date_input_id)
+        self.driver.execute_script(remove_date_readonly_script)
+
+        element_date = WebDriverWait(self.driver, 60).until(
+            EC.presence_of_element_located((By.ID, self.somax_label_scheduling_date_input_id)))
+        print('step2')
+        element_date.clear()
+        element_date.send_keys(date)
+        element_date.send_keys(Keys.ENTER)
+        print(element_date.get_attribute('innerHTML'))
+        # self.driver.execute_script("arguments[0].setAttribute('value', '{date}')".format(date=date),
+        #                            element_date)
+        self.wait_loading(self.somax_label_scheduling_loading_id)
+        print(element_date.get_attribute('innerHTML'))
         print('step3')
         # click available modal
         element_add = WebDriverWait(self.driver, 60).until(
