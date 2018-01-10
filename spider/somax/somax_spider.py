@@ -568,18 +568,18 @@ class SomaxSpider:
         self.wait_loading(self.somax_label_scheduling_loading_grey_table_id)
 
         # close repeat window
-        # element_modal_repeat = self.driver.find_element_by_id(self.somax_label_scheduling_modal_repeat_id)
-        # if element_modal_repeat:
-        #     element_modal_close = WebDriverWait(self.driver, 60).until(
-        #         EC.presence_of_element_located((By.ID, self.somax_label_scheduling_modal_repeat_ok_id)))
-        #     self.driver.execute_script("arguments[0].click();", element_modal_close)
+        element_modal_repeat = self.driver.find_element_by_id(self.somax_label_scheduling_modal_repeat_id)
+        if element_modal_repeat:
+            element_modal_close = WebDriverWait(self.driver, 60).until(
+                EC.presence_of_element_located((By.ID, self.somax_label_scheduling_modal_repeat_ok_id)))
+            self.driver.execute_script("arguments[0].click();", element_modal_close)
 
         # sync schedule hours
         print('step11')
-        # for index, row in tasks_group.iterrows():
-        #     work_order = row['work_order']
-        #     hours = row['schedule_hour']
-        #     self.sync_schedule_hour_to_somax_spider(work_order, hours)
+        for index, row in tasks_group.iterrows():
+            work_order = row['work_order']
+            hours = row['schedule_hour']
+            self.sync_schedule_hour_to_somax_spider(work_order, hours)
 
         time.sleep(3)
 
