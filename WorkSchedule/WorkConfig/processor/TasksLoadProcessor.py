@@ -118,7 +118,8 @@ class TasksLoadProcessor:
                 est = timedelta(hours=0)
                 due_days = None
 
-            current_status = cls.smart_status_choice(row['Work Order'], row['Status'], due_days, row['Created'])
+            current_status = row['Status']
+            # current_status = cls.smart_status_choice(row['Work Order'], row['Status'], due_days, row['Created'])
 
             Tasks.objects.update_or_create(work_order=row['Work Order'],
                                            defaults={
