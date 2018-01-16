@@ -35,9 +35,9 @@ class WorkScheduleDataDAO:
     def get_all_schedules_sync_to_somax(cls):
 
         tasks = Tasks.objects.filter(current_status__in=cls.ready_for_schedule_tasks_status,
-                                     sync_to_somax__in = ['no', 'error'])\
+                                     sync_to_somax__in=['no', 'error'])\
             .exclude(priority__in=['T', 'O']) \
-            .annotate(schedule_hour=Sum('workerscheduled__duration')) \
+            .annotate(schedule_hour=Sum('workerscheduled__duration'))
 
         tasks_record = pd.DataFrame.from_records(tasks
                                                  .values('line',
@@ -49,13 +49,12 @@ class WorkScheduleDataDAO:
                                                          'priority',
                                                          'create_date',
                                                          'current_status',
-                                                         'workerscheduled__duration',
+                                                         'schedule_hour',
                                                          'workerscheduled__date',
                                                          'workerscheduled__name__somax_account',
                                                          'sync_to_somax'
                                                          ))
         tasks_record.rename_axis({'AOR__worker__name': 'AOR'}, axis=1, inplace=True)
-        tasks_record.rename_axis({'workerscheduled__duration': 'schedule_hour'}, axis=1, inplace=True)
         tasks_record.rename_axis({'workerscheduled__date': 'date'}, axis=1, inplace=True)
         tasks_record.rename_axis({'workerscheduled__name__somax_account': 'worker'}, axis=1, inplace=True)
 

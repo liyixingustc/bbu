@@ -460,6 +460,7 @@ class SomaxSpider:
         assigned = tasks_group['worker'].unique()[0]
         date = tasks_group['date'].unique()[0]
         date = '{dt.month}/{dt.day}/{dt.year}'.format(dt=date)
+        # date = '{dt.year}/{dt.month}/{dt.day}'.format(dt=date)
         work_orders = tasks_group['work_order'].tolist()
 
         # revise assigned
@@ -621,8 +622,8 @@ class SomaxSpider:
             time.sleep(0.5)
             # element_table_cell_edit.send_keys(Keys.ENTER)
             somax_logo_id_element = self.driver.find_element_by_id(self.somax_logo_id)
-            # somax_logo_id_element.click()
-            self.driver.execute_script("arguments[0].click();", somax_logo_id_element)
+            somax_logo_id_element.click()
+            # self.driver.execute_script("arguments[0].click();", somax_logo_id_element)
 
             self.wait_loading(self.somax_label_scheduling_loading_grey_table_id, timeout=3)
 
@@ -753,4 +754,5 @@ if __name__ == '__main__':
     # elif spider_type in ['task', '3']:
     #     SomaxSpider().task_spider()
     # SomaxSpider().sync_schedules_to_somax_spider()
-    SomaxSpider().sync_schedules_to_somax_spider()
+    # SomaxSpider().sync_schedules_to_somax_spider()
+    SomaxSpider.get_schedules_to_somax_spider()
