@@ -266,6 +266,7 @@ define(function (require) {
 				duration_hours = duration.split('.')[0],
 				duration_mins = duration.split('.')[1]*6;
 				if(duration_hours<0){duration_hours=0}
+				if(duration_mins >= 60 ){ duration_mins = duration_mins/10 }
 				if(!duration_mins || duration_mins<0){duration_mins=0}
 
 			$(this).data('event', {
