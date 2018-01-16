@@ -262,7 +262,7 @@ define(function (require) {
     function external_drag_init() {
 		$('#WorkSchedulerPanel2Table1TableId').children('tbody').children('tr').each(function() {
 			// store data so the calendar knows to render an event upon drop
-			var duration = $.trim($(this).children('td').eq(3).text()),
+			var duration = $.trim($(this).children('td').eq(2).text()),
 				duration_hours = duration.split('.')[0],
 				duration_mins = duration.split('.')[1]*6;
 				if(duration_hours<0){duration_hours=0}
