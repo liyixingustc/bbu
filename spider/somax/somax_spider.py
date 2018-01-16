@@ -394,7 +394,7 @@ class SomaxSpider:
     @classmethod
     def get_schedules_to_somax_spider(cls):
         tasks_records = WorkScheduleDataDAO.get_all_schedules_sync_to_somax()
-
+        print(tasks_records)
         if tasks_records.empty:
             return pd.DataFrame()
 
