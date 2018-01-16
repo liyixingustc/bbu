@@ -438,7 +438,8 @@ define(function (require) {
 					var qtip_html =
 						// 'Complete: ' + Math.round(event.percent*100)+ '%<br/>\
 						// Task description:' + event.description
-						'Complete: ' + Math.round(event.percent*100) + '%<br/>'
+						'#WO: ' + event.taskId + '<br/>'
+						+ 'Complete: ' + Math.round(event.percent*100) + '%<br/>'
 						+ 'Equip Code:' + event.equip_code + '<br/>'
 						+ 'Task description:' + event.description
 						;
