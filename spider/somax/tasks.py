@@ -3,7 +3,7 @@ from celery import shared_task
 import time
 
 # from .somax_spider import SomaxSpider
-from spider.somax.somax_spider import SomaxSpider
+from spider.somax.somax_spider import *
 
 
 @app.task
@@ -38,7 +38,7 @@ def sync_task():
 @app.task
 def sync_schedules_to_somax():
 
-    somax_spider = SomaxSpider()
+    somax_spider = SomaxScheduleSpider()
 
     try:
         somax_spider.sync_schedules_to_somax_spider()
@@ -54,6 +54,7 @@ def sync_schedules_to_somax():
 def test_task():
     time.sleep(1)
     return
+
 
 if __name__ == '__main__':
     # sync_task.delay()
