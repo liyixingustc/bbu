@@ -29,7 +29,7 @@ else:
     DEBUG = False
 
 ALLOWED_HOSTS = ['bbu.tlinvestmentllc.com', '127.0.0.1', 'localhost',
-                 '54.146.21.16', '54.166.42.245']
+                 '54.146.21.16', '54.144.72.7']
 
 
 # Application definition
