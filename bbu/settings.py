@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'bootstrap_tables',
     'corsheaders',
     'rest_framework',
+    'mod_wsgi.server'
 ]
 
 INSTALLED_APPS += [
