@@ -29,7 +29,7 @@ else:
     DEBUG = False
 
 ALLOWED_HOSTS = ['bbu.tlinvestmentllc.com', '127.0.0.1', 'localhost',
-                 '54.146.21.16']
+                 '54.146.21.16', '54.166.42.245']
 
 
 # Application definition
@@ -44,7 +44,6 @@ INSTALLED_APPS = [
     'bootstrap_tables',
     'corsheaders',
     'rest_framework',
-    'mod_wsgi.server'
 ]
 
 INSTALLED_APPS += [
