@@ -28,9 +28,7 @@ if 'localhost' in os.environ.get('HOSTNAME', ''):
 else:
     DEBUG = False
 
-ALLOWED_HOSTS = ['bbu.tlinvestmentllc.com', '127.0.0.1', 'localhost',
-                 '54.146.21.16', # T&L Server
-                 '10.150.224.83' # bbu VM Centos
+ALLOWED_HOSTS = ['*'
                  ]
 
 
