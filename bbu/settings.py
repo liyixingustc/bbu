@@ -97,7 +97,18 @@ WSGI_APPLICATION = 'bbu.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 # if 'EC2_HOME' in os.environ:
-if 'localhost' not in os.environ.get('HOSTNAME', ''):
+if 'usfhgbqh2l.bbu.gbimbo.com' in os.environ.get('HOSTNAME', ''):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'sqlserver',
+            'NAME': 'SomaxScheduler',
+            'USER': 'SomaxUser',
+            'PASSWORD': 'SomaxAccess',
+            'HOST': '10.150.224.31',
+            'PORT': '1433',
+        }
+    }
+elif 'localhost' in os.environ.get('HOSTNAME', ''):
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
