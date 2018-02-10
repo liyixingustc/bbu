@@ -70,7 +70,7 @@ python manage.py collectstatic
 python manage.py makemigrations
 python manage.py migrate
 python manage.py createsuperuser
-arthur@tlinvestmentllc.com
+arthur.tu@grupobimbo.com
 Tsh19920328
 robert.sarmiento@bbumail.com
 Test1234$
