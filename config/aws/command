@@ -6,17 +6,14 @@ adduser apache
 yum install epel-release
 // update yum
 yum update
+// Compilers and related tools:
+yum groupinstall -y "development tools"
+// Libraries needed during compilation to enable all features of Python:
+yum install -y zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel gdbm-devel db4-devel libpcap-devel xz-devel expat-devel
 // set-up package
-yum install -y  gcc gcc-c++ make git patch openssl-devel zlib-devel readline-devel sqlite-devel bzip2-devel nano wget libffi-devel htop
+yum install -y  gcc gcc-c++ make git patch nano wget libffi-devel htop python36 python36-devel httpd httpd-devel
 // install mysql
-yum install python-devel mysql-devel
-// install http
-yum install httpd httpd-devel
-//install mod_wsgi
-wget https://centos7.iuscommunity.org/ius-release.rpm
-sudo rpm -Uvh ius-release*.rpm
-rm ius-release*.rpm
-yum install python36u-mod_wsgi
+yum install mysql-devel
 // install chromedriver xvfb
 yum install chromedriver
 yum install xorg-x11-server-Xvfb
@@ -40,29 +37,14 @@ Change protected-mode to no
 service redis start
 redis-cli ping
 
-// install pyenv
-sudo su apache
-cd /home/apache
-curl -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
-
-nano /home/apache/.bash_profile
-
-export PATH="~/.pyenv/bin:$PATH"
-eval "$(pyenv init -)"
-eval "$(pyenv virtualenv-init -)"
-
-source /home/apache/.bash_profile
-pyenv update
-
-pyenv install 3.6.3
-pyenv global 3.6.3
-pyenv virtualenv bbu
-pyenv activate bbu
+// setup virtualenv
+cd ~/bbu
+python3.6 -m venv .venv/bbu
+source ~/.venv/bbu/bin/activate
 
 // install bbu
 sudo su apache
-cd /home/apache
-pyenv activate bbu
+cd ~
 git clone https://github.com/tianni4104/bbu.git
 cd bbu
 pip install -r requirements.txt
@@ -70,19 +52,22 @@ python manage.py collectstatic
 python manage.py makemigrations
 python manage.py migrate
 python manage.py createsuperuser
-arthur.tu@grupobimbo.com
+arthur@tlinvestmentllc.com
 Tsh19920328
 robert.sarmiento@bbumail.com
 Test1234$
 
-cd /home/apache
+cd ~
 chmod 755 bbu
-cd /home/apache/bbu
+cd ~/bbu
 chmod 755 db.sqlite3
 chmod 755 -R media
 
+//
+mod_wsgi-express install-module
+
 // http config
-sudo cp /home/apache/bbu/config/apache/server/bbu.conf /etc/httpd/conf.d
+sudo cp /home/apache/bbu/config/apache/server/bbu_test.conf /etc/httpd/conf.d
 //home
 cp /home/arthurtu/projects/bbu/config/apache/home/tlinvestment.conf /etc/httpd/conf.d
 httpd -k restart
@@ -110,6 +95,44 @@ scp -i /home/arthurtu/projects/bbu/config/aws/tlinvestment.pem centos@54.242.48.
 //upload file
 scp -i tlinvestment.pem dist.zip centos@54.146.21.16:./
 
+
+************************************legacy method*****************************************
+
+//install mod_wsgi
+wget https://centos7.iuscommunity.org/ius-release.rpm
+sudo rpm -Uvh ius-release*.rpm
+rm ius-release*.rpm
+yum install python36u-mod_wsgi
+
+// install pyenv
+sudo su apache
+cd /home/apache
+curl -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
+
+nano /home/apache/.bash_profile
+
+export PATH="~/.pyenv/bin:$PATH"
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
+
+source /home/apache/.bash_profile
+pyenv update
+
+pyenv install 3.6.3
+pyenv global 3.6.3
+pyenv virtualenv bbu
+pyenv activate bbu
+
+// install python
+wget http://python.org/ftp/python/3.6.4/Python-3.6.4.tar.xz
+tar xf Python-3.6.4.tar.xz
+cd Python-3.6.4
+./configure --prefix=/usr/local --enable-shared LDFLAGS="-Wl,-rpath /usr/local/lib"
+make && make altinstall
+cd ..
+rm -rf Python-3.6.4 Python-3.6.4.tar.xz
+// Strip the Python 3.6 binary:
+strip /usr/local/lib/libpython3.6m.so.1.0
 
 
 
