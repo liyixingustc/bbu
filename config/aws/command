@@ -70,7 +70,7 @@ python manage.py collectstatic
 python manage.py makemigrations
 python manage.py migrate
 python manage.py createsuperuser
-arthur@tlinvestmentllc.com
+arthur.tu@grupobimbo.com
 Tsh19920328
 robert.sarmiento@bbumail.com
 Test1234$
@@ -82,7 +82,7 @@ chmod 755 db.sqlite3
 chmod 755 -R media
 
 // http config
-sudo cp /home/apache/bbu/config/apache/server/tlinvestment.conf /etc/httpd/conf.d
+sudo cp /home/apache/bbu/config/apache/server/bbu.conf /etc/httpd/conf.d
 //home
 cp /home/arthurtu/projects/bbu/config/apache/home/tlinvestment.conf /etc/httpd/conf.d
 httpd -k restart

@@ -23,10 +23,12 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'g09)et^$8rjua)2^tsgv!l=9c!u#=170cv8kqb!p%90mvcn!=b'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-if 'localhost' in os.environ.get('HOSTNAME', ''):
-    DEBUG = True
-else:
+if 'usfhgbqh2l.bbu.gbimbo.com' in os.environ.get('HOSTNAME', ''):
     DEBUG = False
+# elif 'localhost' in os.environ.get('HOSTNAME', ''):
+#     DEBUG = True
+else:
+    DEBUG = True
 
 ALLOWED_HOSTS = ['*'
                  ]
@@ -97,7 +99,18 @@ WSGI_APPLICATION = 'bbu.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 # if 'EC2_HOME' in os.environ:
-if 'localhost' not in os.environ.get('HOSTNAME', ''):
+if 'usfhgbqh2l.bbu.gbimbo.com' in os.environ.get('HOSTNAME', ''):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'sqlserver',
+            'NAME': 'SomaxScheduler',
+            'USER': 'SomaxUser',
+            'PASSWORD': 'SomaxAccess',
+            'HOST': '10.150.224.31',
+            'PORT': '1433',
+        }
+    }
+elif 'localhost' in os.environ.get('HOSTNAME', ''):
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
@@ -181,10 +194,10 @@ REST_FRAMEWORK = {
 # Celery settings
 from kombu import Exchange, Queue
 
-if 'localhost' not in os.environ.get('HOSTNAME', ''):
-    CELERY_BROKER_URL = 'redis://54.237.230.87:6379/0'
-else:
-    CELERY_BROKER_URL = 'redis://54.237.230.87:6379/0'
+# if 'localhost' not in os.environ.get('HOSTNAME', ''):
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0'
+# else:
+#     CELERY_BROKER_URL = 'redis://54.237.230.87:6379/0'
     # CELERY_BROKER_URL = 'redis://localhost:6379/0'
 
 #: Only add pickle to this list if your broker is secured
