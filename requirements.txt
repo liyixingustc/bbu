@@ -22,3 +22,7 @@ boto3 == 1.4.7
 circus == 0.14.0
 circus-web == 1.0.0
 mod_wsgi == 4.5.24
+django-mssql == 1.8
+python-tds == 1.9.1
+bitarray == 0.8.1
+django-sqlserver = 1.11
