@@ -1,9 +1,11 @@
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from pyvirtualdisplay import Display
 
 from bs4 import BeautifulSoup as bs
@@ -24,6 +26,8 @@ from bbu.settings import BASE_DIR, MEDIA_ROOT
 os.environ['DJANGO_SETTINGS_MODULE'] = 'bbu.settings'
 django.setup()
 
+from utils.UDatetime import UDatetime
+
 from WorkSchedule.WorkConfig.processor.EquipmentLoadProcessor import EquipmentLoadProcessor
 from WorkSchedule.WorkConfig.processor.PMsLoadProcessor import PMsLoadProcessor
 from WorkSchedule.WorkConfig.processor.TasksLoadProcessor import TasksLoadProcessor
@@ -38,7 +42,7 @@ from DAO.WorkScheduleReviseDAO import WorkScheduleReviseDAO
 
 class SomaxSpider:
 
-    DISPLAY = False
+    DISPLAY = True
 
     account = 'BBUGRNATU'
     password = 'ARTHUR'
@@ -64,9 +68,14 @@ class SomaxSpider:
 
     somax_label_scheduling_url = 'https://somaxonline.somax.com/UpdatedLaborScheduling.aspx'
     somax_label_scheduling_table_id = 'MainContent_ASPxCallbackPanel1_gridScheduled_DXMainTable'
+    somax_label_scheduling_table_empty_row_id = 'MainContent_ASPxCallbackPanel1_gridScheduled_DXEmptyRow'
     somax_label_scheduling_table_first_row_id = 'MainContent_ASPxCallbackPanel1_gridScheduled_DXDataRow0'
     somax_label_scheduling_table_edit_input_id = 'MainContent_ASPxCallbackPanel1_gridScheduled_DXEditor4_I'
     somax_label_scheduling_table_pager_id = 'MainContent_ASPxCallbackPanel1_gridScheduled_DXPagerBottom'
+    somax_label_scheduling_table_pager_disable_class = 'dxp-disabledButton'
+    somax_label_scheduling_table_pager_button_class = 'dxp-button'
+    somax_label_scheduling_table_pager_num_class = 'dxp-num'
+    somax_label_scheduling_table_pager_num_current_class = 'dxp-current'
     somax_label_scheduling_date_input_id = 'MainContent_uicSchuduledDate_datetimeControl_I'
     somax_label_scheduling_assigned_input_id = 'MainContent_ddlPersonnel_ddldxControl_I'
     somax_label_scheduling_add_input_id = 'MainContent_ASPxCallbackPanel1_btnAvailableWork'
@@ -121,7 +130,29 @@ class SomaxSpider:
         options = webdriver.ChromeOptions()
         prefs = {'profile.default_content_settings.popups': 0, 'download.default_directory': self.download_path}
         options.add_experimental_option('prefs', prefs)
-        driver = webdriver.Chrome(chrome_options=options,executable_path='/usr/bin/chromedriver')
+
+        # proxy setting
+        if 'apache' in os.environ.get('USER', ''):
+            proxy = {'address': 'proxy.bbu.gbimbo.com:8080',
+                     'usernmae': 'GRNMAINT03',
+                     'password': 'Partsmaint01'}
+
+            capabilities = dict(DesiredCapabilities.CHROME)
+            capabilities['proxy'] = {'proxyType': 'MANUAL',
+                                     'httpProxy': proxy['address'],
+                                     'ftpProxy': proxy['address'],
+                                     'sslProxy': proxy['address'],
+                                     'noProxy': '',
+                                     'class': "org.openqa.selenium.Proxy",
+                                     'autodetect': False}
+
+            capabilities['proxy']['socksUsername'] = proxy['username']
+            capabilities['proxy']['socksPassword'] = proxy['password']
+        else:
+            capabilities=None
+
+        driver = webdriver.Chrome(chrome_options=options,executable_path='/usr/bin/chromedriver',
+                                  desired_capabilities=capabilities)
         return driver
 
     def phantomjsdriver(self):
@@ -531,6 +562,17 @@ class SomaxScheduleSpider(SomaxSpider):
 
         self.get_and_ready(self.somax_label_scheduling_url)
 
+        # check date
+        date_str = self.driver.find_element_by_id(self.somax_label_scheduling_assigned_input_id).text
+        dt_format = UDatetime.check_date_format(date_str)
+
+        if dt_format == 'YY/mm/dd':
+            tasks_records['date'] = tasks_records['date'].apply(lambda x: '{dt.year}/{dt.month}/{dt.day}'.format(dt=x))
+        elif dt_format == 'mm/dd/YY':
+            tasks_records['date'] = tasks_records['date'].apply(lambda x: '{dt.month}/{dt.day}/{dt.year}'.format(dt=x))
+        else:
+            tasks_records['date'] = tasks_records['date'].apply(lambda x: '{dt.year}/{dt.month}/{dt.day}'.format(dt=x))
+
         groups = tasks_records['group'].unique()
         for group in groups:
             tasks_group = tasks_records[tasks_records['group'] == group]
@@ -548,18 +590,258 @@ class SomaxScheduleSpider(SomaxSpider):
         assigned = tasks_group['worker'].unique()[0]
         date = tasks_group['date'].unique()[0]
         # date = '{dt.month}/{dt.day}/{dt.year}'.format(dt=date)
-        date = '{dt.year}/{dt.month}/{dt.day}'.format(dt=date)
+        # date = '{dt.year}/{dt.month}/{dt.day}'.format(dt=date)
         work_orders = tasks_group['work_order'].tolist()
 
-        # revise assigned
-        element_assigned = WebDriverWait(self.driver, 60).until(
-            EC.presence_of_element_located((By.ID, self.somax_label_scheduling_assigned_input_id)))
-        element_assigned.clear()
-        element_assigned.send_keys(assigned)
-        element_assigned.send_keys(Keys.ENTER)
-        self.wait_loading(self.somax_label_scheduling_loading_id)
+        # # revise assigned
+        # self.revise_worker(assigned)
+        # # element_assigned = WebDriverWait(self.driver, 60).until(
+        # #     EC.presence_of_element_located((By.ID, self.somax_label_scheduling_assigned_input_id)))
+        # # element_assigned.clear()
+        # # element_assigned.send_keys(assigned)
+        # # element_assigned.send_keys(Keys.ENTER)
+        # # self.wait_loading(self.somax_label_scheduling_loading_id)
+        #
+        # # revise date
+        # self.revise_date(date)
+        # # remove_date_readonly_script = 'document.getElementById("{id}").removeAttribute("readonly")' \
+        # #     .format(id=self.somax_label_scheduling_date_input_id)
+        # # self.driver.execute_script(remove_date_readonly_script)
+        # #
+        # # element_date = WebDriverWait(self.driver, 60).until(
+        # #     EC.presence_of_element_located((By.ID, self.somax_label_scheduling_date_input_id)))
+        # #
+        # # element_date.clear()
+        # # element_date.send_keys(date)
+        # # element_date.send_keys(Keys.ENTER)
+        # #
+        # # self.wait_loading(self.somax_label_scheduling_loading_id)
+        #
+        # # click available modal
+        # element_add = WebDriverWait(self.driver, 60).until(
+        #     EC.presence_of_element_located((By.ID, self.somax_label_scheduling_add_input_id)))
+        # self.driver.execute_script("arguments[0].click();", element_add)
+        # self.wait_loading(self.somax_label_scheduling_loading_id)
+        #
+        # # clear filter
+        # element_modal_filter_work_order = WebDriverWait(self.driver, 60).until(
+        #     EC.presence_of_element_located((By.ID, self.somax_label_scheduling_modal_filter_work_order_id)))
+        # if element_modal_filter_work_order.text:
+        #     self.driver.execute_script("arguments[0].setAttribute('value', '')",
+        #                                element_modal_filter_work_order)
+        #     element_modal_filter_work_order.send_keys(Keys.ENTER)
+        #
+        # # click include all
+        # element_modal_include_all = WebDriverWait(self.driver, 60).until(
+        #     EC.presence_of_element_located((By.ID, self.somax_label_scheduling_modal_include_all_input_id)))
+        # element_modal_include_all_is_selected = element_modal_include_all.is_selected()
+        # if not element_modal_include_all_is_selected:
+        #     self.driver.execute_script("arguments[0].click();", element_modal_include_all)
+        #     self.wait_loading(self.somax_label_scheduling_loading_id)
+        #
+        # # clear select all
+        # element_modal_select_all = WebDriverWait(self.driver, 60).until(
+        #     EC.presence_of_element_located((By.ID, self.somax_label_scheduling_modal_select_all_input_id)))
+        # element_modal_select_all_class = element_modal_select_all.get_attribute('class')
+        # if element_modal_select_all_class == self.somax_label_scheduling_modal_select_all_input_class_checked:
+        #     self.driver.execute_script("arguments[0].click();", element_modal_select_all)
+        # elif element_modal_select_all_class == self.somax_label_scheduling_modal_select_all_input_class_partial_checked:
+        #     self.driver.execute_script("arguments[0].click();", element_modal_select_all)
+        #     self.driver.execute_script("arguments[0].click();", element_modal_select_all)
+        #
+        # # select work orders
+        # # work_order = work_orders[0]
+        # for work_order in work_orders:
+        #
+        #     # click include all
+        #     element_modal_include_all = WebDriverWait(self.driver, 60).until(
+        #         EC.presence_of_element_located((By.ID, self.somax_label_scheduling_modal_include_all_input_id)))
+        #     element_modal_include_all_is_selected = element_modal_include_all.is_selected()
+        #     if not element_modal_include_all_is_selected:
+        #         self.driver.execute_script("arguments[0].click();", element_modal_include_all)
+        #         self.wait_loading(self.somax_label_scheduling_loading_id)
+        #
+        #     # select work_order
+        #     element_modal_filter_work_order = WebDriverWait(self.driver, 60).until(
+        #         EC.presence_of_element_located((By.ID, self.somax_label_scheduling_modal_filter_work_order_id)))
+        #     self.driver.execute_script(
+        #         "arguments[0].setAttribute('value', '{work_order}')".format(work_order=work_order),
+        #         element_modal_filter_work_order)
+        #     element_modal_filter_work_order.send_keys(Keys.ENTER)
+        #
+        #     self.wait_loading(self.somax_label_scheduling_modal_loading_grey_table_id, timeout=5)
+        #
+        #     element_modal_last_row_first_cell_xpath = "//table[@id='{table_id}']/tbody/tr[last()]/td[2]" \
+        #         .format(table_id=self.somax_label_scheduling_modal_table)
+        #     WebDriverWait(self.driver, 20).until(
+        #         EC.text_to_be_present_in_element((By.XPATH, element_modal_last_row_first_cell_xpath), str(work_order)))
+        #
+        #     element_modal_first_row_check = WebDriverWait(self.driver, 60).until(
+        #         EC.presence_of_element_located((By.ID, self.somax_label_scheduling_modal_first_row_check_id)))
+        #     self.driver.execute_script("arguments[0].click();", element_modal_first_row_check)
+        #
+        # # click modal add
+        # element_modal_add = WebDriverWait(self.driver, 60).until(
+        #     EC.presence_of_element_located((By.ID, self.somax_label_scheduling_modal_add_input_id)))
+        # # self.driver.execute_script("arguments[0].click();", element_modal_add)
+        # element_modal_add.click()
+        # self.wait_loading(self.somax_label_scheduling_loading_id)
+        #
+        # # click modal close
+        # element_modal_close = WebDriverWait(self.driver, 60).until(
+        #     EC.presence_of_element_located((By.ID, self.somax_label_scheduling_modal_close_id)))
+        # self.driver.execute_script("arguments[0].click();", element_modal_close)
+        #
+        # self.wait_loading(self.somax_label_scheduling_loading_grey_table_id)
+        #
+        # # close repeat window
+        # element_modal_repeat = self.driver.find_element_by_id(self.somax_label_scheduling_modal_repeat_id)
+        # if element_modal_repeat:
+        #     element_modal_close = WebDriverWait(self.driver, 60).until(
+        #         EC.presence_of_element_located((By.ID, self.somax_label_scheduling_modal_repeat_ok_id)))
+        #     self.driver.execute_script("arguments[0].click();", element_modal_close)
 
-        # revise date
+        # sync schedule hours
+        for index, row in tasks_group.iterrows():
+            work_order = row['work_order']
+            hours = row['schedule_hour']
+            worker = row['worker']
+            date = row['date']
+            # try:
+            self.sync_schedule_hour_to_somax_spider(work_order, hours, worker, date)
+            # except Exception as e:
+            #     WorkScheduleReviseDAO.update_tasks_sync_to_somax(work_order, mode='error')
+
+        time.sleep(3)
+
+        return True
+
+    def sync_schedule_hour_to_somax_spider(self, work_order=None, hours=None, worker=None, date=None):
+
+        # check worker
+        worker_somax = self.get_worker()
+        if worker and worker_somax != worker:
+            self.revise_worker(worker)
+
+        # check date
+        date_somax = self.get_date()
+        if date and date_somax != date:
+            self.revise_date(date)
+
+        if hours:
+            hours = str(round(hours, 2))
+        else:
+            hours = '0'
+
+        element_table_pager = self.driver.find_elements_by_id(self.somax_label_scheduling_table_pager_id)
+
+        if element_table_pager:
+            element_table_pager = element_table_pager[0]
+            element_table_pager_buttons = element_table_pager.find_elements_by_class_name(self.somax_label_scheduling_table_pager_button_class)
+            element_table_pager_last = element_table_pager_buttons[0]
+            element_table_pager_next = element_table_pager_buttons[1]
+            element_table_pager_num = element_table_pager.find_elements_by_class_name(self.somax_label_scheduling_table_pager_num_class)
+            element_table_pager_current = self.get_current_page()
+            element_table_pager_num_1 = element_table_pager_num[0]
+
+            if element_table_pager_current != element_table_pager_num_1:
+                self.driver.execute_script("arguments[0].scrollIntoView()", element_table_pager_num_1)
+                element_table_pager_num_1.click()
+                self.wait_loading(self.somax_label_scheduling_loading_grey_table_id)
+        else:
+            element_table_pager_num = [None]
+
+        found = False
+        for element_table_page in element_table_pager_num:
+
+            # switch page
+            if element_table_page:
+                element_table_pager_current = self.get_current_page()
+                if element_table_pager_current != element_table_page:
+                    self.driver.execute_script("arguments[0].scrollIntoView()", element_table_page)
+                    element_table_page.click()
+                    self.wait_loading(self.somax_label_scheduling_loading_grey_table_id)
+
+            # wait for the table
+            # element_table_first_row = WebDriverWait(self.driver, 10).until(
+            #     EC.presence_of_element_located((By.ID, self.somax_label_scheduling_table_first_row_id)))
+            # element_table_first_row = self.driver.find_elements_by_id(self.somax_label_scheduling_table_first_row_id)
+            # if not element_table_first_row:
+            #     return False
+            element_table_empty_row = self.driver.find_elements_by_id(self.somax_label_scheduling_table_empty_row_id)
+            print(element_table_empty_row)
+            if element_table_empty_row:
+                continue
+
+            # revise the table
+            element_table_rows_xpath = "//table[@id='{table_id}']/tbody/tr" \
+                .format(table_id=self.somax_label_scheduling_table_id)
+            element_table_rows_counts = len(self.driver.find_elements_by_xpath(element_table_rows_xpath)[3:])
+
+            for row_num in range(1, element_table_rows_counts+1):
+
+                element_table_row = self.driver.find_elements_by_xpath(element_table_rows_xpath)[row_num + 2]
+                table_work_order = element_table_row.find_elements_by_tag_name('td')[1].text
+
+                print(table_work_order, work_order)
+                if table_work_order == str(work_order):
+                    element_table_hour = element_table_row.find_elements_by_tag_name('td')[4]
+                    # hours_old = element_table_hour.text
+                    # if abs(float(hours_old) - float(hours)) < 0.01:
+                    #     print('abc')
+                    #     continue
+
+                    self.driver.execute_script("arguments[0].scrollIntoView()", element_table_hour)
+                    element_table_hour.click()
+                    actionChains = ActionChains(self.driver)
+                    actionChains.double_click(element_table_hour).perform()
+                    element_table_hour.click()
+                    element_table_cell_edit = self.driver.find_element_by_id(self.somax_label_scheduling_table_edit_input_id)
+
+                    element_table_cell_edit.clear()
+                    time.sleep(0.5)
+                    element_table_cell_edit.send_keys(hours)
+                    time.sleep(0.5)
+                    # element_table_cell_edit.send_keys(Keys.ENTER)
+                    somax_logo_id_element = self.driver.find_element_by_id(self.somax_logo_id)
+                    self.driver.execute_script("arguments[0].scrollIntoView()", somax_logo_id_element)
+                    somax_logo_id_element.click()
+
+                    found = True
+                    break
+
+            if found:
+                break
+
+        self.wait_loading(self.somax_label_scheduling_loading_grey_table_id, timeout=3)
+
+        # time.sleep(5)
+        # print(element_table_row)
+        # print(element_table_row.find_elements_by_tag_name('td')[1].text)
+        print('finish-WO:{work_order}-hrs:{hours}'.format(work_order=work_order, hours=hours))
+        # WorkScheduleReviseDAO.update_tasks_sync_to_somax(work_order, mode='yes')
+
+    def get_date(self):
+
+        date = self.driver.find_element_by_id(self.somax_label_scheduling_date_input_id)
+
+        return date
+
+    def get_worker(self):
+
+        worker = self.driver.find_element_by_id(self.somax_label_scheduling_assigned_input_id)
+
+        return worker
+
+    def get_current_page(self):
+
+        element_table_pager = self.driver.find_element_by_id(self.somax_label_scheduling_table_pager_id)
+        element_table_pager_current = element_table_pager.find_element_by_class_name(self.somax_label_scheduling_table_pager_num_current_class)
+
+        return element_table_pager_current
+
+    def revise_date(self, date):
+
         remove_date_readonly_script = 'document.getElementById("{id}").removeAttribute("readonly")' \
             .format(id=self.somax_label_scheduling_date_input_id)
         self.driver.execute_script(remove_date_readonly_script)
@@ -573,159 +855,15 @@ class SomaxScheduleSpider(SomaxSpider):
 
         self.wait_loading(self.somax_label_scheduling_loading_id)
 
-        # click available modal
-        element_add = WebDriverWait(self.driver, 60).until(
-            EC.presence_of_element_located((By.ID, self.somax_label_scheduling_add_input_id)))
-        self.driver.execute_script("arguments[0].click();", element_add)
+    def revise_worker(self, worker):
+
+        # revise assigned
+        element_assigned = WebDriverWait(self.driver, 60).until(
+            EC.presence_of_element_located((By.ID, self.somax_label_scheduling_assigned_input_id)))
+        element_assigned.clear()
+        element_assigned.send_keys(worker)
+        element_assigned.send_keys(Keys.ENTER)
         self.wait_loading(self.somax_label_scheduling_loading_id)
-
-        # clear filter
-        element_modal_filter_work_order = WebDriverWait(self.driver, 60).until(
-            EC.presence_of_element_located((By.ID, self.somax_label_scheduling_modal_filter_work_order_id)))
-        if element_modal_filter_work_order.text:
-            self.driver.execute_script("arguments[0].setAttribute('value', '')",
-                                       element_modal_filter_work_order)
-            element_modal_filter_work_order.send_keys(Keys.ENTER)
-
-        # click include all
-        element_modal_include_all = WebDriverWait(self.driver, 60).until(
-            EC.presence_of_element_located((By.ID, self.somax_label_scheduling_modal_include_all_input_id)))
-        element_modal_include_all_is_selected = element_modal_include_all.is_selected()
-        if not element_modal_include_all_is_selected:
-            self.driver.execute_script("arguments[0].click();", element_modal_include_all)
-            self.wait_loading(self.somax_label_scheduling_loading_id)
-
-        # clear select all
-        element_modal_select_all = WebDriverWait(self.driver, 60).until(
-            EC.presence_of_element_located((By.ID, self.somax_label_scheduling_modal_select_all_input_id)))
-        element_modal_select_all_class = element_modal_select_all.get_attribute('class')
-        if element_modal_select_all_class == self.somax_label_scheduling_modal_select_all_input_class_checked:
-            self.driver.execute_script("arguments[0].click();", element_modal_select_all)
-        elif element_modal_select_all_class == self.somax_label_scheduling_modal_select_all_input_class_partial_checked:
-            self.driver.execute_script("arguments[0].click();", element_modal_select_all)
-            self.driver.execute_script("arguments[0].click();", element_modal_select_all)
-
-        # select work orders
-        # work_order = work_orders[0]
-        for work_order in work_orders:
-
-            # click include all
-            element_modal_include_all = WebDriverWait(self.driver, 60).until(
-                EC.presence_of_element_located((By.ID, self.somax_label_scheduling_modal_include_all_input_id)))
-            element_modal_include_all_is_selected = element_modal_include_all.is_selected()
-            if not element_modal_include_all_is_selected:
-                self.driver.execute_script("arguments[0].click();", element_modal_include_all)
-                self.wait_loading(self.somax_label_scheduling_loading_id)
-
-            # select work_order
-            element_modal_filter_work_order = WebDriverWait(self.driver, 60).until(
-                EC.presence_of_element_located((By.ID, self.somax_label_scheduling_modal_filter_work_order_id)))
-            self.driver.execute_script(
-                "arguments[0].setAttribute('value', '{work_order}')".format(work_order=work_order),
-                element_modal_filter_work_order)
-            element_modal_filter_work_order.send_keys(Keys.ENTER)
-
-            self.wait_loading(self.somax_label_scheduling_modal_loading_grey_table_id, timeout=5)
-
-            element_modal_last_row_first_cell_xpath = "//table[@id='{table_id}']/tbody/tr[last()]/td[2]" \
-                .format(table_id=self.somax_label_scheduling_modal_table)
-            WebDriverWait(self.driver, 20).until(
-                EC.text_to_be_present_in_element((By.XPATH, element_modal_last_row_first_cell_xpath), str(work_order)))
-
-            element_modal_first_row_check = WebDriverWait(self.driver, 60).until(
-                EC.presence_of_element_located((By.ID, self.somax_label_scheduling_modal_first_row_check_id)))
-            self.driver.execute_script("arguments[0].click();", element_modal_first_row_check)
-
-        # click modal add
-        element_modal_add = WebDriverWait(self.driver, 60).until(
-            EC.presence_of_element_located((By.ID, self.somax_label_scheduling_modal_add_input_id)))
-        # self.driver.execute_script("arguments[0].click();", element_modal_add)
-        element_modal_add.click()
-        self.wait_loading(self.somax_label_scheduling_loading_id)
-
-        # click modal close
-        element_modal_close = WebDriverWait(self.driver, 60).until(
-            EC.presence_of_element_located((By.ID, self.somax_label_scheduling_modal_close_id)))
-        self.driver.execute_script("arguments[0].click();", element_modal_close)
-
-        self.wait_loading(self.somax_label_scheduling_loading_grey_table_id)
-
-        # close repeat window
-        element_modal_repeat = self.driver.find_element_by_id(self.somax_label_scheduling_modal_repeat_id)
-        if element_modal_repeat:
-            element_modal_close = WebDriverWait(self.driver, 60).until(
-                EC.presence_of_element_located((By.ID, self.somax_label_scheduling_modal_repeat_ok_id)))
-            self.driver.execute_script("arguments[0].click();", element_modal_close)
-
-        # sync schedule hours
-        for index, row in tasks_group.iterrows():
-            work_order = row['work_order']
-            hours = row['schedule_hour']
-            try:
-                self.sync_schedule_hour_to_somax_spider(work_order, hours)
-            except Exception as e:
-                WorkScheduleReviseDAO.update_tasks_sync_to_somax(work_order, mode='error')
-
-        time.sleep(3)
-
-        return True
-
-    def sync_schedule_hour_to_somax_spider(self, work_order=None, hours=None, worker=None, date=None):
-
-        if hours:
-            hours = str(round(hours, 2))
-        else:
-            hours = '0'
-
-        element_table_pager = self.driver.find_element_by_id(self.somax_label_scheduling_table_pager_id)
-
-        # work_order = work_orders[0]
-        element_table_first_row = WebDriverWait(self.driver, 60).until(
-            EC.presence_of_element_located((By.ID, self.somax_label_scheduling_table_first_row_id)))
-        element_table_first_row = self.driver.find_elements_by_id(self.somax_label_scheduling_table_first_row_id)
-        if not element_table_first_row:
-            return False
-
-        element_table_rows_xpath = "//table[@id='{table_id}']/tbody/tr" \
-            .format(table_id=self.somax_label_scheduling_table_id)
-        element_table_rows_counts = len(self.driver.find_elements_by_xpath(element_table_rows_xpath)[3:-1])
-
-        for row_num in range(1, element_table_rows_counts + 1):
-
-            element_table_row = self.driver.find_elements_by_xpath(element_table_rows_xpath)[row_num + 2]
-            table_work_order = element_table_row.find_elements_by_tag_name('td')[1].text
-
-            if table_work_order == str(work_order):
-                break
-
-        element_table_hour = element_table_row.find_elements_by_tag_name('td')[4]
-        # hours_old = element_table_hour.text
-        # if abs(float(hours_old) - float(hours)) < 0.01:
-        #     print('abc')
-        #     continue
-
-        element_table_hour.click()
-        actionChains = ActionChains(self.driver)
-        actionChains.double_click(element_table_hour).perform()
-        element_table_hour.click()
-        element_table_cell_edit = self.driver.find_element_by_id(self.somax_label_scheduling_table_edit_input_id)
-
-        element_table_cell_edit.clear()
-        time.sleep(0.5)
-        element_table_cell_edit.send_keys(hours)
-        time.sleep(0.5)
-        # element_table_cell_edit.send_keys(Keys.ENTER)
-        somax_logo_id_element = self.driver.find_element_by_id(self.somax_logo_id)
-        somax_logo_id_element.click()
-        # self.driver.execute_script("arguments[0].click();", somax_logo_id_element)
-
-        self.wait_loading(self.somax_label_scheduling_loading_grey_table_id, timeout=3)
-
-        # time.sleep(5)
-        # print(element_table_row)
-        # print(element_table_row.find_elements_by_tag_name('td')[1].text)
-        print('finish-WO:{work_order}-hrs:{hours}'.format(work_order=work_order, hours=hours))
-        WorkScheduleReviseDAO.update_tasks_sync_to_somax(work_order, mode='yes')
 
     def wait_loading(self, loading_id, timeout=10):
 
