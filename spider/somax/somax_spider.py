@@ -42,10 +42,14 @@ from DAO.WorkScheduleReviseDAO import WorkScheduleReviseDAO
 
 class SomaxSpider:
 
-    DISPLAY = True
+    DISPLAY = False
+    In_Server = False
 
     account = 'BBUGRNATU'
     password = 'ARTHUR'
+    proxy = 'proxy.bbu.gbimbo.com:8080'
+    proxy_username = 'GRNMAINT03'
+    proxy_password = 'Partsmaint01'
 
     somax_dashboard_url = 'https://somaxonline.somax.com/DashboardMain.aspx'
     somax_login_url = 'https://somaxonline.somax.com/Login.aspx'
@@ -133,9 +137,10 @@ class SomaxSpider:
 
         # proxy setting
         if 'apache' in os.environ.get('USER', ''):
-            proxy = {'address': 'proxy.bbu.gbimbo.com:8080',
-                     'username': 'GRNMAINT03',
-                     'password': 'Partsmaint01'}
+            self.In_Server = True
+            proxy = {'address': self.proxy,
+                     'username': self.proxy_username,
+                     'password': self.proxy_password}
 
             capabilities = dict(DesiredCapabilities.CHROME)
             capabilities['proxy'] = {'proxyType': 'MANUAL',
@@ -162,6 +167,12 @@ class SomaxSpider:
         return driver
 
     def login(self, account=None, password=None):
+
+        if self.In_Server:
+            time.sleep(5)
+            alert = self.driver.switch_to.alert
+            alert.authenticate(self.proxy_username, self.proxy_password)
+
         if account and password:
             self.account = account
             self.password = password
@@ -899,7 +910,7 @@ if __name__ == '__main__':
     # elif spider_type in ['pm', '2']:
     #     SomaxSpider().equipment_spider()
     # elif spider_type in ['task', '3']:
-    #     SomaxSpider().task_spider()
+        SomaxSpider().task_spider()
     # SomaxSpider().sync_schedules_to_somax_spider()
     # SomaxSpider().sync_schedules_to_somax_spider()
-    SomaxScheduleSpider.get_schedules_to_somax_spider()
+    # SomaxScheduleSpider().get_schedules_to_somax_spider()
