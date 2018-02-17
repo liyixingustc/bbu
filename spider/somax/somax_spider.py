@@ -134,7 +134,7 @@ class SomaxSpider:
         # proxy setting
         if 'apache' in os.environ.get('USER', ''):
             proxy = {'address': 'proxy.bbu.gbimbo.com:8080',
-                     'usernmae': 'GRNMAINT03',
+                     'username': 'GRNMAINT03',
                      'password': 'Partsmaint01'}
 
             capabilities = dict(DesiredCapabilities.CHROME)
