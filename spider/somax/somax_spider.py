@@ -14,6 +14,7 @@ import sys
 import shutil
 import glob
 import time
+import threading
 
 import numpy as np
 import pandas as pd
@@ -132,32 +133,48 @@ class SomaxSpider:
 
     def chromedriver(self):
         options = webdriver.ChromeOptions()
-        prefs = {'profile.default_content_settings.popups': 0, 'download.default_directory': self.download_path}
+        prefs = {
+            # 'profile.default_content_settings.popups': 0,
+             'download.default_directory': self.download_path,
+             # 'profile.default_content_setting_values.notifications': 2
+             }
         options.add_experimental_option('prefs', prefs)
 
         # proxy setting
-        if 'apache' in os.environ.get('USER', ''):
-            self.In_Server = True
-            proxy = {'address': self.proxy,
-                     'username': self.proxy_username,
-                     'password': self.proxy_password}
+        # if 'apache' in os.environ.get('USER', ''):
+        self.In_Server = True
+        # options.add_extension('/home/apache/bbu/spider/somax/Proxy-Auto-Auth_v2.0.crx')
 
-            capabilities = dict(DesiredCapabilities.CHROME)
-            capabilities['proxy'] = {'proxyType': 'MANUAL',
-                                     'httpProxy': proxy['address'],
-                                     'ftpProxy': proxy['address'],
-                                     'sslProxy': proxy['address'],
-                                     'noProxy': '',
-                                     'class': "org.openqa.selenium.Proxy",
-                                     'autodetect': False}
+        proxy = {'address': self.proxy,
+                 'username': self.proxy_username,
+                 'password': self.proxy_password}
 
-            capabilities['proxy']['socksUsername'] = proxy['username']
-            capabilities['proxy']['socksPassword'] = proxy['password']
-        else:
-            capabilities=None
+        capabilities = dict(DesiredCapabilities.CHROME)
+        capabilities['proxy'] = {'proxyType': 'MANUAL',
+                                 'httpProxy': proxy['address'],
+                                 'ftpProxy': proxy['address'],
+                                 'sslProxy': proxy['address'],
+                                 'noProxy': '',
+                                 'class': "org.openqa.selenium.Proxy",
+                                 'autodetect': False}
+
+        capabilities['proxy']['socksUsername'] = proxy['username']
+        capabilities['proxy']['socksPassword'] = proxy['password']
+        # else:
+        #     capabilities=None
 
         driver = webdriver.Chrome(chrome_options=options,executable_path='/usr/bin/chromedriver',
                                   desired_capabilities=capabilities)
+
+        # if self.In_Server:
+        # element_login = WebDriverWait(driver, 5).until(
+        # EC.presence_of_element_located((By.ID, 'login')))
+        # element_password = driver.find_element_by_id('password')
+        # element_submit = driver.find_element_by_id('save')
+        # element_login.send_keys(self.proxy_username)
+        # element_password.send_keys(self.proxy_password)
+        # element_submit.click()
+        # time.sleep(1)
         return driver
 
     def phantomjsdriver(self):
@@ -169,9 +186,14 @@ class SomaxSpider:
     def login(self, account=None, password=None):
 
         if self.In_Server:
-            time.sleep(5)
-            alert = self.driver.switch_to.alert
-            alert.authenticate(self.proxy_username, self.proxy_password)
+            pass
+            # try:
+            #     time.sleep(5)
+            #     alert = self.driver.switch_to.alert
+            #     alert.authenticate(self.proxy_username, self.proxy_password)
+            # except Exception as e:
+            #     pass
+                # self.driver.switch_to.window()
 
         if account and password:
             self.account = account
