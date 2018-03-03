@@ -134,6 +134,9 @@ rm -rf Python-3.6.4 Python-3.6.4.tar.xz
 // Strip the Python 3.6 binary:
 strip /usr/local/lib/libpython3.6m.so.1.0
 
+// git proxy setting
+git config --global http.proxy http://GRNMAINT03:Partsmaint01@proxy.bbu.gbimbo.com:8080
+
 
 
 
