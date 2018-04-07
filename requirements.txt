@@ -25,4 +25,4 @@ mod_wsgi == 4.5.24
 django-mssql == 1.8
 python-tds == 1.9.1
 bitarray == 0.8.1
-django-sqlserver = 1.11
+django-sqlserver == 1.11

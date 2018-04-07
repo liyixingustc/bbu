@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'g09)et^$8rjua)2^tsgv!l=9c!u#=170cv8kqb!p%90mvcn!=b'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-if 'usfhgbqh2l.bbu.gbimbo.com' in os.environ.get('HOSTNAME', ''):
+if '/home/apache' in os.environ.get('HOME', ''):
     DEBUG = False
 # elif 'localhost' in os.environ.get('HOSTNAME', ''):
 #     DEBUG = True
@@ -100,7 +100,7 @@ WSGI_APPLICATION = 'bbu.wsgi.application'
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 # if 'EC2_HOME' in os.environ:
 # if 'usfhgbqh2l.bbu.gbimbo.com' in os.environ.get('HOSTNAME', ''):
-if 'apache' in os.environ.get('USER', ''):
+if '/home/apache' in os.environ.get('HOME', ''):
     DATABASES = {
         'default': {
             'ENGINE': 'sqlserver',
@@ -111,17 +111,17 @@ if 'apache' in os.environ.get('USER', ''):
             'PORT': '1433',
         }
     }
-elif 'localhost' in os.environ.get('HOSTNAME', ''):
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': 'bbu',
-            'USER': 'tlinvestment',
-            'PASSWORD': 'Tsh19920328',
-            'HOST': 'tlinvestment.comop3eprq5n.us-east-1.rds.amazonaws.com',
-            'PORT': '3306',
-        }
-    }
+# elif 'localhost' in os.environ.get('HOSTNAME', ''):
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.mysql',
+#             'NAME': 'bbu',
+#             'USER': 'tlinvestment',
+#             'PASSWORD': 'Tsh19920328',
+#             'HOST': 'tlinvestment.comop3eprq5n.us-east-1.rds.amazonaws.com',
+#             'PORT': '3306',
+#         }
+#     }
 else:
     DATABASES = {
         'default': {
