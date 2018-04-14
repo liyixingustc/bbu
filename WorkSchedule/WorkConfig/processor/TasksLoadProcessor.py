@@ -1,10 +1,18 @@
 import os
+import sys
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+sys.path.append(BASE_DIR)
+
 import numpy as np
 import pandas as pd
 import re
 from datetime import datetime as dt
 import pytz
 import time
+
+import django
+os.environ['DJANGO_SETTINGS_MODULE'] = 'bbu.settings'
+django.setup()
 
 from bbu.settings import TIME_ZONE, BASE_DIR
 from django.http import JsonResponse
@@ -323,3 +331,8 @@ class TasksLoadProcessor:
     #                 return JsonResponse({})
     #     else:
     #         return JsonResponse({})
+
+
+if __name__ == '__main__':
+    path = os.path.join(BASE_DIR, 'WorkSchedule/WorkConfig/sample/config/WorkSearch Approved.csv')
+    TasksLoadProcessor.tasks_load_processor(path)

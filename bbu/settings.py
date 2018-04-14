@@ -111,6 +111,13 @@ if '/home/apache' in os.environ.get('HOME', ''):
             'PORT': '1433',
         }
     }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
+    }
 # elif 'localhost' in os.environ.get('HOSTNAME', ''):
 #     DATABASES = {
 #         'default': {
@@ -122,13 +129,6 @@ if '/home/apache' in os.environ.get('HOME', ''):
 #             'PORT': '3306',
 #         }
 #     }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        }
-    }
 
 
 # Password validation
