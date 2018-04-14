@@ -333,6 +333,7 @@ class TasksLoadProcessor:
     #         return JsonResponse({})
 
 
+
 if __name__ == '__main__':
-    path = os.path.join(BASE_DIR, 'WorkSchedule/WorkConfig/sample/config/WorkSearch Approved.csv')
+    path = os.path.join(BASE_DIR, 'WorkSchedule/WorkConfig/sample/config/WorkSearchApproved.csv')
     TasksLoadProcessor.tasks_load_processor(path)
