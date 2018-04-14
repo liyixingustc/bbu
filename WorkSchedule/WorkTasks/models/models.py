@@ -54,7 +54,7 @@ class Tasks(models.Model):
 
     # model fields
     work_order = models.CharField(max_length=30)
-    description = models.CharField(max_length=500, null=True, blank=True)
+    description = models.CharField(max_length=3000, null=True, blank=True)
     work_type = models.CharField(max_length=10, choices=working_type_choice, null=True, blank=True)
     current_status = models.CharField(max_length=30, choices=status_choice, default='Work Request')
     line = models.CharField(max_length=10, choices=BaseConstants.line_choice, null=True, blank=True)

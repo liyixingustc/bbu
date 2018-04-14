@@ -87,8 +87,10 @@ class TasksLoadProcessor:
         try:
             data['Actual Finish'] = pd.to_datetime(data['Actual Finish'], format='%Y/%m/%d')
         except:
-            data['Actual Finish'] = pd.to_datetime(data['Actual Finish'], format='%m/%d/%Y')
-        data['Actual Finish'] = pd.to_datetime(data['Actual Finish'], format='%Y/%m/%d')
+            try:
+                data['Actual Finish'] = pd.to_datetime(data['Actual Finish'], format='%m/%d/%Y')
+            except:
+                data['Actual Finish'] = pd.to_datetime(data['Actual Finish'], format='%m/%d/%y')
         data['Actual Finish'] = data['Actual Finish'].apply(lambda x: UDatetime.localize(x))
 
         data['Description'] = data['Description'].apply(lambda x: x.encode('ascii', errors="ignore").decode())
