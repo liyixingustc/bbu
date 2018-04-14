@@ -77,8 +77,8 @@ class PageManager:
                                               'time_start': 'start',
                                               'time_end': 'end'}, axis=1, inplace=True)
                     avail_events['resourceId'] = avail_events['resourceId'].astype('str')
-                    avail_events['start'] = avail_events['start'].apply(lambda x: x.astimezone(EST))
-                    avail_events['end'] = avail_events['end'].apply(lambda x: x.astimezone(EST))
+                    # avail_events['start'] = avail_events['start'].apply(lambda x: x.astimezone(EST))
+                    # avail_events['end'] = avail_events['end'].apply(lambda x: x.astimezone(EST))
 
                     avail_response = avail_events.to_dict(orient='records')
 
@@ -119,8 +119,8 @@ class PageManager:
                     event_records['remaining_hours'] = event_records['est'] - event_records['duration']
                     event_records['remaining_hours'] = event_records['remaining_hours'].apply(lambda x:round(x.total_seconds()/3600))
 
-                    event_records['start'] = event_records['start'].apply(lambda x: x.astimezone(EST))
-                    event_records['end'] = event_records['end'].apply(lambda x: x.astimezone(EST))
+                    # event_records['start'] = event_records['start'].apply(lambda x: x.astimezone(EST))
+                    # event_records['end'] = event_records['end'].apply(lambda x: x.astimezone(EST))
                     event_records['duration'] = event_records['duration'].apply(lambda x: np.round(x.total_seconds()/3600, 2))
 
                     # revise time off event percent
@@ -250,8 +250,10 @@ class PageManager:
                         start_list.append(start)
                         end_list = avails_df['time_end'].tolist()
                         end_list.append(end)
-                        start_new = min(start_list).astimezone(EST)
-                        end_new = max(end_list).astimezone(EST)
+                        # start_new = min(start_list).astimezone(EST)
+                        # end_new = max(end_list).astimezone(EST)
+                        start_new = min(start_list).replace(tzinfo=EST)
+                        end_new = max(end_list).replace(tzinfo=EST)
                         date = UDatetime.pick_date_by_two_date(start_new, end_new)
 
                         duration_new = end_new - start_new
@@ -300,6 +302,10 @@ class PageManager:
                                                             name__exact=worker)
 
                     if avails.exists():
+
+                        start = start.replace(tzinfo=pytz.UTC)
+                        end = end.replace(tzinfo=pytz.UTC)
+
                         avails_df = pd.DataFrame.from_records(avails.values())
                         if avails.count() == 1:
                             avail_id = avails_df['id'].tolist()[0]

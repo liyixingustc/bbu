@@ -89,10 +89,14 @@ class UDatetime:
     @classmethod
     def remove_overlap(cls, r1_start, r1_end, r2_start, r2_end):
 
-        r1_start = r1_start.astimezone(cls.local_tz)
-        r1_end = r1_end.astimezone(cls.local_tz)
-        r2_start = r2_start.astimezone(cls.local_tz)
-        r2_end = r2_end.astimezone(cls.local_tz)
+        # r1_start = r1_start.astimezone(cls.local_tz)
+        # r1_end = r1_end.astimezone(cls.local_tz)
+        # r2_start = r2_start.astimezone(cls.local_tz)
+        # r2_end = r2_end.astimezone(cls.local_tz)
+        r1_start = r1_start.replace(tzinfo=cls.local_tz)
+        r1_end = r1_end.replace(tzinfo=cls.local_tz)
+        r2_start = r2_start.replace(tzinfo=cls.local_tz)
+        r2_end = r2_end.replace(tzinfo=cls.local_tz)
 
         latest_start = max(r1_start, r2_start)
         earliest_end = min(r1_end, r2_end)
