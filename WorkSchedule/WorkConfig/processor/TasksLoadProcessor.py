@@ -1,4 +1,8 @@
 import os
+import sys
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+sys.path.append(BASE_DIR)
+
 import numpy as np
 import pandas as pd
 import re
@@ -6,12 +10,16 @@ from datetime import datetime as dt
 import pytz
 import time
 
+import django
+os.environ['DJANGO_SETTINGS_MODULE'] = 'bbu.settings'
+django.setup()
+
 from bbu.settings import TIME_ZONE, BASE_DIR
 from django.http import JsonResponse
 
-from ...WorkConfig.models.models import *
-from ...WorkWorkers.models.models import *
-from ...WorkTasks.models.models import *
+from WorkSchedule.WorkConfig.models.models import *
+from WorkSchedule.WorkWorkers.models.models import *
+from WorkSchedule.WorkTasks.models.models import *
 
 from utils.UDatetime import UDatetime
 
@@ -26,13 +34,14 @@ class TasksLoadProcessor:
     def tasks_load_processor(cls, files_path=None):
 
         if files_path:
-            for file_path in files_path:
-                if os.path.exists(file_path):
-                    data = pd.read_csv(file_path, encoding='iso-8859-1')
-                    # data = pd.read_csv(file_path)
-                    cls.tasks_data_processor(data)
-            else:
-                return JsonResponse({})
+            print(files_path)
+            # for file_path in files_path:
+            # if os.path.exists(files_path):
+            data = pd.read_csv(files_path, encoding='iso-8859-1', engine='python')
+            # data = pd.read_csv(file_path)
+            cls.tasks_data_processor(data)
+            # else:
+            #     return JsonResponse({})
         else:
             files = Documents.objects.filter(status__exact='new', file_type__exact='Tasks')
             if files.exists():
@@ -63,7 +72,10 @@ class TasksLoadProcessor:
         try:
             data['Created'] = pd.to_datetime(data['Created'], format='%Y/%m/%d')
         except:
-            data['Created'] = pd.to_datetime(data['Created'], format='%m/%d/%Y')
+            try:
+                data['Created'] = pd.to_datetime(data['Created'], format='%m/%d/%Y')
+            except:
+                data['Created'] = pd.to_datetime(data['Created'], format='%m/%d/%y')
         data['Created'] = data['Created'].apply(lambda x: UDatetime.localize(x))
 
         try:
@@ -75,8 +87,10 @@ class TasksLoadProcessor:
         try:
             data['Actual Finish'] = pd.to_datetime(data['Actual Finish'], format='%Y/%m/%d')
         except:
-            data['Actual Finish'] = pd.to_datetime(data['Actual Finish'], format='%m/%d/%Y')
-        data['Actual Finish'] = pd.to_datetime(data['Actual Finish'], format='%Y/%m/%d')
+            try:
+                data['Actual Finish'] = pd.to_datetime(data['Actual Finish'], format='%m/%d/%Y')
+            except:
+                data['Actual Finish'] = pd.to_datetime(data['Actual Finish'], format='%m/%d/%y')
         data['Actual Finish'] = data['Actual Finish'].apply(lambda x: UDatetime.localize(x))
 
         data['Description'] = data['Description'].apply(lambda x: x.encode('ascii', errors="ignore").decode())
@@ -323,3 +337,9 @@ class TasksLoadProcessor:
     #                 return JsonResponse({})
     #     else:
     #         return JsonResponse({})
+
+
+
+if __name__ == '__main__':
+    path = os.path.join(BASE_DIR, 'WorkSchedule/WorkConfig/sample/config/Approved.csv')
+    TasksLoadProcessor.tasks_load_processor(path)
