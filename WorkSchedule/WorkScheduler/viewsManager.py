@@ -211,8 +211,8 @@ class PageManager:
             @staticmethod
             def syc_tasks_to_somax(request, *args, **kwargs):
                 response = []
-                # SomaxSpider().sync_schedules_to_somax_spider()
-                sync_schedules_to_somax.delay()
+                SomaxScheduleSpider().sync_schedules_to_somax_spider()
+                # sync_schedules_to_somax.delay()
                 return JsonResponse(response, safe=False)
 
         class ModalManager:

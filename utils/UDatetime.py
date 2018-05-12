@@ -132,3 +132,21 @@ class UDatetime:
             shift_range = [start_shift]
         return shift_range
 
+    @classmethod
+    def check_date_format(cls, date_str):
+        try:
+            datetime.strptime(date_str, '%Y/%m/%d')
+            return 'YY/mm/dd'
+        except Exception as e:
+            pass
+
+        try:
+            datetime.strptime(date_str, '%m/%d/%Y')
+            return 'mm/dd/YY'
+        except Exception as e:
+            pass
+
+        return None
+
+
+
