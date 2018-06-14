@@ -317,4 +317,3 @@ class WorkScheduleDataDAO:
         if not schedule_hour:
             schedule_hour = timedelta(hours=0)
         return schedule_hour
-

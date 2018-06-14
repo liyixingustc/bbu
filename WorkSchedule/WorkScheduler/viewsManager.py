@@ -606,5 +606,3 @@ class PageManager:
                 SmartScheduler(request, start, end).run()
 
                 return JsonResponse({})
-
-

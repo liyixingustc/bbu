@@ -31,57 +31,7 @@
         </div>
     {% endblock toolbar %}
 
-    {% block table %}
-        <table {{ table.attrs.table| safe }}>
-            {% block table.thead %}
-                <thead>
-                    <tr>
-                        {% block table_thead_before %}{% endblock table_thead_before %}
-                        {% for row in table.auto.th %}
-                            {% for column, th_attrs in row%}
-                                {% if column == 'name' %}
-                                <th data-valign="middle"
-                                    data-align="center"
-                                    {{ th_attrs|safe }}>{{ column|safe }}</th>
-                                {% else %}
-                                <th data-valign="middle"
-                                    data-align="center"
-                                    data-editable="true"
-                                    data-editable-type="text"
-                                    data-editable-title="Enter hours"
-                                    {{ th_attrs|safe }}>{{ column|safe }}</th>
-                                {% endif %}
-                            {% endfor %}
-                        {% empty %}
-                            <th>{{ table.empty_text }}</th>
-                        {% endfor %}
-                        {% block table_thead_after %}{% endblock table_thead_after %}
-                    </tr>
-                </thead>
-            {% endblock table.thead %}
-            {% block table.tbody %}
-                <tbody>
-                    {% for row in table.auto.td %}
-                    <tr>
-                        {% block table_tbody_before %}{% endblock table_tbody_before %}
-                        {% for data,td_attrs in row %}
-                                <td {{ td_attrs|safe }}{{ table.attrs.td|safe}}>{{ data|safe }}</td>
-                        {% empty %}
-                            <td>{{ table.empty_text }}</td>
-                        {% endfor %}
-                        {% block table_tbody_after %}{% endblock table_tbody_after %}
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            {% endblock table.tbody %}
-            {% block table.tfoot %}
-                <tfoot>
-                </tfoot>
-            {% endblock table.tfoot %}
-        </table>
-    {% endblock %}
-</div>
-{% endblock table_container %}
+    <div class="row" id="WorkWorkers_Panel1_Table1"></div>
 
 <style>
     .detail{
@@ -94,10 +44,6 @@
 </style>
 
 <script type="text/javascript">
-  var WorkWorkers_Panel1_Table1_container_id = "{{ table.container_id }}",
-      WorkWorkers_Panel1_Table1_id = "{{ table.table_id }}",
-      WorkWorkers_Panel1_Table1_url_detail = "{{ table.url.detail }}",
-      WorkWorkers_Panel1_Table1_url_edit = "{{ table.url.edit }}";
 
   require(["{% static 'requirejs/config.js' %}"], function (config) {
     require(["{% static 'WorkWorkers/js/WorkWorkers_Panel1_Table1.js' %}"],function(run){

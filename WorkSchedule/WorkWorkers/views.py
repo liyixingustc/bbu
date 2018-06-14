@@ -82,10 +82,8 @@ class Page:
                                 period_start = request.GET.get('PeriodStart')
                                 period_end = request.GET.get('PeriodEnd')
 
-                                tables_template_name = 'WorkWorkers/WorkWorkers_Panel1_Table1.html'
                                 data = WorkWorkersPanel1Table1Manager.set_data(period_start, period_end)
-                                table = WorkWorkersPanel1Table1(data)
-                                return render(request, tables_template_name, {'table': table})
+                                return data
 
                         elif widget == 'Table2':
                             if func == 'Create':
@@ -97,8 +95,8 @@ class Page:
 
                                 tables_template_name = 'WorkWorkers/WorkWorkers_Panel1_Table2.html'
                                 data = WorkWorkersPanel1Table2Manager.set_data(parameters)
-                                table = WorkWorkersPanel1Table2(data)
-                                return render(request, tables_template_name, {'table': table})
+
+                                return data
 
                 return JsonResponse({})
 

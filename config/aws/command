@@ -42,6 +42,19 @@ cd ~/bbu
 python3.6 -m venv .venv/bbu
 source ~/.venv/bbu/bin/activate
 
+// Yixing's comments
+sudo yum -y install python-virtualenv
+sudo yum -y install python-virtualenvwrapper
+if ! grep -q VIRTUALENV_ALREADY_ADDED ~/.bashrc; then
+      echo "# VIRTUALENV_ALREADY_ADDED" >> ~/.bashrc
+      echo "WORKON_HOME=~/.virtualenvs" >> ~/.bashrc
+      echo "PROJECT_HOME=/vagrant" >> ~/.bashrc
+      echo "source /usr/bin/virtualenvwrapper.sh" >> ~/.bashrc
+fi
+source .bashrc
+mkvirtualenv bbu --python=/usr/bin/python3.6
+
+
 // install bbu
 sudo su apache
 cd ~

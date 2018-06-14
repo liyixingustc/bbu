@@ -3,6 +3,7 @@ import pandas as pd
 from datetime import datetime as dt,timedelta
 import pytz
 from django.shortcuts import HttpResponse
+from django.http import JsonResponse
 
 from ..models.models import *
 from ...WorkConfig.models import *
@@ -15,35 +16,27 @@ class WorkWorkersPanel1Table1Manager:
     now = dt.now(tz=pytz.timezone('America/New_York'))
 
     @classmethod
-    def set_data(cls, period_start, period_end):
+    def set_data(cls,period_start, period_end):
 
-        period_start = dt.strptime(period_start,'%Y-%m-%d')
-        period_end = dt.strptime(period_end,'%Y-%m-%d')
-        period = pd.date_range(period_start,period_end)
+        workers = Workers.objects.all().values_list('name', 'company')
+        num = workers.count()
+        worker_data=workers
+        if worker_data.exists():
+            worker_data = pd.DataFrame.from_records(worker_data.values('name', 'company'))
+            worker_data = worker_data.to_dict(orient='records')
+            response = {
+                'total': num,
+                'rows': worker_data
+            }
+        else:
+            worker_data = []
+            response = {
+                'total': 0,
+                'rows': []
+            }
 
-        workers = Workers.objects.all().values_list('name')
-        workers_available = WorkerAvailable.objects.filter(date__range=[period_start, period_end]).values('name',
-                                                                                                          'date',
-                                                                                                          'duration')
-
-        workers_available = pd.DataFrame.from_records(workers_available, columns=['name', 'date', 'duration'])
-
-        for worker in workers:
-            worker = worker[0]
-            for date in period:
-                date = date.date()
-                if not ((workers_available['name'] == worker) & (workers_available['date'] == date)).any():
-                    row = pd.DataFrame([{'name': worker, 'date': date, 'duration': timedelta(hours=0)}])
-                    workers_available = pd.concat([workers_available, row], ignore_index=True)
-
-        workers_available = TableConvertor.df_week_view(workers_available)
-
-        workers_available.rename_axis({'name': 'name',
-                                       'duration': 'available'}, axis=1, inplace=True)
-
-        data = workers_available
-
-        return data
+        print(response)
+        return JsonResponse(worker_data,safe=False)
 
     @classmethod
     def edit(cls, parameters):

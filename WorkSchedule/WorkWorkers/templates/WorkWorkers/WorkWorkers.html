@@ -1,6 +1,11 @@
 {% extends 'bbu/dashboard_base.html' %}
 {% load static %}
 
+{% block table_head_css %}
+    <link rel="stylesheet" href="{% static 'bootstrap-table/dist/bootstrap-table.min.css' %}">
+    <link rel="stylesheet" href="//rawgit.com/vitalets/x-editable/master/dist/bootstrap3-editable/css/bootstrap-editable.css">
+{% endblock table_head_css %}
+
 {% block content_dashboard %}
 <div class="row">
 {% include 'WorkWorkers/WorkWorkers_Panel1.html' %}
@@ -11,7 +16,8 @@
 {% block foot_js_dashboard %}
     <script type="text/javascript">
       require(["{% static 'requirejs/config.js' %}"], function (config) {
-        require(["{% static 'WorkWorkers/js/WorkWorkers.js' %}"],function(){
+        require(["{% static 'WorkWorkers/js/WorkWorkers.js' %}"],function(run){
+          run()
         })
       });
     </script>
