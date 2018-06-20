@@ -25,11 +25,15 @@ class Page:
             if 'Form' in widget:
                 if func == 'Submit':
                     return cls.Panel.Form.submit(request, *args, **kwargs)
+                if func == 'Get_Company':
+                    return cls.Panel.Form.get_company(request, *args, **kwargs)
             if 'Table' in widget:
                 if func == 'Create':
                     return cls.Panel.Table.create(request, *args, **kwargs)
                 if func == 'Edit':
                     return cls.Panel.Table.edit(request, *args, **kwargs)
+                if func == 'Delete':
+                    return cls.Panel.Table.delete(request, *args, **kwargs)
         elif panel:
             pass
         elif page:
@@ -61,9 +65,45 @@ class Page:
                     if panel == 'Panel1':
                         if widget == 'Form1':
                             if func == 'Submit':
-                                pass
+                                #name, last_name, first_name, company, level, shirt, status, type, somax_account
+                                for key in request.POST:
+                                    print(key)
+                                    value = request.POST[key]
+                                    print(value)
+                                parameters = {}
+                                parameters['name'] = request.POST.get('name')
+                                parameters['last_name'] = request.POST.get('last_name')
+                                parameters['first_name'] = request.POST.get('first_name')
+                                parameters['company'] = request.POST.get('company')
+                                parameters['level'] = request.POST.get('level')
+                                parameters['shift'] = request.POST.get('shift')
+                                parameters['status'] = request.POST.get('status')
+                                parameters['type'] = request.POST.get('type')
+                                print(parameters)
+                                WorkWorkersPanel1Table1Manager.add_data(parameters)
+                                return JsonResponse({})
 
-                return JsonResponse({'a': 1})
+                return JsonResponse({})
+
+
+            @staticmethod
+            def get_company(request, *args, **kwargs):
+
+                page = kwargs['page']
+                panel = kwargs['panel']
+                widget = kwargs['widget']
+                func = kwargs['func']
+
+                if page == 'WorkWorkers':
+                    if panel == 'Panel1':
+                        if widget == 'Form1':
+                            if func == 'Get_Company':
+                                #name, last_name, first_name, company, level, shirt, status, type, somax_account
+                                companyslist = WorkWorkersPanel1Table1Manager.get_companys()
+                                print(companyslist)
+                                return companyslist
+
+                return JsonResponse({})
 
         class Table:
 
@@ -79,10 +119,7 @@ class Page:
                     if panel == 'Panel1':
                         if widget == 'Table1':
                             if func == 'Create':
-                                period_start = request.GET.get('PeriodStart')
-                                period_end = request.GET.get('PeriodEnd')
-
-                                data = WorkWorkersPanel1Table1Manager.set_data(period_start, period_end)
+                                data = WorkWorkersPanel1Table1Manager.set_data()
                                 return data
 
                         elif widget == 'Table2':
@@ -118,6 +155,26 @@ class Page:
                                 parameters['date'] = request.POST.get('date')
 
                                 WorkWorkersPanel1Table1Manager.edit(parameters)
+                                return JsonResponse({})
+
+                return JsonResponse({})
+
+
+            @staticmethod
+            def delete(request, *args, **kwargs):
+
+                page = kwargs['page']
+                panel = kwargs['panel']
+                widget = kwargs['widget']
+                func = kwargs['func']
+
+                if page == 'WorkWorkers':
+                    if panel == 'Panel1':
+                        if widget == 'Table1':
+                            if func == 'Delete':
+                                parameters = {}
+                                parameters['ids'] = request.POST.get('ids')
+                                data = WorkWorkersPanel1Table1Manager.delete_data(parameters)
                                 return JsonResponse({})
 
                 return JsonResponse({})

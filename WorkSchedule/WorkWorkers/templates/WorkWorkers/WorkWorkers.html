@@ -2,11 +2,12 @@
 {% load static %}
 
 {% block table_head_css %}
-    <link rel="stylesheet" href="{% static 'bootstrap-table/dist/bootstrap-table.min.css' %}">
-    <link rel="stylesheet" href="//rawgit.com/vitalets/x-editable/master/dist/bootstrap3-editable/css/bootstrap-editable.css">
 {% endblock table_head_css %}
 
 {% block content_dashboard %}
+<link rel="stylesheet" href="{% static 'bootstrap-table/dist/bootstrap-table.min.css' %}">
+<link rel="stylesheet" href="//rawgit.com/vitalets/x-editable/master/dist/bootstrap3-editable/css/bootstrap-editable.css">
+<link rel="stylesheet" src="https://npmcdn.com/react-bootstrap-table/dist/react-bootstrap-table.min.css">
 <div class="row">
 {% include 'WorkWorkers/WorkWorkers_Panel1.html' %}
 </div>

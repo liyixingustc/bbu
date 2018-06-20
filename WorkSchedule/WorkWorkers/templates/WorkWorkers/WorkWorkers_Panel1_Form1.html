@@ -1,23 +1,36 @@
-  <form method="post" id="WorkWorkersConfig-form" class="form-horizontal form-label-left">
-  {% csrf_token %}
-    <div class="form-group">
-      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="PeriodStart">Period Start<span class="required">*</span>
-      </label>
-      <div class="col-md-6 col-sm-6 col-xs-12">
-        <input type="text" id="PeriodStart" name="PeriodStart" class="form-control col-md-7 col-xs-12 datepicker" placeholder="YYYY-MM-DD" data-inputmask="'mask': '99/99/9999'" style="width:80% " required>
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="PeriodEnd">Period End<span class="required">*</span>
-      </label>
-      <div class="col-md-6 col-sm-6 col-xs-12">
-        <input type="text" id="PeriodEnd" name="PeriodEnd" class="form-control col-md-7 col-xs-12 datepicker" placeholder="YYYY-MM-DD" data-inputmask="'mask': '99/99/9999'" style="width:80% " required>
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="control-label col-md-3 col-sm-3 col-xs-12"></label>
-      <div class="col-md-6 col-sm-6 col-xs-12">
-        <button type="submit" class="btn btn-primary " id="WorkWorkersConfigSubmit">Submit</button>
-      </div>
-    </div>
+  <form method="post" id="Addworker-form" class="form-horizontal form-label-left">
+    {% csrf_token %}
+  <!-- name, last_name, first_name, company, level, shirt, status, type, somax_account -->
+  <div class="form-group">
+    <label for="namelabel">Name</label>
+    <input name="name" class="form-control" id="name" placeholder="Enter email">
+  </div>
+  <div class="form-group">
+    <label for="lastnamelabel">Last Name</label>
+    <input name="last_name" class="form-control" id="last_name" placeholder="Enter last name">
+  </div>
+  <div class="form-group">
+    <label for="firstnamelabel">First Name</label>
+    <input name="first_name" class="form-control" id="first_name" placeholder="Enter first name">
+  </div>
+  <div class="form-group">
+    <select name ="company" id="company"> Company </select>
+  </div>
+  <div class="form-group">
+    <label for="levellabel">Level</label>
+    <input name="level" class="form-control" id="level" placeholder="Enter level">
+  </div>
+  <div class="form-group">
+    <label for="typelabel">Shift</label>
+    <input name="shift" class="form-control" id="type" placeholder="Enter shift">
+  </div>
+  <div class="form-group">
+    <label for="statuslabel">Status</label>
+    <input name="status" class="form-control" id="status" placeholder="Eneter status">
+  </div>
+  <div class="form-group">
+    <label for="typelabel">Type</label>
+    <input name="type" class="form-control" id="type" placeholder="Eneter type">
+  </div>
+  <button type="submit" class="btn btn-primary" id="Addworker">Submit</button>
   </form>

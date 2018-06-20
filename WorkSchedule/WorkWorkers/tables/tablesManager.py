@@ -16,13 +16,13 @@ class WorkWorkersPanel1Table1Manager:
     now = dt.now(tz=pytz.timezone('America/New_York'))
 
     @classmethod
-    def set_data(cls,period_start, period_end):
+    def set_data(cls):
 
         workers = Workers.objects.all().values_list('name', 'company')
         num = workers.count()
         worker_data=workers
         if worker_data.exists():
-            worker_data = pd.DataFrame.from_records(worker_data.values('name', 'company'))
+            worker_data = pd.DataFrame.from_records(worker_data.values('id', 'name', 'company'))
             worker_data = worker_data.to_dict(orient='records')
             response = {
                 'total': num,
@@ -35,8 +35,24 @@ class WorkWorkersPanel1Table1Manager:
                 'rows': []
             }
 
-        print(response)
-        return JsonResponse(worker_data,safe=False)
+        return JsonResponse(response,safe=False)
+
+
+    @classmethod
+    def add_data(cls, parameters):
+        #name, last_name, first_name, company, level, shirt, status, type, somax_account
+        name = str(parameters['name'])
+        last_name = str(parameters['last_name'])
+        first_name = str(parameters['first_name'])
+        companyname = str(parameters['company'])
+        company = Company.objects.get(business_name=companyname)
+        level = str(parameters['level'])
+        shift = str(parameters['shift'])
+        status = str(parameters['status'])
+        type = str(parameters['type'])
+        worker = Workers.objects.create(name = name, last_name = last_name, first_name = first_name, company = company, level = level, shift = shift, status = status, type = type)
+        return
+
 
     @classmethod
     def edit(cls, parameters):
@@ -47,6 +63,31 @@ class WorkWorkersPanel1Table1Manager:
         name = Workers.objects.get(name= parameters['name'])
         WorkerAvailable.objects.update_or_create(name=name,date=date,
                                                  defaults={'duration':duration})
+
+        return
+
+
+    @classmethod
+    def get_companys(cls):
+        companys = Company.objects.all().values_list('business_name')
+        if companys.exists():
+            companys = pd.DataFrame.from_records(companys.values('business_name'))
+            companys = companys.to_dict(orient='records')
+            return JsonResponse(companys,safe=False)
+        return JsonResponse({})
+
+
+    @classmethod
+    def delete_data(cls, parameters):
+        parameterstr = str(parameters['ids'])
+        parameterlist = parameterstr.split(',')
+        for parameter in parameterlist:
+            parameterno = int(parameter)
+            print(parameterno)
+            #WorkerAvailable.objects.filter(name=parameter).delete()
+            worker = Workers.objects.get(id=parameterno)
+            worker.delete()
+            #WorkerAvailable.objects.update_or_create(name=name,date=date,defaults={'duration':duration})
 
         return
 
